@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+网页代码/node_modules/
+
+# Cache
+.npm-cache/
+.pnpm-store/
+
+# Build output
+网页代码/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+
+# Local scripts
+启动网页.bat
+推送到GitHub.bat
+
+# Local docs
+开发总结_中华文明探源工程.md
+
+# Lock file (GitHub Actions will install deps)
+package-lock.json

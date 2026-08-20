@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>时空探源 | 长江文化时空谱系</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "jinqi-gold": "#c9a227",
+                        "secondary-fixed-dim": "#ffb3ac",
+                        "primary-fixed-dim": "#ecc246",
+                        "on-secondary-fixed-variant": "#8a1a1a",
+                        "wood-charcoal": "#1a1108",
+                        "background": "#17130d",
+                        "surface-dim": "#17130d",
+                        "surface-container-lowest": "#120d08",
+                        "surface-tint": "#ecc246",
+                        "silk-cream": "#f0e6cc",
+                        "on-tertiary": "#35301f",
+                        "surface-container": "#241f19",
+                        "error": "#ffb4ab",
+                        "xuanshu-black": "#0d0905",
+                        "tertiary-fixed": "#ece2c8",
+                        "inverse-surface": "#ebe1d7",
+                        "secondary-fixed": "#ffdad6",
+                        "primary": "#ecc246",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#2e2923",
+                        "on-tertiary-container": "#413c2a",
+                        "surface-variant": "#3a342d",
+                        "on-primary-fixed": "#241a00",
+                        "chini-red": "#8b1a1a",
+                        "surface": "#17130d",
+                        "primary-fixed": "#ffe08e",
+                        "secondary-container": "#8e1c1c",
+                        "on-tertiary-fixed": "#201b0b",
+                        "outline": "#99907b",
+                        "on-surface": "#ebe1d7",
+                        "on-surface-variant": "#d1c5af",
+                        "on-primary-fixed-variant": "#584400",
+                        "secondary": "#ffb3ac",
+                        "on-tertiary-fixed-variant": "#4c4734",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#3a342d",
+                        "on-secondary-container": "#ff9e96",
+                        "inverse-on-surface": "#352f29",
+                        "outline-variant": "#4d4635",
+                        "tertiary": "#cfc6ad",
+                        "tertiary-fixed-dim": "#cfc6ad",
+                        "on-primary": "#3d2e00",
+                        "on-error": "#690005",
+                        "inverse-primary": "#755b00",
+                        "on-secondary": "#680007",
+                        "on-primary-container": "#4b3a00",
+                        "surface-container-low": "#201b15",
+                        "muted-gold": "#8b7a5e",
+                        "surface-bright": "#3e3832",
+                        "tertiary-container": "#afa68f",
+                        "primary-container": "#c9a227",
+                        "on-secondary-fixed": "#410003",
+                        "on-background": "#ebe1d7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "24px",
+                        "margin-desktop": "32px",
+                        "container-max": "1280px",
+                        "section-padding": "96px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "card-heading": ["Noto Serif SC"],
+                        "metadata": ["Noto Serif SC"],
+                        "body-lg": ["Noto Serif SC"],
+                        "body-md": ["Noto Serif SC"],
+                        "section-heading": ["Noto Serif SC"],
+                        "label-caps": ["Noto Serif SC"],
+                        "hero-display-mobile": ["Noto Serif SC"],
+                        "hero-display": ["Noto Serif SC"]
+                    },
+                    "fontSize": {
+                        "card-heading": ["20px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "metadata": ["10px", {"lineHeight": "14px", "letterSpacing": "0.3em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "section-heading": ["48px", {"lineHeight": "60px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.2em", "fontWeight": "400"}],
+                        "hero-display-mobile": ["48px", {"lineHeight": "56px", "fontWeight": "400"}],
+                        "hero-display": ["96px", {"lineHeight": "112px", "letterSpacing": "0.05em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0d0905;
+            color: #ebe1d7;
+            font-family: 'Noto Serif SC', serif;
+            overflow-x: hidden;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .timeline-spine {
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, #c9a227 10%, #c9a227 90%, transparent);
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            transform: translateX(-50%);
+        }
+
+        .bracket-corner {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: rgba(201, 162, 39, 0.6);
+        }
+        .bracket-tl { top: -2px; left: -2px; border-top: 1px solid; border-left: 1px solid; }
+        .bracket-br { bottom: -2px; right: -2px; border-bottom: 1px solid; border-right: 1px solid; }
+
+        .silk-overlay {
+            background: radial-gradient(circle at center, transparent 0%, rgba(13, 9, 5, 0.8) 100%),
+                        url("https://www.transparenttextures.com/patterns/silk.png");
+            opacity: 0.15;
+        }
+
+        .vanish-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(201, 162, 39, 0.4) 50%, transparent 100%);
+        }
+
+        .cinematic-zoom:hover img {
+            transform: scale(1.05);
+            transition: transform 700ms ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-xuanshu-black selection:bg-jinqi-gold selection:text-xuanshu-black">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-outline-variant/30 h-20 transition-all duration-700">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-8">
+<span class="font-hero-display-mobile text-hero-display-mobile text-jinqi-gold tracking-widest cursor-pointer">时空探源</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md text-jinqi-gold border-b-2 border-jinqi-gold pb-1 font-bold" href="#">时空探源</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-jinqi-gold transition-colors duration-300" href="#">文化遗珍</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-jinqi-gold transition-colors duration-300" href="#">探源社区</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-jinqi-gold transition-colors duration-300" href="#">个人中心</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-jinqi-gold hover:scale-105 transition-transform duration-700"><span class="material-symbols-outlined">history_edu</span></button>
+<button class="text-jinqi-gold hover:scale-105 transition-transform duration-700"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</div>
+</header>
+<main class="relative pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[80vh] flex flex-col items-center justify-center text-center overflow-hidden py-section-padding px-margin-desktop">
+<div class="absolute inset-0 silk-overlay pointer-events-none"></div>
+<div class="relative z-10 max-w-4xl mx-auto">
+<div class="mb-6 flex justify-center items-center gap-4">
+<div class="h-px w-12 bg-jinqi-gold/40"></div>
+<span class="font-metadata text-metadata uppercase tracking-[0.4em] text-jinqi-gold">The Great River Civilization</span>
+<div class="h-px w-12 bg-jinqi-gold/40"></div>
+</div>
+<h1 class="font-hero-display text-hero-display text-jinqi-gold mb-8 drop-shadow-2xl">长江文明 · 时空谱系</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                    从良渚的玉琮之光，到明清的锦绣华章。长江，这条横贯东西的文明之母，以其温润而厚重的力量，滋养了中华民族延绵不绝的文化根脉。
+                </p>
+<div class="mt-12">
+<span class="material-symbols-outlined text-jinqi-gold animate-bounce text-4xl">keyboard_double_arrow_down</span>
+</div>
+</div>
+</section>
+<!-- Timeline Section -->
+<section class="relative py-section-padding">
+<div class="timeline-spine hidden md:block"></div>
+<div class="max-w-container-max mx-auto px-margin-desktop space-y-32">
+<!-- Period 1: Liangzhu -->
+<div class="relative flex flex-col md:flex-row items-center gap-12 group">
+<div class="md:w-1/2 flex justify-center md:justify-end cinematic-zoom relative">
+<div class="relative p-1">
+<div class="bracket-corner bracket-tl"></div>
+<div class="bracket-corner bracket-br"></div>
+<img alt="Jade Cong of Liangzhu Culture" class="w-full max-w-lg aspect-[1.79] object-cover border border-jinqi-gold/15" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZnfpy9QFockXDqISFd7xgQ0383WgQf_-2wsQAgRWNLb0gAFBbAGEjharLBcdem8v8IsbKzqWzazqTMN-8doxzkjooadjh9gb8_iJtkuuOfuYcbs-vMXP1y33ouQJHyUw2c0oOMZ9B7ogV_fmvdyq12LkG0vym6J1o60uHTmF9LzFTpvjO1K_C-KtCcHxDFVLchCmhSrCjov3jTJ7TOQDY_o235xkleQQMVH6PFMAoABg_ygeyWaykizrXc2YuH2RarJ7Oaqrh-Kw"/>
+</div>
+</div>
+<!-- Timeline Node -->
+<div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center">
+<div class="w-4 h-4 rounded-full bg-jinqi-gold border-4 border-xuanshu-black shadow-[0_0_15px_rgba(201,162,39,0.8)] z-20"></div>
+<div class="h-12 w-px bg-jinqi-gold/60 mt-4"></div>
+</div>
+<div class="md:w-1/2 text-left md:pl-24">
+<span class="font-metadata text-metadata text-jinqi-gold mb-2 block">NEOLITHIC AGE / 新石器时代</span>
+<h2 class="font-section-heading text-section-heading text-jinqi-gold mb-4">良渚遗珍：玉之神邦</h2>
+<div class="inline-block px-4 py-1 border border-jinqi-gold/30 mb-6 font-metadata text-jinqi-gold">公元前3300 - 2300年</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            良渚文明以精密的大型水利系统和等级森严的玉器礼制，构筑了东亚最早的“神权国家”。玉琮，这一内圆外方的礼器，象征着良渚人对天圆地方的宇宙认知，是长江下游文明破晓时分最耀眼的华光。
+                        </p>
+<div class="mt-8 flex gap-4">
+<button class="bg-chini-red text-silk-cream px-8 py-3 font-label-caps text-label-caps hover:bg-chini-red/90 transition-all">探索遗迹</button>
+<button class="border border-jinqi-gold text-jinqi-gold px-8 py-3 font-label-caps text-label-caps hover:scale-105 transition-all">器物志</button>
+</div>
+</div>
+</div>
+<!-- Divider Glyph -->
+<div class="flex justify-center py-12">
+<span class="text-jinqi-gold opacity-60 text-2xl">◆</span>
+</div>
+<!-- Period 2: Song Dynasty -->
+<div class="relative flex flex-col md:flex-row-reverse items-center gap-12 group">
+<div class="md:w-1/2 flex justify-center md:justify-start cinematic-zoom relative">
+<div class="relative p-1">
+<div class="bracket-corner bracket-tl"></div>
+<div class="bracket-corner bracket-br"></div>
+<img alt="Song Dynasty Water Town" class="w-full max-w-lg aspect-[1.79] object-cover border border-jinqi-gold/15" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBITPxpQurCYogUif2tLADBS0vRk0a5fSR6GZ6RY3_xY78lP4xw8Jq30CvtXTrIgNuYpynfwfc1rXcjd9_3TpvJZoAJ9dnhFaTEG6aFm_mkDmTHbteGsqteW9FSYsXnXm7bGCjIf2TZ6FXYD49CsZP2karRhHOAl0p4xYsH0Zmy4NI8oOEmb1AKMiw-Kck_mLkaf2-maE3eelNuXFIXfBT0z_bMZJ9nF0YApEDmfWeDuLjMYrKilAW-WJzNTLvSrCrDXAq6t54c7-8"/>
+</div>
+</div>
+<!-- Timeline Node -->
+<div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center">
+<div class="w-4 h-4 rounded-full bg-jinqi-gold border-4 border-xuanshu-black shadow-[0_0_15px_rgba(201,162,39,0.8)] z-20"></div>
+<div class="h-12 w-px bg-jinqi-gold/60 mt-4"></div>
+</div>
+<div class="md:w-1/2 text-left md:pr-24">
+<span class="font-metadata text-metadata text-jinqi-gold mb-2 block">SONG DYNASTY / 大宋气象</span>
+<h2 class="font-section-heading text-section-heading text-jinqi-gold mb-4">江南水乡：诗意栖居</h2>
+<div class="inline-block px-4 py-1 border border-jinqi-gold/30 mb-6 font-metadata text-jinqi-gold">公元960 - 1279年</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            两宋时期，经济重心南移，长江三角洲成为繁华的中心。烟雨朦胧的水乡建筑，拱桥流水的空间布局，不仅是世俗生活的盛景，更是中国文人画中追求的平淡天真与疏远空灵。
+                        </p>
+<div class="mt-8">
+<a class="text-jinqi-gold font-body-md flex items-center gap-2 group-hover:translate-x-2 transition-transform duration-500" href="#">
+                                走入苏杭胜景 <span class="material-symbols-outlined">trending_flat</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Divider Glyph -->
+<div class="flex justify-center py-12">
+<span class="text-jinqi-gold opacity-60 text-2xl">◆</span>
+</div>
+<!-- Period 3: Ming/Qing Dynasty -->
+<div class="relative flex flex-col md:flex-row items-center gap-12 group">
+<div class="md:w-1/2 flex justify-center md:justify-end cinematic-zoom relative">
+<div class="relative p-1">
+<div class="bracket-corner bracket-tl"></div>
+<div class="bracket-corner bracket-br"></div>
+<img alt="Ming Dynasty Silk Weaving" class="w-full max-w-lg aspect-[1.79] object-cover border border-jinqi-gold/15" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcCb6Dc_Uz2KpbP2jOt0OXEViRsRoubpwyxYEBiVuC0d1qiYFLEzNYR33XY7M_QRPKhISnTqyVwoBO4_fPXxVt5H7NFLC_uhh62XM8-3lZXnvyYhaSv1K0dzWTLbcTlRJEjBpLVDPrSHxxtXawZ0L-6MnPT1dWzfC-PL0dHyqFyyWpnjVrTzMbPPiLSabapsIoHG-UZkhwGm2PV25qIbD00hAgzKvDUu5th2IV_XtsVkDu3JM7J2ZVGKsjhDbK4sXR3ClUJtF4DIg"/>
+</div>
+</div>
+<!-- Timeline Node -->
+<div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center">
+<div class="w-4 h-4 rounded-full bg-jinqi-gold border-4 border-xuanshu-black shadow-[0_0_15px_rgba(201,162,39,0.8)] z-20"></div>
+<div class="h-12 w-px bg-jinqi-gold/60 mt-4"></div>
+</div>
+<div class="md:w-1/2 text-left md:pl-24">
+<span class="font-metadata text-metadata text-jinqi-gold mb-2 block">MING &amp; QING / 锦绣明清</span>
+<h2 class="font-section-heading text-section-heading text-jinqi-gold mb-4">锦绣华章：天工开物</h2>
+<div class="inline-block px-4 py-1 border border-jinqi-gold/30 mb-6 font-metadata text-jinqi-gold">公元1368 - 1912年</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            明清时期，长江中下游的手工业达到巅峰。苏绣之精微，丝绸之华美，凝聚了千年的东方美学。这一时期的工匠不仅在织造物上复刻自然之美，更将中华礼序与生活艺术完美融合。
+                        </p>
+<div class="mt-8 grid grid-cols-2 gap-4">
+<div class="bg-wood-charcoal border border-jinqi-gold/10 p-6 relative">
+<div class="bracket-corner bracket-tl"></div>
+<h4 class="font-card-heading text-card-heading text-jinqi-gold mb-2">织造记忆</h4>
+<p class="text-xs text-muted-gold">非遗工艺的当代数字化保护</p>
+</div>
+<div class="bg-wood-charcoal border border-jinqi-gold/10 p-6 relative">
+<div class="bracket-corner bracket-tl"></div>
+<h4 class="font-card-heading text-card-heading text-jinqi-gold mb-2">地理考据</h4>
+<p class="text-xs text-muted-gold">长江流域手工业分布图谱</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Atmospheric CTA -->
+<section class="py-section-padding bg-surface-container-lowest relative overflow-hidden">
+
+<div class="max-w-4xl mx-auto px-margin-desktop text-center relative z-10">
+<div class="vanish-divider mb-12"></div>
+<h3 class="font-section-heading text-section-heading text-jinqi-gold mb-6">探寻尚未揭晓的源头</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-12">
+                    文明的河流从未停歇。加入时空探源计划，与我们一同绘制中华文明的完整版图。
+                </p>
+<div class="flex flex-col sm:flex-row justify-center gap-6">
+<button class="bg-chini-red text-silk-cream px-12 py-4 font-label-caps text-label-caps shadow-2xl hover:scale-105 transition-all">加入探源社区</button>
+<button class="border border-jinqi-gold text-jinqi-gold px-12 py-4 font-label-caps text-label-caps hover:bg-jinqi-gold/10 transition-all">获取学术报告</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-xuanshu-black border-t border-jinqi-gold/15">
+<div class="w-full py-section-padding px-margin-desktop flex flex-col items-center gap-8 max-w-container-max mx-auto">
+<div class="font-hero-display-mobile text-hero-display-mobile text-jinqi-gold tracking-widest">时空探源</div>
+<div class="flex flex-wrap justify-center gap-8 md:gap-16">
+<a class="font-metadata text-metadata uppercase tracking-[0.3em] text-muted-gold hover:text-silk-cream transition-colors duration-300" href="#">关于我们</a>
+<a class="font-metadata text-metadata uppercase tracking-[0.3em] text-muted-gold hover:text-silk-cream transition-colors duration-300" href="#">学术支持</a>
+<a class="font-metadata text-metadata uppercase tracking-[0.3em] text-muted-gold hover:text-silk-cream transition-colors duration-300" href="#">版权声明</a>
+<a class="font-metadata text-metadata uppercase tracking-[0.3em] text-muted-gold hover:text-silk-cream transition-colors duration-300" href="#">联系我们</a>
+</div>
+<div class="vanish-divider w-full max-w-2xl opacity-30"></div>
+<p class="font-metadata text-metadata uppercase tracking-[0.3em] text-jinqi-gold opacity-80 text-center">
+                © 2024 时空探源 TIME-SPACE EXPLORATION. 传承华夏文明，赓续大汉气象。
+            </p>
+</div>
+</footer>
+<script>
+        // Micro-interaction for scroll fade-in
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-12');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.group').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-12', 'transition-all', 'duration-[1200ms]', 'ease-out');
+            observer.observe(el);
+        });
+
+        // Sticky header transition
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('bg-background/95', 'h-16');
+                header.classList.remove('h-20');
+            } else {
+                header.classList.remove('bg-background/95', 'h-16');
+                header.classList.add('h-20');
+            }
+        });
+    </script>
+</body></html>

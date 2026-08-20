@@ -1,0 +1,465 @@
+<!DOCTYPE html><html class="dark" lang="zh"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>探源社区 - 游客动态广场</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#410003",
+                    "on-primary-fixed-variant": "#584400",
+                    "tertiary-container": "#afa68f",
+                    "surface-container-highest": "#3a342d",
+                    "outline": "#99907b",
+                    "error": "#ffb4ab",
+                    "surface-container-low": "#201b15",
+                    "surface-tint": "#ecc246",
+                    "on-surface": "#ebe1d7",
+                    "on-surface-variant": "#d1c5af",
+                    "secondary-fixed-dim": "#ffb3ac",
+                    "tertiary-fixed": "#ece2c8",
+                    "on-background": "#ebe1d7",
+                    "wood-charcoal": "#1a1108",
+                    "surface": "#17130d",
+                    "primary": "#ecc246",
+                    "surface-bright": "#3e3832",
+                    "primary-fixed-dim": "#ecc246",
+                    "chini-red": "#8b1a1a",
+                    "surface-dim": "#17130d",
+                    "on-secondary-fixed-variant": "#8a1a1a",
+                    "on-secondary": "#680007",
+                    "inverse-surface": "#ebe1d7",
+                    "muted-gold": "#8b7a5e",
+                    "background": "#17130d",
+                    "secondary": "#ffb3ac",
+                    "jinqi-gold": "#c9a227",
+                    "silk-cream": "#f0e6cc",
+                    "secondary-container": "#8e1c1c",
+                    "on-tertiary": "#35301f",
+                    "error-container": "#93000a",
+                    "inverse-on-surface": "#352f29",
+                    "surface-container": "#241f19",
+                    "tertiary": "#cfc6ad",
+                    "primary-container": "#c9a227",
+                    "on-tertiary-fixed": "#201b0b",
+                    "on-tertiary-container": "#413c2a",
+                    "tertiary-fixed-dim": "#cfc6ad",
+                    "primary-fixed": "#ffe08e",
+                    "secondary-fixed": "#ffdad6",
+                    "outline-variant": "#4d4635",
+                    "on-error-container": "#ffdad6",
+                    "xuanshu-black": "#0d0905",
+                    "on-primary": "#3d2e00",
+                    "surface-container-high": "#2e2923",
+                    "surface-variant": "#3a342d",
+                    "on-primary-fixed": "#241a00",
+                    "on-error": "#690005",
+                    "surface-container-lowest": "#120d08",
+                    "on-tertiary-fixed-variant": "#4c4734",
+                    "inverse-primary": "#755b00",
+                    "on-primary-container": "#4b3a00",
+                    "on-secondary-container": "#ff9e96"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "24px",
+                    "section-padding": "96px"
+            },
+            "fontFamily": {
+                    "body-lg": [
+                            "Noto Serif SC"
+                    ],
+                    "metadata": [
+                            "Noto Serif SC"
+                    ],
+                    "label-caps": [
+                            "Noto Serif SC"
+                    ],
+                    "hero-display-mobile": [
+                            "Noto Serif SC"
+                    ],
+                    "section-heading": [
+                            "Noto Serif SC"
+                    ],
+                    "hero-display": [
+                            "Noto Serif SC"
+                    ],
+                    "card-heading": [
+                            "Noto Serif SC"
+                    ],
+                    "body-md": [
+                            "Noto Serif SC"
+                    ]
+            },
+            "fontSize": {
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "metadata": [
+                            "10px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.3em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.2em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "hero-display-mobile": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "section-heading": [
+                            "48px",
+                            {
+                                    "lineHeight": "60px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "hero-display": [
+                            "96px",
+                            {
+                                    "lineHeight": "112px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "card-heading": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #0d0905;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            color: #ebe1d7;
+            font-family: 'Noto Serif SC', serif;
+        }
+        
+        .bg-card {
+            background-color: #1a1108;
+            border: 1px solid rgba(201, 162, 39, 0.15);
+            position: relative;
+        }
+        
+        .corner-bracket {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: #c9a227;
+        }
+        
+        .bracket-tl { top: -1px; left: -1px; border-top: 1px solid; border-left: 1px solid; }
+        .bracket-tr { top: -1px; right: -1px; border-top: 1px solid; border-right: 1px solid; }
+        .bracket-bl { bottom: -1px; left: -1px; border-bottom: 1px solid; border-left: 1px solid; }
+        .bracket-br { bottom: -1px; right: -1px; border-bottom: 1px solid; border-right: 1px solid; }
+
+        .btn-primary {
+            background-color: #8b1a1a;
+            color: #f0e6cc;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            border: 1px solid #c9a227;
+            color: #c9a227;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            transform: scale(1.02);
+            background-color: rgba(201, 162, 39, 0.05);
+        }
+
+        .gold-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.4), transparent);
+        }
+        
+        .vertical-axis {
+            width: 1px;
+            background-color: rgba(201, 162, 39, 0.15);
+        }
+
+        .hover-zoom img {
+            transition: transform 700ms ease;
+        }
+        .hover-zoom:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative">
+<!-- Top Navigation -->
+<nav class="bg-surface/80 dark:bg-surface/80 backdrop-blur-xl font-body-lg text-body-lg docked full-width top-0 sticky z-50 border-b border-outline-variant/30 flat no shadows transition-all duration-300 ease-in-out">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-16">
+<div class="font-section-heading text-section-heading-mobile tracking-widest text-primary dark:text-primary">
+                探源社区
+            </div>
+<div class="hidden md:flex items-center gap-8 ml-auto"><a class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity" href="#">时空探源</a><a class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity" href="#">文化遗珍</a><a class="text-primary font-bold border-b-2 border-primary pb-1 hover:opacity-80 transition-opacity" href="#">探源社区</a><a class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity" href="#">个人中心</a></div>
+<div class="flex items-center gap-4">
+<button class="text-primary dark:text-primary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-primary dark:text-primary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- Main Layout -->
+<div class="flex-grow flex flex-col items-center w-full">
+<!-- Hero Section -->
+<header class="w-full relative h-[400px] flex flex-col justify-center items-center overflow-hidden border-b border-outline-variant/20">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-t from-xuanshu-black via-transparent to-xuanshu-black z-10"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-xuanshu-black via-transparent to-xuanshu-black z-10"></div>
+<img class="w-full h-full object-cover opacity-40" data-alt="A majestic aerial view of an ancient Han Dynasty ruin at twilight. The scene is illuminated by dramatic, moody lighting with deep shadows and golden hour highlights. The atmosphere is solemn and historically profound, featuring intricate architectural remains amidst a rugged landscape. High contrast, cinematic composition, imperial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGOWXrg-iu2TcYWM_mJl9FdoaiWh7nqlKF2SIS9KgAj5Wx4-y00-pCebNCXsWRwRHOXiUPbVCqSIKu5Gzfa-QxlZK_fXpXzZn2x0Jo_ES7lAqJm2UvgyV5pZodeJvJkHpbsGVcTWSQoPiXNxMm3CDjYo_jTdug-Kt5pGM-MwLh3TZsp-AlVtD3c1p8tGXnsGFMffXTF43HjcjD6tgzA5Wp1DGv-8bEdCwZnfeIywNVIXJ88cI-C_64Xsy2GvgDRQMPYpYxmmXIZdY">
+</div>
+<div class="relative z-20 text-center px-4 max-w-3xl">
+<div class="flex items-center justify-center gap-4 mb-6">
+<div class="h-[1px] w-12 bg-jinqi-gold/50"></div>
+<span class="text-jinqi-gold font-metadata uppercase tracking-widest text-metadata">社 区 广 场</span>
+<div class="h-[1px] w-12 bg-jinqi-gold/50"></div>
+</div>
+<h1 class="font-hero-display-mobile md:font-hero-display text-hero-display-mobile md:text-hero-display text-silk-cream mb-6 tracking-wider shadow-sm">
+                    大汉气象 · 众志成城
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+                    汇聚天下名士，共话历史寻源。此处交流考古游历、分享研究心得，传承不息之汉风文化。
+                </p>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="w-full max-w-container-max px-margin-mobile md:px-margin-desktop py-12 flex flex-col lg:flex-row gap-8 relative">
+<!-- Structural Vertical Axis Lines (Decorative) -->
+<div class="hidden lg:block absolute top-0 bottom-0 left-[25%] vertical-axis z-0"></div>
+<div class="hidden lg:block absolute top-0 bottom-0 left-[50%] vertical-axis z-0"></div>
+<div class="hidden lg:block absolute top-0 bottom-0 left-[75%] vertical-axis z-0"></div>
+<!-- Left/Center Column: Dynamic Waterfall Feed (Simulated Masonry) -->
+<div class="w-full lg:w-3/4 z-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Card 1 -->
+<article class="bg-card p-6 flex flex-col gap-4">
+<div class="corner-bracket bracket-tl"></div>
+<div class="corner-bracket bracket-br"></div>
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border border-jinqi-gold/30 object-cover" data-alt="A macro shot of an intricate Han Dynasty jade artifact, glowing softly under museum lighting against a pitch-black background. Imperial brutalism style, high contrast, golden reflections, deep shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfQvCYJ_YBHTbKW2VzZlV5x2radG7Kgzi_-NX5UeV42JiopcOUL6d4RF7WT7EFQzJ2pC0UspHtXnhY_TZP0VbGivf7janDDE4q0DMLGULHBkNWaWz8ognrUVpLZncNSNK5YCjlOkSmRp-Qnb4XnI8CUUwnAQBQ4kdrgpOeNjZ__Wn_qBoE9t3CenhrhWxoU1KpBHTX58uvAeXXqAH8W8RZpfJ0rClbAlOiIIQLgAuRvOavsDWgA2E74QtXnPqwSWcETeDoyiI1N90">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-card-heading text-card-heading text-silk-cream">子曰无云</span>
+<span class="px-2 py-0.5 border border-chini-red text-chini-red text-[10px] tracking-wider rounded-sm">校书郎</span>
+</div>
+<span class="font-metadata text-metadata text-muted-gold">丁酉年 · 秋</span>
+</div>
+</div>
+<h3 class="font-body-lg text-body-lg text-primary font-bold">良渚遗址：跨越千年的对话</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">
+                            今日漫步良渚，见玉琮之精美，叹古人之智慧。天地之圆方，尽在方寸之间。那些斑驳的痕迹，仿佛在低语一段被遗忘的史诗。
+                        </p>
+<div class="hover-zoom overflow-hidden border border-outline-variant/30 rounded-sm mt-2">
+<img class="w-full h-48 object-cover" data-alt="A beautifully lit, high-resolution photograph of a Han Dynasty jade cong (cylindrical artifact with square outer section). Placed on a dark, textured slate surface. Dramatic, moody spotlighting highlighting the intricate carvings and translucent green hue of the jade. Imperial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAi_5YJo7SMA2bO7AeNgbu3htxssai0_Y7w0BjH_obqbX7q_XhEG7MD4oJ0nzaDiCEL6kjY79KhRBtKinHXkdtwo-MqUMB4ioZs1HgqnRZ0XOIU7F6aIZNxHNWr6BTost5zul7BQLPivC-PqL5lvFkGTPzJzKFa7ZptQ7yvstnNUkSbbw12ryg5trx2WjXTvyN1TD1s8BVgvpiW_oWNneLpP6sdozVA4t7l89bW9c44WH_-4vLLyItzqlq7j2LAn8BuNVP2k8MuSA">
+</div>
+<div class="gold-divider my-2"></div>
+<div class="flex justify-between items-center text-muted-gold font-body-md text-sm">
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">favorite</span> 124</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">chat_bubble</span> 42</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-card p-6 flex flex-col gap-4">
+<div class="corner-bracket bracket-tl"></div>
+<div class="corner-bracket bracket-br"></div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-jinqi-gold/30 bg-surface-container flex items-center justify-center text-jinqi-gold font-bold">
+                                汉
+                            </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-card-heading text-card-heading text-silk-cream">长安客</span>
+<span class="px-2 py-0.5 border border-jinqi-gold text-jinqi-gold text-[10px] tracking-wider rounded-sm">廷尉</span>
+</div>
+<span class="font-metadata text-metadata text-muted-gold">三日前</span>
+</div>
+</div>
+<h3 class="font-body-lg text-body-lg text-primary font-bold">寻访未央宫遗址</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                            残阳如血，秋风瑟瑟。立于未央宫前殿基址之上，遥想当年万国来朝之盛况，不禁令人唏嘘。岁月流转，唯有这厚重的夯土，依然诉说着大汉的荣耀。
+                        </p>
+<div class="gold-divider my-2"></div>
+<div class="flex justify-between items-center text-muted-gold font-body-md text-sm">
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">favorite</span> 89</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">chat_bubble</span> 15</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-card p-6 flex flex-col gap-4">
+<div class="corner-bracket bracket-tl"></div>
+<div class="corner-bracket bracket-br"></div>
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border border-jinqi-gold/30 object-cover" data-alt="A close up of an ancient Chinese bronze mirror back, highly detailed, deep metallic tones, dark moody lighting, museum quality photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5KVCZTBOOfrb0NQQxpRxoCzdR6sNyS0WtkrWqBu3arNzeBjC3ub01O9t_4nXDtGtT--43v5FKh6XlTJrYazdBrA1LNR1ravkRhAGrb2llydr6nO5-M3yIejllyZ3yiawRfbKOi1tmqTIIcJqcWXop62JGQ_fOuciNinsY5tBoWzdY7Ymq-x_As39DYJ1Tr-Bv94O1fbXGLQae-899j7TX6s7qV7lO_fPrhy7GzE0FjdjPL7-ZHW-wp3VFCjdmEhBOQFUwBHdDXLw">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-card-heading text-card-heading text-silk-cream">青铜鉴</span>
+<span class="px-2 py-0.5 border border-outline-variant text-outline-variant text-[10px] tracking-wider rounded-sm">书生</span>
+</div>
+<span class="font-metadata text-metadata text-muted-gold">七日之前</span>
+</div>
+</div>
+<h3 class="font-body-lg text-body-lg text-primary font-bold">考工记札记：青铜铸造之秘</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                            近期研读《考工记》，对先秦至汉代的青铜合金配比有了新的感悟。“金有六齐”，古人的冶金技术实乃令人惊叹。附上几张新摄入的馆藏错金银铜器细节图，供同好赏析。
+                        </p>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="hover-zoom overflow-hidden border border-outline-variant/30 rounded-sm h-24">
+<img class="w-full h-full object-cover" data-alt="Extreme macro shot of gold inlay on a dark oxidized bronze artifact from Han Dynasty. Intense contrast, deep black background, shimmering gold details, museum aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxIWlGAOHC0UrLJQemntav3YJPPUDi6AIS9-7_6UF67YhUkbEkfFziqmgzUta7_4AobhBmOFDWC07FEGBOXkRilSKk81r-aUHAxQwgvTUA82Pt2FIQfc0eYxfrKp4p4FgLjtchWsZABXn1w27GahDyOWxxLrzMsIWBo0fFEBvOeWcW_Pqywkah7wh7i2jbiweBxbeY_VNHIn0rldZgxAdjOzlKLnmdOqfIeIOK_fyGEYxEA_N2u75Pvii_VqMfxHv_DTMMMHaMZjE">
+</div>
+<div class="hover-zoom overflow-hidden border border-outline-variant/30 rounded-sm h-24">
+<img class="w-full h-full object-cover" data-alt="Macro photography of ancient Chinese bronze patina and geometric patterns, moody lighting, dark background, highly detailed texture, historical artifact." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5idb6W2sfMwsw_DgqEClWYtPlLRj2TpucRh6Dq90i7wnQtJVWRQIJmd818QpP2gm_kT5t3JN43j0mnOLIK5pX8iV5uzSWNqzP4cgVt2RTZ8jCQwVv-wiPhRsrg70Ea9XqQ-783CfExhpeBYV-M-URi6_Wkxrtf8OUBajvwufWK1qDpM_1RFTnX1Brv7iXws7YWao3wOZp9sv7EOod5IrlIE5er8TsdoRUDgPwZonw6E2NhFvWfHZdXl9hw49HII3TuYIGUEbEp8A">
+</div>
+</div>
+<div class="gold-divider my-2"></div>
+<div class="flex justify-between items-center text-muted-gold font-body-md text-sm">
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">favorite</span> 210</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">chat_bubble</span> 67</button>
+<button class="flex items-center gap-1 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">share</span></button>
+</div>
+</article>
+</div>
+</div>
+<!-- Right Sidebar -->
+<aside class="w-full lg:w-1/4 flex flex-col gap-8 z-10">
+<!-- CTA Button -->
+<button class="w-full py-4 bg-gradient-to-r from-[#5a461c] to-[#3d2e00] border border-jinqi-gold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(201,162,39,0.15)] relative overflow-hidden group">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23c9a227\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E')] opacity-50 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-primary relative z-10">draw</span>
+<span class="font-card-heading text-card-heading text-primary font-bold tracking-widest relative z-10">撰写游记</span>
+</button>
+<!-- Trending Topics -->
+<div class="bg-card p-6">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-jinqi-gold">trending_up</span>
+<h4 class="font-card-heading text-card-heading text-silk-cream border-b border-jinqi-gold/30 pb-1 w-full flex justify-between">
+                            热门话题
+                        </h4>
+</div>
+<ul class="flex flex-col gap-3 font-body-md text-sm">
+<li class="flex justify-between items-center group cursor-pointer">
+<span class="text-on-surface-variant group-hover:text-primary group-hover:translate-x-1 transition-all">#良渚玉器之美#</span>
+<span class="text-muted-gold font-metadata">1.2w 讨论</span>
+</li>
+<li class="flex justify-between items-center group cursor-pointer">
+<span class="text-on-surface-variant group-hover:text-primary group-hover:translate-x-1 transition-all">#寻找失落的都城#</span>
+<span class="text-muted-gold font-metadata">8k 讨论</span>
+</li>
+<li class="flex justify-between items-center group cursor-pointer">
+<span class="text-on-surface-variant group-hover:text-primary group-hover:translate-x-1 transition-all">#汉代画像石解析#</span>
+<span class="text-muted-gold font-metadata">5.4k 讨论</span>
+</li>
+</ul>
+</div>
+<!-- Recommended Experts -->
+<div class="bg-card p-6">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-jinqi-gold">workspace_premium</span>
+<h4 class="font-card-heading text-card-heading text-silk-cream border-b border-jinqi-gold/30 pb-1 w-full">
+                            推荐名士
+                        </h4>
+</div>
+<div class="flex flex-col gap-4 mt-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-bright border border-outline-variant flex items-center justify-center text-muted-gold">
+<span class="material-symbols-outlined text-[16px]">account_balance</span>
+</div>
+<div>
+<div class="font-body-md text-silk-cream text-sm font-bold">李教授</div>
+<div class="font-metadata text-muted-gold text-[10px]">汉文化研究院</div>
+</div>
+</div>
+<button class="btn-outline px-3 py-1 text-xs font-body-md rounded-sm">关注</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-bright border border-outline-variant flex items-center justify-center text-muted-gold">
+<span class="material-symbols-outlined text-[16px]">explore</span>
+</div>
+<div>
+<div class="font-body-md text-silk-cream text-sm font-bold">风中游侠</div>
+<div class="font-metadata text-muted-gold text-[10px]">资深探险家</div>
+</div>
+</div>
+<button class="btn-outline px-3 py-1 text-xs font-body-md rounded-sm">关注</button>
+</div>
+</div>
+</div>
+</aside>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest font-metadata text-metadata uppercase font-label-caps text-label-caps text-jinqi-gold w-full py-12 border-t border-outline-variant/10 flat no shadows flex flex-col items-center gap-4 w-full mt-section-padding opacity-80 hover:opacity-100 transition-opacity text-muted-gold dark:text-muted-gold relative z-20">
+<div class="flex gap-6">
+<a class="text-outline hover:text-primary transition-colors" href="#">关于我们</a>
+<a class="text-outline hover:text-primary transition-colors" href="#">文物公约</a>
+<a class="text-outline hover:text-primary transition-colors" href="#">版权申明</a>
+<a class="text-outline hover:text-primary transition-colors" href="#">加入我们</a>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-jinqi-gold text-[16px] leading-none">◆</span>
+<span class="">© 2024 探源社区 - 大汉气象 传承不息</span>
+<span class="text-jinqi-gold text-[16px] leading-none">◆</span>
+</div>
+</footer>
+
+
+</body></html>

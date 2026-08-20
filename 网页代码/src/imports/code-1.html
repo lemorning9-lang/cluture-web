@@ -1,0 +1,358 @@
+<!DOCTYPE html><html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>文化遗珍 - 时空探源</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#201b0b",
+                    "secondary-fixed-dim": "#ffb3ac",
+                    "secondary": "#ffb3ac",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#ecc246",
+                    "surface-variant": "#3a342d",
+                    "error": "#ffb4ab",
+                    "on-background": "#ebe1d7",
+                    "on-primary-fixed": "#241a00",
+                    "outline": "#99907b",
+                    "on-primary-fixed-variant": "#584400",
+                    "surface-container": "#241f19",
+                    "on-secondary": "#680007",
+                    "wood-charcoal": "#1a1108",
+                    "error-container": "#93000a",
+                    "outline-variant": "#4d4635",
+                    "tertiary": "#cfc6ad",
+                    "on-surface": "#ebe1d7",
+                    "surface-bright": "#3e3832",
+                    "on-tertiary-fixed-variant": "#4c4734",
+                    "inverse-primary": "#755b00",
+                    "tertiary-fixed": "#ece2c8",
+                    "on-secondary-container": "#ff9e96",
+                    "secondary-container": "#8e1c1c",
+                    "surface-tint": "#ecc246",
+                    "tertiary-fixed-dim": "#cfc6ad",
+                    "surface-container-low": "#201b15",
+                    "on-error-container": "#ffdad6",
+                    "inverse-on-surface": "#352f29",
+                    "secondary-fixed": "#ffdad6",
+                    "surface-container-highest": "#3a342d",
+                    "tertiary-container": "#afa68f",
+                    "chini-red": "#8b1a1a",
+                    "on-primary": "#3d2e00",
+                    "jinqi-gold": "#c9a227",
+                    "inverse-surface": "#ebe1d7",
+                    "on-secondary-fixed-variant": "#8a1a1a",
+                    "background": "#17130d",
+                    "surface-container-high": "#2e2923",
+                    "on-tertiary": "#35301f",
+                    "on-surface-variant": "#d1c5af",
+                    "xuanshu-black": "#0d0905",
+                    "primary-fixed": "#ffe08e",
+                    "primary": "#ecc246",
+                    "primary-container": "#c9a227",
+                    "silk-cream": "#f0e6cc",
+                    "surface-container-lowest": "#120d08",
+                    "on-secondary-fixed": "#410003",
+                    "surface": "#17130d",
+                    "muted-gold": "#8b7a5e",
+                    "on-primary-container": "#4b3a00",
+                    "surface-dim": "#17130d",
+                    "on-tertiary-container": "#413c2a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "section-padding": "96px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": [
+                            "Noto Serif SC"
+                    ],
+                    "section-heading": [
+                            "Noto Serif SC"
+                    ],
+                    "body-lg": [
+                            "Noto Serif SC"
+                    ],
+                    "metadata": [
+                            "Noto Serif SC"
+                    ],
+                    "hero-display": [
+                            "Noto Serif SC"
+                    ],
+                    "card-heading": [
+                            "Noto Serif SC"
+                    ],
+                    "body-md": [
+                            "Noto Serif SC"
+                    ],
+                    "hero-display-mobile": [
+                            "Noto Serif SC"
+                    ]
+            },
+            "fontSize": {
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.2em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "section-heading": [
+                            "48px",
+                            {
+                                    "lineHeight": "60px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "metadata": [
+                            "10px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.3em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "hero-display": [
+                            "96px",
+                            {
+                                    "lineHeight": "112px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "card-heading": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "hero-display-mobile": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .water-mask {
+            mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 50 Q 25 25, 50 50 T 100 50 L 100 100 L 0 100 Z" fill="black" opacity="0.1"/></svg>');
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0 50 Q 25 25, 50 50 T 100 50 L 100 100 L 0 100 Z" fill="black" opacity="0.1"/></svg>');
+            mask-size: cover;
+            -webkit-mask-size: cover;
+        }
+        .cloud-pattern {
+            background-image: radial-gradient(circle at 100% 150%, transparent 20%, rgba(201, 162, 39, 0.05) 21%, rgba(201, 162, 39, 0.05) 34%, transparent 35%, transparent),
+                              radial-gradient(circle at 0% 150%, transparent 20%, rgba(201, 162, 39, 0.05) 21%, rgba(201, 162, 39, 0.05) 34%, transparent 35%, transparent);
+            background-size: 60px 60px;
+        }
+        
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 24px;
+        }
+        @media (min-width: 768px) {
+            .masonry-grid { column-count: 2; }
+        }
+        @media (min-width: 1024px) {
+            .masonry-grid { column-count: 3; }
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 24px;
+        }
+        .gold-gradient-divider {
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.5), transparent);
+            height: 1px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen relative overflow-x-hidden">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-xuanshu-black/80 backdrop-blur-xl border-b border-jinqi-gold/20 shadow-none hidden md:flex">
+<div class="flex items-center gap-8">
+<span class="font-section-heading text-card-heading text-jinqi-gold tracking-widest">时空探源 Time-Space Exploration</span>
+</div>
+<div class="flex items-center gap-6 font-body-md text-body-md ml-auto">
+<a class="text-on-surface-variant hover:text-jinqi-gold transition-all duration-300 px-3 py-1 rounded-md" href="#">时空探源</a>
+<a class="text-jinqi-gold font-bold border-b-2 border-jinqi-gold pb-1 transition-all" href="#">文化遗珍</a>
+<a class="text-on-surface-variant hover:text-jinqi-gold transition-all duration-300 px-3 py-1 rounded-md" href="#">探源社区</a>
+<a class="text-on-surface-variant hover:text-jinqi-gold transition-all duration-300 px-3 py-1 rounded-md" href="#">个人中心</a>
+<div class="flex items-center gap-4 text-jinqi-gold ml-4">
+<button class="hover:bg-wood-charcoal/50 p-2 rounded-full transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+</button>
+<button class="hover:bg-wood-charcoal/50 p-2 rounded-full transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history_edu</span>
+</button>
+<button class="hover:bg-wood-charcoal/50 p-2 rounded-full transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-28 md:pt-36 pb-32 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto relative z-10">
+<!-- Header Section -->
+<header class="mb-8 text-center md:text-left relative">
+<div class="absolute inset-0 cloud-pattern opacity-50 pointer-events-none"></div>
+<h1 class="font-hero-display-mobile md:font-section-heading text-hero-display-mobile md:text-section-heading text-jinqi-gold mb-4">文化遗珍</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto md:mx-0">探索中华古代工艺与美学的巅峰。发现跨越千年的琢玉、彩陶与青铜铸造背后的故事。</p>
+</header>
+<div class="gold-gradient-divider mb-8"></div>
+<!-- Filter Bar -->
+<div class="mb-10 flex flex-wrap gap-4 items-center justify-center md:justify-start sticky top-20 z-30 bg-background/90 py-4 backdrop-blur-sm">
+<button class="filter-btn px-6 py-2 rounded-full bg-jinqi-gold text-xuanshu-black font-body-md text-body-md shadow-sm active:scale-95 transition-all">全部活动</button>
+<button class="filter-btn px-6 py-2 rounded-full border border-jinqi-gold/30 text-muted-gold font-body-md text-body-md hover:border-jinqi-gold hover:text-jinqi-gold bg-wood-charcoal shadow-sm active:scale-95 transition-all">传统手工艺</button>
+<button class="filter-btn px-6 py-2 rounded-full border border-jinqi-gold/30 text-muted-gold font-body-md text-body-md hover:border-jinqi-gold hover:text-jinqi-gold bg-wood-charcoal shadow-sm active:scale-95 transition-all">礼乐歌舞</button>
+<button class="filter-btn px-6 py-2 rounded-full border border-jinqi-gold/30 text-muted-gold font-body-md text-body-md hover:border-jinqi-gold hover:text-jinqi-gold bg-wood-charcoal shadow-sm active:scale-95 transition-all">祭祀文化</button>
+<button class="filter-btn px-6 py-2 rounded-full border border-jinqi-gold/30 text-muted-gold font-body-md text-body-md hover:border-jinqi-gold hover:text-jinqi-gold bg-wood-charcoal shadow-sm active:scale-95 transition-all">古代建筑</button>
+</div>
+<!-- Masonry Grid Gallery -->
+<div class="masonry-grid">
+<!-- Card 1: Liangzhu Jade -->
+<article class="masonry-item bg-wood-charcoal rounded-xl shadow-md border border-jinqi-gold/20 overflow-hidden group cursor-pointer hover:border-jinqi-gold/60 hover:shadow-[0_0_15px_rgba(201,162,39,0.2)] transition-all duration-300 transform hover:-translate-y-1">
+<div class="relative h-72 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A highly detailed close-up of a Liangzhu jade cong artifact. The jade is a pale, milky green with intricate, micro-carved taotie mask motifs. Soft, directional museum lighting highlights the polished, smooth texture and the precise craftsmanship. The background is a dark, stately charcoal, creating a sophisticated, scholarly aesthetic characteristic of a high-end cultural exhibit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMv_Y099LBpqDhQ_ER2JVMs_9HjepFhw1S4uRKIu_s-mMMo1ZSC3r4VSz5z9-h78n-Kj8j6Ux4eqIObLZ2dWnt_DgTrukuskyLPVYAOaSZSMs9dd23gQanrR1xn0OxKDeZ_-BYhMVAV2LGa2DguKyBUnuE4Mn3IGazSVOGsWMZcfQX87ia86QAPBsMLuZj9LhwNW1zfWhX1z3kgveipKJCp-zwZRJgw3VL3K36CnxRiJ_LTT5S764zlan7XcqqagNtRO0Fv5bsA7Q">
+<div class="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-jinqi-gold" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-label-caps text-jinqi-gold">4.9</span>
+</div>
+<div class="absolute bottom-4 right-4 bg-xuanshu-black/90 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 shadow-sm">
+<span class="font-label-caps text-label-caps text-jinqi-gold">手工</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-card-heading text-card-heading text-jinqi-gold mb-2 group-hover:text-primary transition-colors">良渚琢玉体验</h3>
+<p class="font-body-md text-body-md text-silk-cream/80 line-clamp-3">学习古代琢玉技法，亲手体验良渚玉琮的制作过程，感受精雕细琢的工匠精神。</p>
+</div>
+</article>
+<!-- Card 2: Yangshao Pottery -->
+<article class="masonry-item bg-wood-charcoal rounded-xl shadow-md border border-jinqi-gold/20 overflow-hidden group cursor-pointer hover:border-jinqi-gold/60 hover:shadow-[0_0_15px_rgba(201,162,39,0.2)] transition-all duration-300 transform hover:-translate-y-1">
+<div class="relative h-96 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An exquisite piece of Yangshao painted pottery, a large bowl with vibrant black and red geometric and fish motifs on an earthen orange base. The pottery sits on a wooden pedestal in a serene, warmly lit minimalist setting. The lighting casts soft shadows, emphasizing the organic curve of the bowl and the raw, tactile texture of the ancient clay, conveying a stately, historical mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrhQB7gb1fc72DKxoX68wmL5TY6n8MKLCiAOAuEzCYlEkHGDzKciyvDsRcdsUEq3zd4EQsIV0lzztGvAUqgE7gSnIaKx8ptG43Ox1WQJ9EX4y7bSYOPiix-7M5xw0iYfW2rnY_68BINEoWSxJTbcCer7jDuXnyE5n4ZXUmWF9GXxzZu0ayN0XwYtA6XgcDhB2M2WA8rfPYLaNRRyBIlU9VBGuXNARWphQU_g_ypF2IMi9kzCo57jeKzQGyC1Yj8vLRfGujuyiOzMI">
+<div class="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-jinqi-gold" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-label-caps text-jinqi-gold">4.8</span>
+</div>
+<div class="absolute bottom-4 right-4 bg-xuanshu-black/90 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 shadow-sm">
+<span class="font-label-caps text-label-caps text-jinqi-gold">手工</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-card-heading text-card-heading text-jinqi-gold mb-2 group-hover:text-primary transition-colors">仰韶彩陶彩绘</h3>
+<p class="font-body-md text-body-md text-silk-cream/80 mb-4">领略仰韶文化的艺术魅力。学习绘制复杂的几何图案与鱼纹，在陶器上运用天然矿物颜料。</p>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+<span class="font-label-caps text-label-caps">查看图集</span>
+</div>
+</div>
+</article>
+<!-- Card 3: Bianzhong Music -->
+<article class="masonry-item bg-wood-charcoal rounded-xl shadow-md border border-jinqi-gold/20 overflow-hidden group cursor-pointer hover:border-jinqi-gold/60 hover:shadow-[0_0_15px_rgba(201,162,39,0.2)] transition-all duration-300 transform hover:-translate-y-1">
+<div class="relative h-64 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A grand set of Bronze Bianzhong (chime bells) suspended on an ornate wooden frame. The scene is illuminated by dramatic, warm spotlighting that reflects off the patina of the ancient bronze, creating an atmosphere of reverence and scholarly depth. The background is a soft, deep green velvet, enhancing the modern orientalist aesthetic and highlighting the intricate casting details on each bell." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXmTvpOiOWPPti7VRexvFiw6HTs9cem8ZHhbzrfUY5VosR4zPBfGtFX4RE1poEB6wlXhtrXNtyjX2E6kEudYIfNbqMsf1GaEYd0yg5uqxBLxBUx27EAGKTidqWw6uBMm9gNhode4SpnPS1-Cdwlz9f5x-UPLMXhMTTdDeWq2u1vZ8IaaWagpOXq7uZZVzsOXteog1Imwym3YIRw8Sy_PCYpLZ7mRuZVYXzdaJPxbcd6w6QvUJFmHsJgq7xqtQ0OnlicQPDraXhgFA">
+<div class="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-jinqi-gold" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-label-caps text-jinqi-gold">5.0</span>
+</div>
+<div class="absolute bottom-4 right-4 bg-xuanshu-black/90 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 shadow-sm">
+<span class="font-label-caps text-label-caps text-jinqi-gold">礼乐</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-card-heading text-card-heading text-jinqi-gold mb-2 group-hover:text-primary transition-colors">编钟礼乐表演</h3>
+<p class="font-body-md text-body-md text-silk-cream/80">沉浸于周代庄严的编钟乐声中。了解双音钟的声学奥秘，参与复原的祭祀礼乐合奏。</p>
+</div>
+</article>
+<!-- Card 4: Bronze Casting -->
+<article class="masonry-item bg-wood-charcoal rounded-xl shadow-md border border-jinqi-gold/20 overflow-hidden group cursor-pointer hover:border-jinqi-gold/60 hover:shadow-[0_0_15px_rgba(201,162,39,0.2)] transition-all duration-300 transform hover:-translate-y-1">
+<div class="relative h-80 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A macro shot of a Shang Dynasty bronze Ding vessel. The focus is tightly on the complex piece-mold casting seams and the fierce Taotie motif. The bronze has a rich, verdigris patina. The lighting is low-key and dramatic, casting deep shadows that emphasize the monumental and solemn brand personality. The overall tone is academic and highly textured." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEXATcO-hF1ysmV0nMY7Loyq9SVnVjAtGGHKBs8F80zRIvwQuE1Jd7irByPKHnic4hLyoDqGwEtPEsYaV1c37uH0kle42_l2NvbKbUEe4fSfI0uJQ0Vt_LmrJXm3dOeLhJEUkPCCW5LrIxjpe24jdA7PY_xXYS2rmCmcXB2hQzHHvBNyHHcDqEmeY7fVt0v-nYaNnyJ7594AQ-H7GrvjqTEw35KFb86ca-Qxg6KEaVhD04hfwhtkvYSWwT1dcPB-KEROOwOUd_Kuw">
+<div class="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-jinqi-gold" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-label-caps text-jinqi-gold">4.7</span>
+</div>
+<div class="absolute bottom-4 right-4 bg-xuanshu-black/90 backdrop-blur-md px-3 py-1 rounded-full border border-jinqi-gold/30 shadow-sm">
+<span class="font-label-caps text-label-caps text-jinqi-gold">手工</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-card-heading text-card-heading text-jinqi-gold mb-2 group-hover:text-primary transition-colors">商代青铜铸造</h3>
+<p class="font-body-md text-body-md text-silk-cream/80">探索商代精密的分范铸造技术。了解后母戊鼎等礼器背后的冶金文明成就。</p>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Shared Component for Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-8 pb-4 bg-xuanshu-black/95 backdrop-blur-md border-t border-jinqi-gold/20 shadow-lg shadow-xuanshu-black/50 md:hidden rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-muted-gold hover:text-jinqi-gold transition-all active:scale-90 gap-1 mt-2">
+<span class="material-symbols-outlined text-[24px]">hourglass_top</span>
+<span class="font-label-caps text-label-caps">夏</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-chini-red text-silk-cream rounded-full w-12 h-12 shadow-md transform -translate-y-2">
+<span class="material-symbols-outlined text-[24px]">temple_buddhist</span>
+<span class="font-label-caps text-[10px] mt-0.5">商</span>
+</button>
+<button class="flex flex-col items-center justify-center text-muted-gold hover:text-jinqi-gold transition-all active:scale-90 gap-1 mt-2">
+<span class="material-symbols-outlined text-[24px]">swords</span>
+<span class="font-label-caps text-label-caps">周</span>
+</button>
+<button class="flex flex-col items-center justify-center text-muted-gold hover:text-jinqi-gold transition-all active:scale-90 gap-1 mt-2">
+<span class="material-symbols-outlined text-[24px]">account_balance</span>
+<span class="font-label-caps text-label-caps">秦</span>
+</button>
+</nav>
+<script>
+        // Simple filter interaction simulation
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-jinqi-gold', 'text-xuanshu-black');
+                    b.classList.add('bg-wood-charcoal', 'text-muted-gold', 'border', 'border-jinqi-gold/30');
+                });
+                e.currentTarget.classList.remove('bg-wood-charcoal', 'text-muted-gold', 'border', 'border-jinqi-gold/30');
+                e.currentTarget.classList.add('bg-jinqi-gold', 'text-xuanshu-black');
+            });
+        });
+    </script>
+
+
+</body></html>
