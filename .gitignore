@@ -39,3 +39,16 @@ package-lock.json
 
 # API Keys (do not commit)
 网页代码/高德api/config.js
+
+# Old Figma exports (not used in current code)
+网页代码/src/imports/image.png
+网页代码/src/imports/____-1-1.jpg
+网页代码/src/imports/____-2-1.jpg
+网页代码/src/imports/____-3-1.jpg
+网页代码/src/imports/code.html
+网页代码/src/imports/code-1.html
+网页代码/src/imports/code-2.html
+网页代码/src/imports/DESIGN.md
+网页代码/src/imports/____-11___-____.pdf
+网页代码/src/imports/____-11___-____-1.pdf
+网页代码/src/imports/__7_______.pdf
