@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Create AMAP config from secret
+        run: |
+          cp 网页代码/高德api/config.example.js 网页代码/高德api/config.js
+          sed -i "s/YOUR_AMAP_API_KEY_HERE/${{ secrets.AMAP_KEY }}/g" 网页代码/高德api/config.js
+        shell: bash
+
       - name: Install dependencies
         run: npm install
         working-directory: 网页代码

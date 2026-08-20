@@ -37,7 +37,7 @@ npm-debug.log*
 # Lock file (GitHub Actions will install deps)
 package-lock.json
 
-# API Keys (do not commit)
+# API Keys (do not commit config.js, but config.example.js is OK)
 网页代码/高德api/config.js
 
 # Old Figma exports (not used in current code)
