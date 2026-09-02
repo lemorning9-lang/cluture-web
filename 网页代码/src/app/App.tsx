@@ -56,6 +56,10 @@ import actChuWu from "../imports/__.png";
 // H1 display: 演示春风楷 (LXGW WenKai is the closest free web equivalent)
 const FD =
   "'Zhi Mang Xing', 'LXGW WenKai', 'KaiTi', 'STKaiti', serif";
+// 楷体（序章正文与章节条目试效专用）
+const FS = "'KaiTi', 'STKaiti', '楷体', 'Noto Serif SC', serif";
+// 宋体（章节条目专用）
+const FSONG = "'SimSun', 'NSimSun', 'STSong', '宋体', 'Noto Serif SC', serif";
 // H2 section: 楷体/宋体
 const FH = "'KaiTi', 'STKaiti', 'Noto Serif SC', serif";
 // Body: 仿宋/楷体
@@ -1329,20 +1333,24 @@ function CinematicPrologue({
                 CHAPTER ONE · ORIGIN
               </p>
               <p
-                className="text-foreground/85 text-3xl leading-relaxed mb-4"
-                style={{ fontFamily: FD }}
+                className="text-[#E8B84B] text-3xl leading-relaxed mb-4"
+                style={{
+                  fontFamily: FS,
+                  textShadow:
+                    "0 0 10px rgba(232,184,75,0.60), 0 0 22px rgba(232,184,75,0.35), 0 0 44px rgba(232,184,75,0.15)",
+                }}
               >
                 源，聚多源之水，奔涌成流。
               </p>
               <p
-                className="text-foreground/70 text-2xl leading-relaxed mb-4"
-                style={{ fontFamily: FD }}
+                className="text-foreground/85 text-2xl leading-relaxed mb-4"
+                style={{ fontFamily: FS }}
               >
                 数万年前，中华先民在黄河、长江、辽河等流域繁衍生息。他们以石为器，以土为陶，在广袤大地上书写最初的文明篇章；历经不断繁衍，逐渐由原始聚落演变为定居的农耕社会，表现为社会分工日趋复杂，礼仪制度初步显现，权力阶层悄然形成。
               </p>
               <p
-                className="text-foreground/70 text-2xl leading-relaxed"
-                style={{ fontFamily: FD }}
+                className="text-foreground/85 text-2xl leading-relaxed"
+                style={{ fontFamily: FS }}
               >
                 中华文明的特质——多元一体、连绵不断、兼容并蓄——在这一时期已见雏形。探源，正是寻找这一切的起点，亦是理解当下中华文化生命力的必由之路。
               </p>
@@ -1704,14 +1712,18 @@ function CinematicPrologue({
                       {item.en}
                     </div>
                     <h3
-                      className="text-foreground/90 text-4xl mb-3"
-                      style={{ fontFamily: FD }}
+                      className="text-[#E8B84B] text-4xl mb-3"
+                      style={{
+                        fontFamily: FS,
+                        textShadow:
+                          "0 0 10px rgba(232,184,75,0.60), 0 0 22px rgba(232,184,75,0.35), 0 0 44px rgba(232,184,75,0.15)",
+                      }}
                     >
                       {item.zh}
                     </h3>
                     <p
-                      className="text-muted-foreground text-2xl leading-relaxed"
-                      style={{ fontFamily: FD }}
+                      className="text-white text-2xl leading-relaxed"
+                      style={{ fontFamily: FS }}
                     >
                       {item.desc}
                     </p>
@@ -1820,14 +1832,18 @@ function CinematicPrologue({
                       {item.en}
                     </div>
                     <h3
-                      className="text-foreground/90 text-4xl mb-3"
-                      style={{ fontFamily: FD }}
+                      className="text-[#E8B84B] text-4xl mb-3"
+                      style={{
+                        fontFamily: FS,
+                        textShadow:
+                          "0 0 10px rgba(232,184,75,0.60), 0 0 22px rgba(232,184,75,0.35), 0 0 44px rgba(232,184,75,0.15)",
+                      }}
                     >
                       {item.zh}
                     </h3>
                     <p
-                      className="text-muted-foreground text-2xl leading-relaxed"
-                      style={{ fontFamily: FD }}
+                      className="text-white text-2xl leading-relaxed"
+                      style={{ fontFamily: FS }}
                     >
                       {item.desc}
                     </p>
