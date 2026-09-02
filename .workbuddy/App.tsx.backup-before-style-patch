@@ -1090,7 +1090,7 @@ function Divider() {
 }
 
 function GoldDiamond() {
-  return <span className="text-primary text-sm">◆</span>;
+  return <span className="text-primary text-xs">◆</span>;
 }
 
 function CornerBrackets() {
@@ -1107,7 +1107,7 @@ function SectionLabel({ en }: { en: string }) {
     <div className="flex items-center gap-3 mb-2">
       <GoldDiamond />
       <span
-        className="text-primary/70 text-base tracking-[0.25em] uppercase"
+        className="text-primary/70 text-sm tracking-[0.25em] uppercase"
         style={{ fontFamily: FE }}
       >
         {en}
@@ -1148,7 +1148,7 @@ function ChapterDivider({ phrase }: { phrase: string }) {
         ◆
       </div>
       <p
-        className="text-primary/45 text-sm tracking-[0.35em]"
+        className="text-primary/45 text-xs tracking-[0.35em]"
         style={{ fontFamily: "'KaiTi', 'STKaiti', serif" }}
       >
         {phrase}
@@ -1181,14 +1181,14 @@ function CinematicPrologue({
           alt="石峁博物馆壁画 — 农耕文明"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/10 to-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/25 to-background" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
         {/* Edge feather vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 85% 80% at 50% 50%, transparent 35%, rgba(30,12,8,0.12) 100%)",
+              "radial-gradient(ellipse 85% 80% at 50% 50%, transparent 35%, rgba(30,12,8,0.75) 100%)",
           }}
         />
         {/* Film grain */}
@@ -1228,7 +1228,7 @@ function CinematicPrologue({
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <p
-            className="text-primary/80 text-base tracking-[0.4em] uppercase mb-8"
+            className="text-primary/80 text-sm tracking-[0.4em] uppercase mb-8"
             style={{ fontFamily: FE }}
           >
             ORIGINS OF CHINESE CIVILIZATION
@@ -1243,7 +1243,7 @@ function CinematicPrologue({
             中华文明探源
           </h1>
           <div className="h-px w-24 bg-primary/60 mx-auto mb-6" />
-          <div className="space-y-2 text-primary/60 text-base tracking-widest">
+          <div className="space-y-2 text-primary/60 text-sm tracking-widest">
             <p>
               社会分化·文明曙光 &ensp;·&ensp; 古国四起·文明初成
             </p>
@@ -1258,7 +1258,7 @@ function CinematicPrologue({
           onClick={scrollToMap}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-primary/50 hover:text-primary transition-colors group"
         >
-          <span className="text-sm tracking-widest">
+          <span className="text-xs tracking-widest">
             向下探索
           </span>
           <ChevronDown size={20} className="animate-bounce" />
@@ -1272,7 +1272,7 @@ function CinematicPrologue({
           alt="石峁博物馆壁画 — 狩猎图"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-background/20 to-background/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/75 via-background/45 to-background/25" />
         {/* Top & bottom dissolve into background */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background pointer-events-none" />
         {/* Edge feather vignette */}
@@ -1280,7 +1280,7 @@ function CinematicPrologue({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 90% 85% at 60% 50%, transparent 30%, rgba(30,12,8,0.12) 100%)",
+              "radial-gradient(ellipse 90% 85% at 60% 50%, transparent 30%, rgba(30,12,8,0.8) 100%)",
           }}
         />
         {/* Film grain */}
@@ -1323,25 +1323,25 @@ function CinematicPrologue({
           <div className="flex items-start gap-8 mb-16">
             <div className="flex-1 pt-4">
               <p
-                className="text-primary/60 text-base tracking-[0.3em] uppercase mb-4"
+                className="text-primary/60 text-sm tracking-[0.3em] uppercase mb-4"
                 style={{ fontFamily: FE }}
               >
                 CHAPTER ONE · ORIGIN
               </p>
               <p
-                className="text-foreground/85 text-3xl leading-relaxed mb-4"
+                className="text-foreground/85 text-xl leading-relaxed mb-4"
                 style={{ fontFamily: FD }}
               >
                 源，聚多源之水，奔涌成流。
               </p>
               <p
-                className="text-foreground/70 text-2xl leading-relaxed mb-4"
+                className="text-foreground/70 leading-relaxed mb-4"
                 style={{ fontFamily: FD }}
               >
                 数万年前，中华先民在黄河、长江、辽河等流域繁衍生息。他们以石为器，以土为陶，在广袤大地上书写最初的文明篇章；历经不断繁衍，逐渐由原始聚落演变为定居的农耕社会，表现为社会分工日趋复杂，礼仪制度初步显现，权力阶层悄然形成。
               </p>
               <p
-                className="text-foreground/70 text-2xl leading-relaxed"
+                className="text-foreground/70 leading-relaxed"
                 style={{ fontFamily: FD }}
               >
                 中华文明的特质——多元一体、连绵不断、兼容并蓄——在这一时期已见雏形。探源，正是寻找这一切的起点，亦是理解当下中华文化生命力的必由之路。
@@ -1388,7 +1388,7 @@ function CinematicPrologue({
                 key={card.title}
                 className="relative px-7 py-5 cursor-default"
                 style={{
-                  background: "rgba(155,48,32,0.18)",
+                  background: "rgba(200,165,110,0.13)",
                   border: "1px solid rgba(200,150,64,0.28)",
                 }}
               >
@@ -1516,7 +1516,7 @@ function CinematicPrologue({
                 />
                 {/* Content */}
                 <div
-                  className="text-sm tracking-[0.32em] mb-2 text-primary/50"
+                  className="text-xs tracking-[0.32em] mb-2 text-primary/50"
                   style={{ fontFamily: FH }}
                 >
                   {card.era}
@@ -1531,7 +1531,7 @@ function CinematicPrologue({
                 >
                   {card.title}
                 </h3>
-                <p className="text-base leading-relaxed text-foreground/75">
+                <p className="text-sm leading-relaxed text-foreground/75">
                   {card.text}
                 </p>
               </div>
@@ -1547,7 +1547,7 @@ function CinematicPrologue({
           alt="石峁博物馆壁画 — 玉首骑马图"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-background/20 to-background/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/75 via-background/45 to-background/20" />
         {/* Top & bottom dissolve into background */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background pointer-events-none" />
         {/* Edge feather vignette */}
@@ -1555,7 +1555,7 @@ function CinematicPrologue({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 90% 85% at 40% 50%, transparent 30%, rgba(30,12,8,0.12) 100%)",
+              "radial-gradient(ellipse 90% 85% at 40% 50%, transparent 30%, rgba(30,12,8,0.8) 100%)",
           }}
         />
         {/* Film grain */}
@@ -1654,13 +1654,13 @@ function CinematicPrologue({
               </svg>
               {/* Classic water poetry */}
               <div className="text-left space-y-1">
-                <p className="text-primary/30 text-sm tracking-[0.3em]">
+                <p className="text-primary/30 text-xs tracking-[0.3em]">
                   上善若水
                 </p>
-                <p className="text-primary/20 text-sm tracking-[0.3em]">
+                <p className="text-primary/20 text-xs tracking-[0.3em]">
                   水善利萬物而不爭
                 </p>
-                <p className="text-muted-foreground/20 text-sm tracking-widest">
+                <p className="text-muted-foreground/20 text-xs tracking-widest">
                   ——《道德经》
                 </p>
               </div>
@@ -1668,7 +1668,7 @@ function CinematicPrologue({
             {/* Right: theme chapters */}
             <div className="flex-1">
               <p
-                className="text-primary/60 text-base tracking-[0.3em] uppercase mb-8"
+                className="text-primary/60 text-sm tracking-[0.3em] uppercase mb-8"
                 style={{ fontFamily: FE }}
               >
                 CHAPTER TWO · CONTINUITY
@@ -1698,19 +1698,19 @@ function CinematicPrologue({
                       style={{ top: `${i * 152 + 8}px` }}
                     />
                     <div
-                      className="text-primary/50 text-base tracking-widest mb-1"
+                      className="text-primary/50 text-sm tracking-widest mb-1"
                       style={{ fontFamily: FE }}
                     >
                       {item.en}
                     </div>
                     <h3
-                      className="text-foreground/90 text-4xl mb-3"
+                      className="text-foreground/90 text-3xl mb-3"
                       style={{ fontFamily: FD }}
                     >
                       {item.zh}
                     </h3>
                     <p
-                      className="text-muted-foreground text-2xl leading-relaxed"
+                      className="text-muted-foreground text-base leading-relaxed"
                       style={{ fontFamily: FD }}
                     >
                       {item.desc}
@@ -1730,7 +1730,7 @@ function CinematicPrologue({
           alt="石峁博物馆壁画 — 先民生活"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-background/40 via-background/20 to-background/10" />
+        <div className="absolute inset-0 bg-gradient-to-l from-background/75 via-background/50 to-background/30" />
         {/* Top & bottom dissolve into background */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background pointer-events-none" />
         {/* Edge feather vignette */}
@@ -1738,7 +1738,7 @@ function CinematicPrologue({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 88% 82% at 50% 55%, transparent 32%, rgba(30,12,8,0.12) 100%)",
+              "radial-gradient(ellipse 88% 82% at 50% 55%, transparent 32%, rgba(30,12,8,0.82) 100%)",
           }}
         />
         {/* Film grain */}
@@ -1781,7 +1781,7 @@ function CinematicPrologue({
             {/* Left: theme chapters — mirrored from 流, text right-aligned */}
             <div className="flex-1">
               <p
-                className="text-primary/60 text-base tracking-[0.3em] uppercase mb-8 text-right"
+                className="text-primary/60 text-sm tracking-[0.3em] uppercase mb-8 text-right"
                 style={{ fontFamily: FE }}
               >
                 CHAPTER THREE · CONFLUENCE
@@ -1814,19 +1814,19 @@ function CinematicPrologue({
                       style={{ top: `${i * 152 + 8}px` }}
                     />
                     <div
-                      className="text-primary/50 text-base tracking-widest mb-1"
+                      className="text-primary/50 text-sm tracking-widest mb-1"
                       style={{ fontFamily: FE }}
                     >
                       {item.en}
                     </div>
                     <h3
-                      className="text-foreground/90 text-4xl mb-3"
+                      className="text-foreground/90 text-3xl mb-3"
                       style={{ fontFamily: FD }}
                     >
                       {item.zh}
                     </h3>
                     <p
-                      className="text-muted-foreground text-2xl leading-relaxed"
+                      className="text-muted-foreground text-base leading-relaxed"
                       style={{ fontFamily: FD }}
                     >
                       {item.desc}
@@ -1893,13 +1893,13 @@ function CinematicPrologue({
                 />
               </svg>
               <div className="text-right space-y-1">
-                <p className="text-primary/30 text-sm tracking-[0.3em]">
+                <p className="text-primary/30 text-xs tracking-[0.3em]">
                   殊途同归
                 </p>
-                <p className="text-primary/20 text-sm tracking-[0.3em]">
+                <p className="text-primary/20 text-xs tracking-[0.3em]">
                   天下大同·华夏一统
                 </p>
-                <p className="text-muted-foreground/20 text-sm tracking-widest">
+                <p className="text-muted-foreground/20 text-xs tracking-widest">
                   ——《礼记·礼运》
                 </p>
               </div>
@@ -1929,7 +1929,7 @@ function CinematicPrologue({
                 key={card.title}
                 className="relative px-7 py-3 transition-transform duration-300 hover:-translate-y-2 cursor-default"
                 style={{
-                  background: "rgba(155,48,32,0.18)",
+                  background: "rgba(200,165,110,0.13)",
                   border: "1px solid rgba(200,150,64,0.28)",
                 }}
               >
@@ -2057,7 +2057,7 @@ function CinematicPrologue({
                 />
                 {/* Content */}
                 <div
-                  className="text-sm tracking-[0.2em] uppercase mb-2 text-primary/50"
+                  className="text-xs tracking-[0.2em] uppercase mb-2 text-primary/50"
                   style={{ fontFamily: FE }}
                 >
                   {card.sub}
@@ -2072,7 +2072,7 @@ function CinematicPrologue({
                 >
                   {card.title}
                 </h3>
-                <p className="text-base leading-relaxed text-foreground/75">
+                <p className="text-sm leading-relaxed text-foreground/75">
                   {card.text}
                 </p>
               </div>
@@ -2095,10 +2095,10 @@ function CinematicPrologue({
         <div className="relative z-10 flex flex-col items-center gap-4">
           <div className="h-px w-64 bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
           <GoldDiamond />
-          <p className="text-foreground/60 text-base tracking-[0.3em]">
+          <p className="text-foreground/60 text-sm tracking-[0.3em]">
             探索二十九处文明遗址
           </p>
-          <p className="text-muted-foreground text-sm tracking-wider">
+          <p className="text-muted-foreground text-xs tracking-wider">
             选择时代或文化域，在地图上定位遗址坐标
           </p>
           <div className="h-px w-64 bg-gradient-to-r from-transparent via-primary/60 to-transparent mt-2" />
@@ -2136,7 +2136,7 @@ function HorizontalTimeline({
             >
               {/* Phase first-name above */}
               <span
-                className={`text-sm tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-primary/80" : "text-muted-foreground/50"}`}
+                className={`text-xs tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-primary/80" : "text-muted-foreground/50"}`}
                 style={{ fontFamily: FH }}
               >
                 {era.top}
@@ -2149,7 +2149,7 @@ function HorizontalTimeline({
                 )}
                 {era.glyph ? (
                   <span
-                    className={`text-base transition-colors ${isActive ? "text-primary" : "text-muted-foreground/40 group-hover:text-primary/60"}`}
+                    className={`text-sm transition-colors ${isActive ? "text-primary" : "text-muted-foreground/40 group-hover:text-primary/60"}`}
                   >
                     {era.glyph}
                   </span>
@@ -2166,7 +2166,7 @@ function HorizontalTimeline({
 
               {/* Era label below */}
               <span
-                className={`text-base tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground/70"}`}
+                className={`text-sm tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground/70"}`}
                 style={{ fontFamily: FH }}
               >
                 {era.label}
@@ -2174,7 +2174,7 @@ function HorizontalTimeline({
 
               {/* Date / keyword */}
               <span
-                className={`text-sm tracking-widest transition-colors ${isActive ? "text-primary/70" : "text-muted-foreground/30"}`}
+                className={`text-xs tracking-widest transition-colors ${isActive ? "text-primary/70" : "text-muted-foreground/30"}`}
                 style={{ fontFamily: FE }}
               >
                 {era.keyword}
@@ -2333,14 +2333,14 @@ function ModuleTimeSpace() {
 
           {/* Domain filter + site count */}
           <div className="flex items-center gap-3 pb-3 flex-wrap">
-            <span className="text-muted-foreground text-sm tracking-widest">
+            <span className="text-muted-foreground text-xs tracking-widest">
               文化域
             </span>
             {DOMAINS.map((d) => (
               <button
                 key={d}
                 onClick={() => setDomain(d)}
-                className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 ${
+                className={`px-4 py-1 text-xs tracking-widest border transition-all duration-200 ${
                   domain === d
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -2349,7 +2349,7 @@ function ModuleTimeSpace() {
                 {d}
               </button>
             ))}
-            <span className="ml-auto text-muted-foreground text-sm">
+            <span className="ml-auto text-muted-foreground text-xs">
               显示{" "}
               <span className="text-primary">
                 {filtered.length}
@@ -2445,15 +2445,15 @@ function ModuleTimeSpace() {
 
             {/* Legend */}
             <div className="absolute bottom-3 left-3 z-10 bg-background/85 backdrop-blur-sm border border-border p-3 space-y-1.5">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="w-3 h-3 rounded-full bg-primary" />
                 实地打卡
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div className="w-3 h-3 rounded-full bg-secondary" />
                 线上打卡
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <div
                   className="w-3 h-3 border border-muted-foreground/40"
                   style={{
@@ -2468,7 +2468,7 @@ function ModuleTimeSpace() {
 
           {/* Drawer — 展柜纵幅 */}
           <div
-            className={`overflow-hidden transition-all duration-300 flex-shrink-0 ${selectedSite ? "w-[420px] opacity-100" : "w-0 opacity-0"}`}
+            className={`overflow-hidden transition-all duration-300 flex-shrink-0 ${selectedSite ? "w-80 opacity-100" : "w-0 opacity-0"}`}
             style={{ height: "520px" }}
           >
             {selectedSite && (
@@ -2476,7 +2476,7 @@ function ModuleTimeSpace() {
                 className="w-80 h-full flex flex-col relative"
                 style={{
                   background:
-                    "linear-gradient(160deg, rgba(84,36,14,0.90) 0%, rgba(60,24,10,0.93) 60%, rgba(100,44,18,0.88) 100%)",
+                    "linear-gradient(160deg, rgba(72,30,12,0.98) 0%, rgba(48,18,6,1) 60%, rgba(88,36,14,0.96) 100%)",
                   border: "1px solid rgba(200,150,64,0.25)",
                 }}
               >
@@ -2532,7 +2532,7 @@ function ModuleTimeSpace() {
                   style={{
                     height: "162px",
                     boxShadow:
-                      "0 4px 20px rgba(0,0,0,0.60), 0 0 0 1px rgba(200,150,64,0.28)",
+                      "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(200,150,64,0.22)",
                   }}
                 >
                   <img
@@ -2567,12 +2567,12 @@ function ModuleTimeSpace() {
                   <div
                     className="absolute top-2 right-2 px-1.5 py-0.5"
                     style={{
-                      background: "rgba(52,22,8,0.78)",
+                      background: "rgba(40,16,6,0.85)",
                       border: "1px solid rgba(200,150,64,0.30)",
                     }}
                   >
                     <span
-                      className="text-xs tracking-[0.2em]"
+                      className="text-[9px] tracking-[0.2em]"
                       style={{
                         color: "rgba(200,150,64,0.75)",
                         fontFamily: FH,
@@ -2586,7 +2586,7 @@ function ModuleTimeSpace() {
                     onClick={() => setSelectedSite(null)}
                     className="absolute top-2 left-2 w-5 h-5 flex items-center justify-center transition-opacity hover:opacity-60"
                     style={{
-                      background: "rgba(52,22,8,0.68)",
+                      background: "rgba(40,16,6,0.75)",
                       border: "1px solid rgba(200,150,64,0.22)",
                       color: "rgba(200,150,64,0.65)",
                     }}
@@ -2600,7 +2600,7 @@ function ModuleTimeSpace() {
                   className="relative flex flex-col flex-1 -mt-2 overflow-hidden"
                   style={{
                     background:
-                      "linear-gradient(160deg, rgba(84,36,14,0.89) 0%, rgba(60,24,10,0.92) 60%, rgba(100,44,18,0.87) 100%)",
+                      "linear-gradient(160deg, rgba(72,30,12,0.97) 0%, rgba(48,18,6,1) 60%, rgba(88,36,14,0.95) 100%)",
                     borderTop:
                       "1px solid rgba(200,150,64,0.18)",
                   }}
@@ -2724,7 +2724,7 @@ function ModuleTimeSpace() {
                                     }}
                                   />
                                   <span
-                                    className="text-sm tracking-wide"
+                                    className="text-xs tracking-wide"
                                     style={{
                                       color:
                                         "rgba(240,215,165,0.82)",
@@ -2738,7 +2738,7 @@ function ModuleTimeSpace() {
 
                             {/* Brief */}
                             <p
-                              className="text-sm leading-relaxed"
+                              className="text-xs leading-relaxed"
                               style={{
                                 color: "rgba(220,195,150,0.78)",
                                 fontFamily: FH,
@@ -2787,7 +2787,7 @@ function ModuleTimeSpace() {
                                   相关纪录片
                                 </div>
                                 <p
-                                  className="text-sm leading-snug"
+                                  className="text-xs leading-snug"
                                   style={{
                                     color:
                                       "rgba(240,215,165,0.88)",
@@ -2918,7 +2918,7 @@ function ModuleTimeSpace() {
                                       探源
                                     </span>
                                     <span
-                                      className="text-base leading-none"
+                                      className="text-sm leading-none"
                                       style={{ fontFamily: FD }}
                                     >
                                       {hasCheckedIn
@@ -2933,7 +2933,7 @@ function ModuleTimeSpace() {
                                     </span>
                                   </div>
                                   <span
-                                    className="text-xs tracking-[0.2em]"
+                                    className="text-[9px] tracking-[0.2em]"
                                     style={{
                                       fontFamily: FH,
                                       color: hasCheckedIn
@@ -2970,7 +2970,7 @@ function ModuleTimeSpace() {
                                       实地
                                     </span>
                                     <span
-                                      className="text-sm leading-none"
+                                      className="text-base leading-none"
                                       style={{ fontFamily: FD }}
                                     >
                                       ✓
@@ -2983,7 +2983,7 @@ function ModuleTimeSpace() {
                                     </span>
                                   </div>
                                   <span
-                                    className="text-xs tracking-[0.25em]"
+                                    className="text-[9px] tracking-[0.25em]"
                                     style={{
                                       color:
                                         "rgba(200,150,64,0.55)",
@@ -3055,7 +3055,7 @@ function ModuleTimeSpace() {
                     {drawerTab === "周边" && (
                       <div className="px-4 pt-3 pb-5 space-y-3">
                         <p
-                          className="text-xs tracking-[0.35em]"
+                          className="text-[9px] tracking-[0.35em]"
                           style={{
                             color: "rgba(200,150,64,0.45)",
                             fontFamily: FH,
@@ -3089,7 +3089,7 @@ function ModuleTimeSpace() {
                         ].map((cat) => (
                           <div key={cat.label}>
                             <div
-                              className="flex items-center gap-2 mb-1.5 text-xs tracking-[0.3em]"
+                              className="flex items-center gap-2 mb-1.5 text-[9px] tracking-[0.3em]"
                               style={{
                                 color: "rgba(200,150,64,0.58)",
                                 fontFamily: FH,
@@ -3168,7 +3168,7 @@ function ModuleTimeSpace() {
                 style={{
                   height: "180px",
                   boxShadow:
-                    "0 4px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.28)",
+                    "0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.20)",
                 }}
               >
                 <img
@@ -3192,12 +3192,12 @@ function ModuleTimeSpace() {
                 <div
                   className="absolute top-2 right-2 px-1.5 py-0.5"
                   style={{
-                    background: "rgba(52,22,8,0.75)",
+                    background: "rgba(40,16,6,0.82)",
                     border: "1px solid rgba(200,150,64,0.30)",
                   }}
                 >
                   <span
-                    className="text-xs text-primary/70 tracking-[0.2em]"
+                    className="text-[9px] text-primary/70 tracking-[0.2em]"
                     style={{ fontFamily: FH }}
                   >
                     {site.culture}
@@ -3210,7 +3210,7 @@ function ModuleTimeSpace() {
                 className="relative -mt-6 pt-10 px-4 pb-4 flex flex-col flex-1"
                 style={{
                   background:
-                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
+                    "linear-gradient(160deg, rgba(72,30,12,0.92) 0%, rgba(48,18,6,0.95) 60%, rgba(88,36,14,0.90) 100%)",
                   border: "1px solid rgba(200,150,64,0.25)",
                 }}
               >
@@ -3290,7 +3290,7 @@ function ModuleTimeSpace() {
                 />
 
                 <div
-                  className="flex justify-center gap-3 mb-3 text-xs tracking-[0.25em] text-primary/45"
+                  className="flex justify-center gap-3 mb-3 text-[9px] tracking-[0.25em] text-primary/45"
                   style={{ fontFamily: FH }}
                 >
                   <span>{site.period}时期</span>
@@ -3304,14 +3304,14 @@ function ModuleTimeSpace() {
 
                 <div className="mt-3 flex items-center justify-between">
                   <span
-                    className={`text-xs tracking-widest flex items-center gap-1 ${site.status === "实地打卡" ? "text-primary/72" : site.status === "线上打卡" ? "text-secondary/72" : "text-muted-foreground/38"}`}
+                    className={`text-[9px] tracking-widest flex items-center gap-1 ${site.status === "实地打卡" ? "text-primary/72" : site.status === "线上打卡" ? "text-secondary/72" : "text-muted-foreground/38"}`}
                   >
                     <span
                       className={`w-1 h-1 rounded-full ${site.status === "实地打卡" ? "bg-primary" : site.status === "线上打卡" ? "bg-secondary" : "bg-muted-foreground/28"}`}
                     />
                     {site.status}
                   </span>
-                  <span className="text-xs tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+                  <span className="text-[9px] tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
                     查看
                     <ArrowRight
                       size={8}
@@ -3357,7 +3357,7 @@ function ModuleCulturalTreasures() {
           >
             文化遗珍
           </h1>
-          <p className="text-muted-foreground text-base mt-1 tracking-wider">
+          <p className="text-muted-foreground text-sm mt-1 tracking-wider">
             探索各域文化衍生的沉浸式体验活动
           </p>
         </div>
@@ -3370,7 +3370,7 @@ function ModuleCulturalTreasures() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 ${
+              className={`px-4 py-1 text-xs tracking-widest border transition-all duration-200 ${
                 activeCategory === cat
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -3401,7 +3401,7 @@ function ModuleCulturalTreasures() {
                         ? "170px"
                         : "130px",
                   boxShadow:
-                    "0 4px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.28)",
+                    "0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.18)",
                 }}
               >
                 <img
@@ -3417,12 +3417,12 @@ function ModuleCulturalTreasures() {
                 <div
                   className="absolute top-2 right-2 px-1.5 py-0.5"
                   style={{
-                    background: "rgba(52,22,8,0.75)",
+                    background: "rgba(40,16,6,0.82)",
                     border: "1px solid rgba(200,150,64,0.30)",
                   }}
                 >
                   <span
-                    className="text-xs text-primary/70 tracking-[0.2em]"
+                    className="text-[9px] text-primary/70 tracking-[0.2em]"
                     style={{ fontFamily: FH }}
                   >
                     {act.category}
@@ -3443,7 +3443,7 @@ function ModuleCulturalTreasures() {
                 className="relative -mt-6 pt-9 px-4 pb-4 flex flex-col flex-1"
                 style={{
                   background:
-                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
+                    "linear-gradient(160deg, rgba(72,30,12,0.92) 0%, rgba(48,18,6,0.95) 60%, rgba(88,36,14,0.90) 100%)",
                   border: "1px solid rgba(200,150,64,0.25)",
                 }}
               >
@@ -3527,7 +3527,7 @@ function ModuleCulturalTreasures() {
                       "linear-gradient(to right, transparent, rgba(200,150,64,0.35), transparent)",
                   }}
                 />
-                <p className="text-foreground/50 text-xs leading-relaxed line-clamp-2 flex-1">
+                <p className="text-foreground/50 text-[11px] leading-relaxed line-clamp-2 flex-1">
                   {act.description}
                 </p>
                 <div className="mt-3 flex items-center justify-between">
@@ -3538,7 +3538,7 @@ function ModuleCulturalTreasures() {
                     />
                     {act.location}
                   </div>
-                  <span className="text-xs tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+                  <span className="text-[9px] tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
                     详情
                     <ArrowRight
                       size={8}
@@ -3562,7 +3562,7 @@ function ModuleCulturalTreasures() {
             className="relative z-10 w-full max-w-sm flex flex-col"
             style={{
               background:
-                "linear-gradient(160deg, rgba(84,36,14,0.90) 0%, rgba(60,24,10,0.93) 60%, rgba(100,44,18,0.88) 100%)",
+                "linear-gradient(160deg, rgba(72,30,12,0.98) 0%, rgba(48,18,6,1) 60%, rgba(88,36,14,0.96) 100%)",
               border: "1px solid rgba(200,150,64,0.25)",
               maxHeight: "88vh",
             }}
@@ -3619,7 +3619,7 @@ function ModuleCulturalTreasures() {
               style={{
                 height: "200px",
                 boxShadow:
-                  "0 4px 20px rgba(0,0,0,0.60), 0 0 0 1px rgba(200,150,64,0.28)",
+                  "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(200,150,64,0.22)",
               }}
             >
               <img
@@ -3643,12 +3643,12 @@ function ModuleCulturalTreasures() {
                 <div
                   className="px-1.5 py-0.5"
                   style={{
-                    background: "rgba(52,22,8,0.78)",
+                    background: "rgba(40,16,6,0.85)",
                     border: "1px solid rgba(200,150,64,0.30)",
                   }}
                 >
                   <span
-                    className="text-xs tracking-[0.2em]"
+                    className="text-[9px] tracking-[0.2em]"
                     style={{
                       color: "rgba(200,150,64,0.75)",
                       fontFamily: FH,
@@ -3660,12 +3660,12 @@ function ModuleCulturalTreasures() {
                 <div
                   className="px-1.5 py-0.5"
                   style={{
-                    background: "rgba(52,22,8,0.78)",
+                    background: "rgba(40,16,6,0.85)",
                     border: "1px solid rgba(200,150,64,0.18)",
                   }}
                 >
                   <span
-                    className="text-xs tracking-[0.2em]"
+                    className="text-[9px] tracking-[0.2em]"
                     style={{
                       color: "rgba(200,150,64,0.50)",
                       fontFamily: FH,
@@ -3680,7 +3680,7 @@ function ModuleCulturalTreasures() {
                 onClick={() => setSelectedActivity(null)}
                 className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center transition-opacity hover:opacity-60"
                 style={{
-                  background: "rgba(52,22,8,0.68)",
+                  background: "rgba(40,16,6,0.75)",
                   border: "1px solid rgba(200,150,64,0.22)",
                   color: "rgba(200,150,64,0.65)",
                 }}
@@ -3768,7 +3768,7 @@ function ModuleCulturalTreasures() {
                         }}
                       />
                       <span
-                        className="text-sm tracking-wide"
+                        className="text-xs tracking-wide"
                         style={{
                           color: "rgba(240,215,165,0.82)",
                         }}
@@ -3790,7 +3790,7 @@ function ModuleCulturalTreasures() {
 
                 {/* Description */}
                 <p
-                  className="text-sm leading-relaxed"
+                  className="text-xs leading-relaxed"
                   style={{
                     color: "rgba(220,195,150,0.78)",
                     fontFamily: FH,
@@ -3884,7 +3884,7 @@ function ModuleCommunity() {
               className="relative p-4"
               style={{
                 background:
-                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
                 border: "1px solid rgba(200,150,64,0.32)",
               }}
             >
@@ -3954,7 +3954,7 @@ function ModuleCommunity() {
                 <input
                   type="text"
                   placeholder="分享您的探源见闻…"
-                  className="flex-1 bg-transparent outline-none py-1 text-sm"
+                  className="flex-1 bg-transparent outline-none py-1 text-base"
                   style={{
                     color: "rgba(200,188,168,0.82)",
                     fontFamily: FH,
@@ -3963,7 +3963,7 @@ function ModuleCommunity() {
                   }}
                 />
                 <button
-                  className="px-4 py-1.5 text-sm tracking-[0.3em] transition-all hover:opacity-80 flex-shrink-0"
+                  className="px-4 py-1.5 text-xs tracking-[0.3em] transition-all hover:opacity-80 flex-shrink-0"
                   style={{
                     background: "rgba(200,150,64,0.10)",
                     border: "1px solid rgba(200,150,64,0.32)",
@@ -3982,7 +3982,7 @@ function ModuleCommunity() {
                 className="relative flex overflow-visible"
                 style={{
                   background:
-                    "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+                    "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
                   border: "1px solid rgba(200,150,64,0.32)",
                 }}
               >
@@ -4051,7 +4051,7 @@ function ModuleCommunity() {
                           fontFamily:
                             "'KaiTi', 'STKaiti', serif",
                           textShadow:
-                            "0 1px 4px rgba(0,0,0,0.55), 1px 1px 0 rgba(0,0,0,0.35)",
+                            "0 1px 4px rgba(0,0,0,0.60), 1px 1px 0 rgba(0,0,0,0.40)",
                           letterSpacing: "-0.02em",
                         }}
                       >
@@ -4070,7 +4070,7 @@ function ModuleCommunity() {
                           {post.author}
                         </span>
                         <span
-                          className="text-sm"
+                          className="text-xs"
                           style={{
                             color: "rgba(200,150,64,0.48)",
                             fontFamily: FH,
@@ -4087,7 +4087,7 @@ function ModuleCommunity() {
                           }}
                         />
                         <span
-                          className="text-sm tracking-[0.15em]"
+                          className="text-xs tracking-[0.15em]"
                           style={{
                             color: "rgba(200,150,64,0.55)",
                             fontFamily: FH,
@@ -4149,7 +4149,7 @@ function ModuleCommunity() {
                         }
                       />
                       <span
-                        className="text-sm"
+                        className="text-xs"
                         style={{ fontFamily: FH }}
                       >
                         {post.likes +
@@ -4162,7 +4162,7 @@ function ModuleCommunity() {
                     >
                       <MessageCircle size={14} />
                       <span
-                        className="text-sm"
+                        className="text-xs"
                         style={{ fontFamily: FH }}
                       >
                         {post.comments}
@@ -4211,7 +4211,7 @@ function ModuleCommunity() {
                           width: "114px",
                           height: "148px",
                           boxShadow:
-                            "0 4px 20px rgba(0,0,0,0.58), 0 0 0 1px rgba(200,150,64,0.28)",
+                            "0 8px 28px rgba(0,0,0,0.60), 0 0 0 1px rgba(200,150,64,0.22)",
                         }}
                       >
                         <img
@@ -4242,7 +4242,7 @@ function ModuleCommunity() {
                             }}
                           >
                             <span
-                              className="text-sm"
+                              className="text-xs"
                               style={{
                                 color: "rgba(200,150,64,0.82)",
                                 fontFamily: FH,
@@ -4267,7 +4267,7 @@ function ModuleCommunity() {
               className="relative p-5"
               style={{
                 background:
-                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
                 border: "1px solid rgba(200,150,64,0.32)",
               }}
             >
@@ -4323,7 +4323,7 @@ function ModuleCommunity() {
                 }}
               />
               <div
-                className="text-sm tracking-[0.35em] mb-4 flex items-center gap-2"
+                className="text-xs tracking-[0.35em] mb-4 flex items-center gap-2"
                 style={{
                   color: "rgba(200,150,64,0.68)",
                   fontFamily: FH,
@@ -4347,7 +4347,7 @@ function ModuleCommunity() {
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className="text-sm w-4"
+                        className="text-xs w-4"
                         style={{
                           color: "rgba(200,150,64,0.35)",
                           fontFamily: FH,
@@ -4356,7 +4356,7 @@ function ModuleCommunity() {
                         {i + 1}
                       </span>
                       <span
-                        className="text-base transition-colors"
+                        className="text-sm transition-colors"
                         style={{
                           color: "rgba(200,188,168,0.72)",
                           fontFamily: FH,
@@ -4366,7 +4366,7 @@ function ModuleCommunity() {
                       </span>
                     </div>
                     <span
-                      className="text-sm"
+                      className="text-xs"
                       style={{
                         color: "rgba(200,150,64,0.42)",
                         fontFamily: FH,
@@ -4384,7 +4384,7 @@ function ModuleCommunity() {
               className="relative p-5"
               style={{
                 background:
-                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
                 border: "1px solid rgba(200,150,64,0.32)",
               }}
             >
@@ -4440,7 +4440,7 @@ function ModuleCommunity() {
                 }}
               />
               <div
-                className="text-sm tracking-[0.35em] mb-4 flex items-center gap-2"
+                className="text-xs tracking-[0.35em] mb-4 flex items-center gap-2"
                 style={{
                   color: "rgba(200,150,64,0.68)",
                   fontFamily: FH,
@@ -4463,7 +4463,7 @@ function ModuleCommunity() {
                     className="flex items-start gap-3"
                   >
                     <div
-                      className="w-9 h-9 flex-shrink-0 flex items-center justify-center text-sm"
+                      className="w-9 h-9 flex-shrink-0 flex items-center justify-center text-base"
                       style={{
                         border:
                           "1px solid rgba(200,150,64,0.32)",
@@ -4476,7 +4476,7 @@ function ModuleCommunity() {
                     </div>
                     <div>
                       <div
-                        className="text-sm"
+                        className="text-base"
                         style={{
                           color: "rgba(215,205,188,0.88)",
                           fontFamily: FH,
@@ -4485,7 +4485,7 @@ function ModuleCommunity() {
                         {exp.name}
                       </div>
                       <div
-                        className="text-base mt-0.5"
+                        className="text-sm mt-0.5"
                         style={{
                           color: "rgba(200,188,168,0.58)",
                           fontFamily: FH,
@@ -4494,7 +4494,7 @@ function ModuleCommunity() {
                         {exp.title}
                       </div>
                       <div
-                        className="text-sm mt-0.5"
+                        className="text-xs mt-0.5"
                         style={{
                           color: "rgba(200,150,64,0.55)",
                           fontFamily: FH,
@@ -4513,7 +4513,7 @@ function ModuleCommunity() {
               className="relative p-5"
               style={{
                 background:
-                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
                 border: "1px solid rgba(200,150,64,0.32)",
               }}
             >
@@ -4569,7 +4569,7 @@ function ModuleCommunity() {
                 }}
               />
               <div
-                className="text-sm tracking-[0.35em] mb-4 flex items-center gap-2"
+                className="text-xs tracking-[0.35em] mb-4 flex items-center gap-2"
                 style={{
                   color: "rgba(200,150,64,0.68)",
                   fontFamily: FH,
@@ -4586,7 +4586,7 @@ function ModuleCommunity() {
                 }}
               />
               <p
-                className="text-base leading-relaxed mb-4"
+                className="text-sm leading-relaxed mb-4"
                 style={{
                   color: "rgba(200,188,168,0.72)",
                   fontFamily: FH,
@@ -4596,7 +4596,7 @@ function ModuleCommunity() {
               </p>
               <a
                 href="#"
-                className="flex items-center gap-1.5 text-sm tracking-widest transition-opacity hover:opacity-70"
+                className="flex items-center gap-1.5 text-xs tracking-widest transition-opacity hover:opacity-70"
                 style={{
                   color: "rgba(200,150,64,0.62)",
                   fontFamily: FH,
@@ -4653,7 +4653,7 @@ function ModulePersonal() {
               >
                 文化行者·源
               </h2>
-              <p className="text-muted-foreground text-base mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 探源达人 · 已加入238天
               </p>
               <div className="flex items-center gap-6 mt-3">
@@ -4669,11 +4669,11 @@ function ModulePersonal() {
                   >
                     <div className="text-center">
                       <div
-                        className={`text-base ${i === 0 ? "text-primary" : "text-foreground"}`}
+                        className={`text-lg ${i === 0 ? "text-primary" : "text-foreground"}`}
                       >
                         {stat.v}
                       </div>
-                      <div className="text-muted-foreground text-sm tracking-wider">
+                      <div className="text-muted-foreground text-xs tracking-wider">
                         {stat.l}
                       </div>
                     </div>
@@ -4728,11 +4728,11 @@ function ModulePersonal() {
                 {badge.unlocked ? "◆" : "◇"}
               </div>
               <div
-                className={`text-sm leading-tight ${badge.unlocked ? "text-foreground" : "text-muted-foreground"}`}
+                className={`text-xs leading-tight ${badge.unlocked ? "text-foreground" : "text-muted-foreground"}`}
               >
                 {badge.label}
               </div>
-              <div className="text-muted-foreground/50 text-sm mt-0.5 leading-tight">
+              <div className="text-muted-foreground/50 text-xs mt-0.5 leading-tight">
                 {badge.desc}
               </div>
             </div>
@@ -4746,7 +4746,7 @@ function ModulePersonal() {
             <button
               key={t}
               onClick={() => setPersonalTab(t)}
-              className={`px-6 py-3 text-base tracking-widest transition-colors ${personalTab === t ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+              className={`px-6 py-3 text-sm tracking-widest transition-colors ${personalTab === t ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t === "足迹"
                 ? "我的探源足迹"
@@ -4761,7 +4761,7 @@ function ModulePersonal() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <SectionLabel en="MY HERITAGE FOOTPRINT" />
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <div className="w-2 h-2 bg-primary" />
                   实地打卡
@@ -4789,12 +4789,12 @@ function ModulePersonal() {
                   }`}
                 >
                   <div
-                    className={`text-sm tracking-wide mb-1 leading-tight ${site.status !== "未打卡" ? "text-foreground" : "text-muted-foreground/50"}`}
+                    className={`text-xs tracking-wide mb-1 leading-tight ${site.status !== "未打卡" ? "text-foreground" : "text-muted-foreground/50"}`}
                   >
                     {site.name}
                   </div>
                   <div
-                    className={`text-sm leading-tight ${site.status !== "未打卡" ? "text-muted-foreground" : "text-muted-foreground/30"}`}
+                    className={`text-xs leading-tight ${site.status !== "未打卡" ? "text-muted-foreground" : "text-muted-foreground/30"}`}
                   >
                     {site.culture}
                   </div>
@@ -4820,7 +4820,7 @@ function ModulePersonal() {
               ))}
             </div>
             <div className="mt-6 p-4 border border-border bg-card flex items-center gap-6">
-              <span className="text-base text-muted-foreground whitespace-nowrap">
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
                 探源进度：
                 <span className="text-primary">
                   {visited.length}
@@ -4835,7 +4835,7 @@ function ModulePersonal() {
                   }}
                 />
               </div>
-              <span className="text-primary text-base whitespace-nowrap">
+              <span className="text-primary text-sm whitespace-nowrap">
                 {Math.round((visited.length / 29) * 100)}%
               </span>
             </div>
@@ -4844,10 +4844,10 @@ function ModulePersonal() {
         {personalTab === "游记" && (
           <div className="text-center py-16 text-muted-foreground">
             <div className="text-5xl mb-4 opacity-20">✍</div>
-            <p className="text-base tracking-widest">
+            <p className="text-sm tracking-widest">
               暂无游记，探访遗址后分享您的见闻吧
             </p>
-            <button className="mt-6 px-6 py-2.5 border border-primary text-primary text-sm tracking-widest hover:bg-primary/10 transition-colors">
+            <button className="mt-6 px-6 py-2.5 border border-primary text-primary text-xs tracking-widest hover:bg-primary/10 transition-colors">
               写游记
             </button>
           </div>
@@ -4855,7 +4855,7 @@ function ModulePersonal() {
         {personalTab === "收藏" && (
           <div className="text-center py-16 text-muted-foreground">
             <div className="text-5xl mb-4 opacity-20">◇</div>
-            <p className="text-base tracking-widest">
+            <p className="text-sm tracking-widest">
               暂无收藏内容
             </p>
           </div>
@@ -4941,13 +4941,13 @@ function AIAssistant() {
               <Sparkles size={14} className="text-primary" />
             </div>
             <div>
-              <div className="text-foreground text-base tracking-wide">
+              <div className="text-foreground text-sm tracking-wide">
                 探源AI导游
               </div>
             </div>
             <div className="ml-auto flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              <span className="text-muted-foreground text-sm">
+              <span className="text-muted-foreground text-xs">
                 在线
               </span>
             </div>
@@ -4968,7 +4968,7 @@ function AIAssistant() {
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-muted-foreground"}`}
+                  className={`max-w-[80%] px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-muted-foreground"}`}
                 >
                   {msg.content}
                   {msg.typing && (
@@ -4982,7 +4982,7 @@ function AIAssistant() {
 
           {messages.length <= 1 && (
             <div className="px-4 pb-2 flex-shrink-0">
-              <div className="text-muted-foreground text-sm tracking-wider mb-2">
+              <div className="text-muted-foreground text-xs tracking-wider mb-2">
                 快捷提问
               </div>
               <div className="space-y-1.5">
@@ -4990,7 +4990,7 @@ function AIAssistant() {
                   <button
                     key={q}
                     onClick={() => sendMessage(q)}
-                    className="w-full text-left px-3 py-2 border border-border text-sm text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+                    className="w-full text-left px-3 py-2 border border-border text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
                   >
                     {q}
                   </button>
@@ -5008,7 +5008,7 @@ function AIAssistant() {
                 e.key === "Enter" && sendMessage(input)
               }
               placeholder="输入您的问题…"
-              className="flex-1 bg-transparent text-base text-foreground placeholder:text-muted-foreground outline-none"
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
             />
             <button
               onClick={() => sendMessage(input)}
@@ -5062,7 +5062,7 @@ export default function App() {
               />
             </div>
             <div
-              className="text-primary text-lg tracking-widest leading-none"
+              className="text-primary text-sm tracking-widest leading-none"
               style={{ fontFamily: FH }}
             >
               中华文明探源工程
@@ -5074,7 +5074,7 @@ export default function App() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`relative px-4 py-2 text-lg tracking-wider transition-colors ${activeTab === tab.key ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                className={`relative px-4 py-2 text-sm tracking-wider transition-colors ${activeTab === tab.key ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {tab.label}
                 {activeTab === tab.key && (
@@ -5092,7 +5092,7 @@ export default function App() {
               <Bell size={16} />
             </button>
             <div
-              className="w-8 h-8 bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-lg"
+              className="w-8 h-8 bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-sm"
               style={{ fontFamily: FD }}
             >
               源
@@ -5115,11 +5115,11 @@ export default function App() {
                   setActiveTab(tab.key);
                   setMenuOpen(false);
                 }}
-                className={`w-full px-6 py-3 text-left text-lg tracking-wider flex items-center gap-3 ${activeTab === tab.key ? "text-primary bg-primary/5" : "text-muted-foreground"}`}
+                className={`w-full px-6 py-3 text-left text-sm tracking-wider flex items-center gap-3 ${activeTab === tab.key ? "text-primary bg-primary/5" : "text-muted-foreground"}`}
               >
                 {tab.label}
                 <span
-                  className="text-base text-muted-foreground/40 tracking-[0.2em]"
+                  className="text-xs text-muted-foreground/40 tracking-[0.2em]"
                   style={{ fontFamily: FE }}
                 >
                   {tab.sub}
@@ -5145,19 +5145,19 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 border border-primary/40 flex items-center justify-center text-primary text-sm">
+                <div className="w-6 h-6 border border-primary/40 flex items-center justify-center text-primary text-xs">
                   源
                 </div>
-                <span className="text-foreground text-base tracking-widest">
+                <span className="text-foreground text-sm tracking-widest">
                   中华文明探源工程
                 </span>
               </div>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <p className="text-muted-foreground text-xs leading-relaxed">
                 以科技之力，还原五千年文明脉络。汇考古学、历史学、自然科学于一体，探寻华夏文明之根。
               </p>
             </div>
             <div>
-              <div className="text-primary/60 text-sm tracking-[0.25em] uppercase mb-4">
+              <div className="text-primary/60 text-xs tracking-[0.25em] uppercase mb-4">
                 快速导航
               </div>
               <div className="space-y-2">
@@ -5170,7 +5170,7 @@ export default function App() {
                 ].map((link) => (
                   <div
                     key={link}
-                    className="text-muted-foreground text-sm hover:text-primary transition-colors cursor-pointer flex items-center gap-1"
+                    className="text-muted-foreground text-xs hover:text-primary transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <ChevronRight
                       size={10}
@@ -5182,10 +5182,10 @@ export default function App() {
               </div>
             </div>
             <div>
-              <div className="text-primary/60 text-sm tracking-[0.25em] uppercase mb-4">
+              <div className="text-primary/60 text-xs tracking-[0.25em] uppercase mb-4">
                 支持机构
               </div>
-              <div className="space-y-1.5 text-muted-foreground text-sm leading-relaxed">
+              <div className="space-y-1.5 text-muted-foreground text-xs leading-relaxed">
                 <p>国家文物局</p>
                 <p>中国社会科学院考古研究所</p>
                 <p>北京大学考古文博学院</p>
@@ -5195,10 +5195,10 @@ export default function App() {
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-6" />
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground/50 text-sm tracking-wider">
+            <span className="text-muted-foreground/50 text-xs tracking-wider">
               © 2026 中华文明探源工程文旅数字化平台
             </span>
-            <div className="flex items-center gap-2 text-muted-foreground/40 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground/40 text-xs">
               <GoldDiamond />
               <span>探索文明之源 · 传承华夏文脉</span>
               <GoldDiamond />

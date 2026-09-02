@@ -12,26 +12,27 @@
 
 :root {
   --font-size: 16px;
-  --background: #1E0C08;
+  /* 方案A 壁炉暖焰 — 底色提亮约1.5档，去阴影，壁画透出 */
+  --background: #3C1A0C;
   --foreground: #F4E4CC;
-  --card: #3A2010;
+  --card: #5A2E14;
   --card-foreground: #EED8B8;
-  --popover: #321A0C;
+  --popover: #4A2210;
   --popover-foreground: #EED8B8;
   --primary: #C89640;
-  --primary-foreground: #1E0C08;
+  --primary-foreground: #2A0E04;
   --secondary: #9B3020;
   --secondary-foreground: #F4E4CC;
-  --muted: #4A2A18;
+  --muted: #5E3220;
   --muted-foreground: #C09870;
-  --accent: #3E2210;
+  --accent: #522A14;
   --accent-foreground: #EED8B8;
   --destructive: #c0392b;
   --destructive-foreground: #F0DEC8;
-  --border: rgba(200, 150, 64, 0.22);
-  --input: #4A2A18;
-  --input-background: #4A2A18;
-  --switch-background: #6A3A20;
+  --border: rgba(200, 150, 64, 0.28);
+  --input: #5E3220;
+  --input-background: #5E3220;
+  --switch-background: #7A3A20;
   --font-weight-medium: 400;
   --font-weight-normal: 300;
   --ring: rgba(200, 150, 64, 0.50);
@@ -41,13 +42,13 @@
   --chart-4: #D4A840;
   --chart-5: #C8B098;
   --radius: 0px;
-  --sidebar: #261006;
+  --sidebar: #3A1A0A;
   --sidebar-foreground: #E8D4B4;
   --sidebar-primary: #C89640;
-  --sidebar-primary-foreground: #1E0C08;
-  --sidebar-accent: #3C1E10;
+  --sidebar-primary-foreground: #2A0E04;
+  --sidebar-accent: #522A14;
   --sidebar-accent-foreground: #E8D4B4;
-  --sidebar-border: rgba(200, 150, 64, 0.22);
+  --sidebar-border: rgba(200, 150, 64, 0.28);
   --sidebar-ring: rgba(200, 150, 64, 0.50);
 }
 

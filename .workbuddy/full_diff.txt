@@ -1,0 +1,1366 @@
+===== BLOCK 1 [delete] old 29-32 (4L) new 29-28 (0L) =====
+--- OLD ---
+
+// 遗址/社区图片映射 + 高德地图配置
+import { getSiteMainImage, COMMUNITY_IMAGES } from "../data/siteImages";
+import AMAP_CONFIG from "../../高德api/config.js";
+--- NEW ---
+
+===== BLOCK 2 [delete] old 143-146 (4L) new 139-138 (0L) =====
+--- OLD ---
+  /** 纬度（高德地图坐标） */
+  lat: number;
+  /** 经度（高德地图坐标） */
+  lng: number;
+--- NEW ---
+
+===== BLOCK 3 [delete] old 195-196 (2L) new 187-186 (0L) =====
+--- OLD ---
+    lat: 34.52,
+    lng: 110.86,
+--- NEW ---
+
+===== BLOCK 4 [delete] old 210-211 (2L) new 200-199 (0L) =====
+--- OLD ---
+    lat: 29.66,
+    lng: 111.76,
+--- NEW ---
+
+===== BLOCK 5 [delete] old 225-226 (2L) new 213-212 (0L) =====
+--- OLD ---
+    lat: 31.87,
+    lng: 120.55,
+--- NEW ---
+
+===== BLOCK 6 [delete] old 242-243 (2L) new 228-227 (0L) =====
+--- OLD ---
+    lat: 34.75,
+    lng: 113,
+--- NEW ---
+
+===== BLOCK 7 [delete] old 257-258 (2L) new 241-240 (0L) =====
+--- OLD ---
+    lat: 34.98,
+    lng: 105.67,
+--- NEW ---
+
+===== BLOCK 8 [delete] old 272-273 (2L) new 254-253 (0L) =====
+--- OLD ---
+    lat: 35.73,
+    lng: 107.64,
+--- NEW ---
+
+===== BLOCK 9 [delete] old 287-288 (2L) new 267-266 (0L) =====
+--- OLD ---
+    lat: 36,
+    lng: 117.1,
+--- NEW ---
+
+===== BLOCK 10 [delete] old 302-303 (2L) new 280-279 (0L) =====
+--- OLD ---
+    lat: 36.72,
+    lng: 117.53,
+--- NEW ---
+
+===== BLOCK 11 [delete] old 317-318 (2L) new 293-292 (0L) =====
+--- OLD ---
+    lat: 35.08,
+    lng: 117.15,
+--- NEW ---
+
+===== BLOCK 12 [delete] old 332-333 (2L) new 306-305 (0L) =====
+--- OLD ---
+    lat: 41.33,
+    lng: 119.5,
+--- NEW ---
+
+===== BLOCK 13 [delete] old 347-348 (2L) new 319-318 (0L) =====
+--- OLD ---
+    lat: 29.68,
+    lng: 111.74,
+--- NEW ---
+
+===== BLOCK 14 [delete] old 362-363 (2L) new 332-331 (0L) =====
+--- OLD ---
+    lat: 30.93,
+    lng: 113.58,
+--- NEW ---
+
+===== BLOCK 15 [delete] old 377-378 (2L) new 345-344 (0L) =====
+--- OLD ---
+    lat: 33.05,
+    lng: 112.6,
+--- NEW ---
+
+===== BLOCK 16 [delete] old 392-393 (2L) new 358-357 (0L) =====
+--- OLD ---
+    lat: 31.55,
+    lng: 118.05,
+--- NEW ---
+
+===== BLOCK 17 [delete] old 409-410 (2L) new 373-372 (0L) =====
+--- OLD ---
+    lat: 31.38,
+    lng: 120.98,
+--- NEW ---
+
+===== BLOCK 18 [delete] old 424-425 (2L) new 386-385 (0L) =====
+--- OLD ---
+    lat: 31.32,
+    lng: 120.75,
+--- NEW ---
+
+===== BLOCK 19 [delete] old 439-440 (2L) new 399-398 (0L) =====
+--- OLD ---
+    lat: 30.38,
+    lng: 120.03,
+--- NEW ---
+
+===== BLOCK 20 [delete] old 454-455 (2L) new 412-411 (0L) =====
+--- OLD ---
+    lat: 30.78,
+    lng: 113.18,
+--- NEW ---
+
+===== BLOCK 21 [delete] old 469-470 (2L) new 425-424 (0L) =====
+--- OLD ---
+    lat: 30.57,
+    lng: 103.82,
+--- NEW ---
+
+===== BLOCK 22 [delete] old 484-485 (2L) new 438-437 (0L) =====
+--- OLD ---
+    lat: 36.74,
+    lng: 117.55,
+--- NEW ---
+
+===== BLOCK 23 [delete] old 499-500 (2L) new 451-450 (0L) =====
+--- OLD ---
+    lat: 35.88,
+    lng: 111.52,
+--- NEW ---
+
+===== BLOCK 24 [delete] old 514-515 (2L) new 464-463 (0L) =====
+--- OLD ---
+    lat: 38.82,
+    lng: 110.33,
+--- NEW ---
+
+===== BLOCK 25 [delete] old 529-530 (2L) new 477-476 (0L) =====
+--- OLD ---
+    lat: 38.55,
+    lng: 111.12,
+--- NEW ---
+
+===== BLOCK 26 [delete] old 544-545 (2L) new 490-489 (0L) =====
+--- OLD ---
+    lat: 36.45,
+    lng: 102.42,
+--- NEW ---
+
+===== BLOCK 27 [delete] old 561-562 (2L) new 505-504 (0L) =====
+--- OLD ---
+    lat: 34.69,
+    lng: 112.72,
+--- NEW ---
+
+===== BLOCK 28 [delete] old 576-577 (2L) new 518-517 (0L) =====
+--- OLD ---
+    lat: 34.75,
+    lng: 113.68,
+--- NEW ---
+
+===== BLOCK 29 [delete] old 591-592 (2L) new 531-530 (0L) =====
+--- OLD ---
+    lat: 36.12,
+    lng: 114.32,
+--- NEW ---
+
+===== BLOCK 30 [delete] old 606-607 (2L) new 544-543 (0L) =====
+--- OLD ---
+    lat: 30.99,
+    lng: 104.2,
+--- NEW ---
+
+===== BLOCK 31 [delete] old 621-622 (2L) new 557-556 (0L) =====
+--- OLD ---
+    lat: 27.78,
+    lng: 115.4,
+--- NEW ---
+
+===== BLOCK 32 [replace] old 1093-1093 (1L) new 1027-1027 (1L) =====
+--- OLD ---
+  return <span className="text-primary text-xs">◆</span>;
+--- NEW ---
+  return <span className="text-primary text-sm">◆</span>;
+
+===== BLOCK 33 [replace] old 1110-1110 (1L) new 1044-1044 (1L) =====
+--- OLD ---
+        className="text-primary/70 text-sm tracking-[0.25em] uppercase"
+--- NEW ---
+        className="text-primary/70 text-base tracking-[0.25em] uppercase"
+
+===== BLOCK 34 [replace] old 1151-1151 (1L) new 1085-1085 (1L) =====
+--- OLD ---
+        className="text-primary/45 text-xs tracking-[0.35em]"
+--- NEW ---
+        className="text-primary/45 text-sm tracking-[0.35em]"
+
+===== BLOCK 35 [replace] old 1184-1184 (1L) new 1118-1118 (1L) =====
+--- OLD ---
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/25 to-background" />
+--- NEW ---
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/10 to-background/60" />
+
+===== BLOCK 36 [replace] old 1191-1191 (1L) new 1125-1125 (1L) =====
+--- OLD ---
+              "radial-gradient(ellipse 85% 80% at 50% 50%, transparent 35%, rgba(30,12,8,0.75) 100%)",
+--- NEW ---
+              "radial-gradient(ellipse 85% 80% at 50% 50%, transparent 35%, rgba(30,12,8,0.12) 100%)",
+
+===== BLOCK 37 [replace] old 1231-1231 (1L) new 1165-1165 (1L) =====
+--- OLD ---
+            className="text-primary/80 text-sm tracking-[0.4em] uppercase mb-8"
+--- NEW ---
+            className="text-primary/80 text-base tracking-[0.4em] uppercase mb-8"
+
+===== BLOCK 38 [replace] old 1246-1246 (1L) new 1180-1180 (1L) =====
+--- OLD ---
+          <div className="space-y-2 text-primary/60 text-sm tracking-widest">
+--- NEW ---
+          <div className="space-y-2 text-primary/60 text-base tracking-widest">
+
+===== BLOCK 39 [replace] old 1261-1261 (1L) new 1195-1195 (1L) =====
+--- OLD ---
+          <span className="text-xs tracking-widest">
+--- NEW ---
+          <span className="text-sm tracking-widest">
+
+===== BLOCK 40 [replace] old 1275-1275 (1L) new 1209-1209 (1L) =====
+--- OLD ---
+        <div className="absolute inset-0 bg-gradient-to-r from-background/75 via-background/45 to-background/25" />
+--- NEW ---
+        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-background/20 to-background/10" />
+
+===== BLOCK 41 [replace] old 1283-1283 (1L) new 1217-1217 (1L) =====
+--- OLD ---
+              "radial-gradient(ellipse 90% 85% at 60% 50%, transparent 30%, rgba(30,12,8,0.8) 100%)",
+--- NEW ---
+              "radial-gradient(ellipse 90% 85% at 60% 50%, transparent 30%, rgba(30,12,8,0.12) 100%)",
+
+===== BLOCK 42 [replace] old 1326-1326 (1L) new 1260-1260 (1L) =====
+--- OLD ---
+                className="text-primary/60 text-sm tracking-[0.3em] uppercase mb-4"
+--- NEW ---
+                className="text-primary/60 text-base tracking-[0.3em] uppercase mb-4"
+
+===== BLOCK 43 [replace] old 1332-1332 (1L) new 1266-1266 (1L) =====
+--- OLD ---
+                className="text-foreground/85 text-xl leading-relaxed mb-4"
+--- NEW ---
+                className="text-foreground/85 text-3xl leading-relaxed mb-4"
+
+===== BLOCK 44 [replace] old 1338-1338 (1L) new 1272-1272 (1L) =====
+--- OLD ---
+                className="text-foreground/70 leading-relaxed mb-4"
+--- NEW ---
+                className="text-foreground/70 text-2xl leading-relaxed mb-4"
+
+===== BLOCK 45 [replace] old 1344-1344 (1L) new 1278-1278 (1L) =====
+--- OLD ---
+                className="text-foreground/70 leading-relaxed"
+--- NEW ---
+                className="text-foreground/70 text-2xl leading-relaxed"
+
+===== BLOCK 46 [replace] old 1391-1391 (1L) new 1325-1325 (1L) =====
+--- OLD ---
+                  background: "rgba(200,165,110,0.13)",
+--- NEW ---
+                  background: "rgba(155,48,32,0.18)",
+
+===== BLOCK 47 [replace] old 1519-1519 (1L) new 1453-1453 (1L) =====
+--- OLD ---
+                  className="text-xs tracking-[0.32em] mb-2 text-primary/50"
+--- NEW ---
+                  className="text-sm tracking-[0.32em] mb-2 text-primary/50"
+
+===== BLOCK 48 [replace] old 1534-1534 (1L) new 1468-1468 (1L) =====
+--- OLD ---
+                <p className="text-sm leading-relaxed text-foreground/75">
+--- NEW ---
+                <p className="text-base leading-relaxed text-foreground/75">
+
+===== BLOCK 49 [replace] old 1550-1550 (1L) new 1484-1484 (1L) =====
+--- OLD ---
+        <div className="absolute inset-0 bg-gradient-to-r from-background/75 via-background/45 to-background/20" />
+--- NEW ---
+        <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-background/20 to-background/10" />
+
+===== BLOCK 50 [replace] old 1558-1558 (1L) new 1492-1492 (1L) =====
+--- OLD ---
+              "radial-gradient(ellipse 90% 85% at 40% 50%, transparent 30%, rgba(30,12,8,0.8) 100%)",
+--- NEW ---
+              "radial-gradient(ellipse 90% 85% at 40% 50%, transparent 30%, rgba(30,12,8,0.12) 100%)",
+
+===== BLOCK 51 [replace] old 1657-1657 (1L) new 1591-1591 (1L) =====
+--- OLD ---
+                <p className="text-primary/30 text-xs tracking-[0.3em]">
+--- NEW ---
+                <p className="text-primary/30 text-sm tracking-[0.3em]">
+
+===== BLOCK 52 [replace] old 1660-1660 (1L) new 1594-1594 (1L) =====
+--- OLD ---
+                <p className="text-primary/20 text-xs tracking-[0.3em]">
+--- NEW ---
+                <p className="text-primary/20 text-sm tracking-[0.3em]">
+
+===== BLOCK 53 [replace] old 1663-1663 (1L) new 1597-1597 (1L) =====
+--- OLD ---
+                <p className="text-muted-foreground/20 text-xs tracking-widest">
+--- NEW ---
+                <p className="text-muted-foreground/20 text-sm tracking-widest">
+
+===== BLOCK 54 [replace] old 1671-1671 (1L) new 1605-1605 (1L) =====
+--- OLD ---
+                className="text-primary/60 text-sm tracking-[0.3em] uppercase mb-8"
+--- NEW ---
+                className="text-primary/60 text-base tracking-[0.3em] uppercase mb-8"
+
+===== BLOCK 55 [replace] old 1701-1701 (1L) new 1635-1635 (1L) =====
+--- OLD ---
+                      className="text-primary/50 text-sm tracking-widest mb-1"
+--- NEW ---
+                      className="text-primary/50 text-base tracking-widest mb-1"
+
+===== BLOCK 56 [replace] old 1707-1707 (1L) new 1641-1641 (1L) =====
+--- OLD ---
+                      className="text-foreground/90 text-3xl mb-3"
+--- NEW ---
+                      className="text-foreground/90 text-4xl mb-3"
+
+===== BLOCK 57 [replace] old 1713-1713 (1L) new 1647-1647 (1L) =====
+--- OLD ---
+                      className="text-muted-foreground text-base leading-relaxed"
+--- NEW ---
+                      className="text-muted-foreground text-2xl leading-relaxed"
+
+===== BLOCK 58 [replace] old 1733-1733 (1L) new 1667-1667 (1L) =====
+--- OLD ---
+        <div className="absolute inset-0 bg-gradient-to-l from-background/75 via-background/50 to-background/30" />
+--- NEW ---
+        <div className="absolute inset-0 bg-gradient-to-l from-background/40 via-background/20 to-background/10" />
+
+===== BLOCK 59 [replace] old 1741-1741 (1L) new 1675-1675 (1L) =====
+--- OLD ---
+              "radial-gradient(ellipse 88% 82% at 50% 55%, transparent 32%, rgba(30,12,8,0.82) 100%)",
+--- NEW ---
+              "radial-gradient(ellipse 88% 82% at 50% 55%, transparent 32%, rgba(30,12,8,0.12) 100%)",
+
+===== BLOCK 60 [replace] old 1784-1784 (1L) new 1718-1718 (1L) =====
+--- OLD ---
+                className="text-primary/60 text-sm tracking-[0.3em] uppercase mb-8 text-right"
+--- NEW ---
+                className="text-primary/60 text-base tracking-[0.3em] uppercase mb-8 text-right"
+
+===== BLOCK 61 [replace] old 1817-1817 (1L) new 1751-1751 (1L) =====
+--- OLD ---
+                      className="text-primary/50 text-sm tracking-widest mb-1"
+--- NEW ---
+                      className="text-primary/50 text-base tracking-widest mb-1"
+
+===== BLOCK 62 [replace] old 1823-1823 (1L) new 1757-1757 (1L) =====
+--- OLD ---
+                      className="text-foreground/90 text-3xl mb-3"
+--- NEW ---
+                      className="text-foreground/90 text-4xl mb-3"
+
+===== BLOCK 63 [replace] old 1829-1829 (1L) new 1763-1763 (1L) =====
+--- OLD ---
+                      className="text-muted-foreground text-base leading-relaxed"
+--- NEW ---
+                      className="text-muted-foreground text-2xl leading-relaxed"
+
+===== BLOCK 64 [replace] old 1896-1896 (1L) new 1830-1830 (1L) =====
+--- OLD ---
+                <p className="text-primary/30 text-xs tracking-[0.3em]">
+--- NEW ---
+                <p className="text-primary/30 text-sm tracking-[0.3em]">
+
+===== BLOCK 65 [replace] old 1899-1899 (1L) new 1833-1833 (1L) =====
+--- OLD ---
+                <p className="text-primary/20 text-xs tracking-[0.3em]">
+--- NEW ---
+                <p className="text-primary/20 text-sm tracking-[0.3em]">
+
+===== BLOCK 66 [replace] old 1902-1902 (1L) new 1836-1836 (1L) =====
+--- OLD ---
+                <p className="text-muted-foreground/20 text-xs tracking-widest">
+--- NEW ---
+                <p className="text-muted-foreground/20 text-sm tracking-widest">
+
+===== BLOCK 67 [replace] old 1932-1932 (1L) new 1866-1866 (1L) =====
+--- OLD ---
+                  background: "rgba(200,165,110,0.13)",
+--- NEW ---
+                  background: "rgba(155,48,32,0.18)",
+
+===== BLOCK 68 [replace] old 2060-2060 (1L) new 1994-1994 (1L) =====
+--- OLD ---
+                  className="text-xs tracking-[0.2em] uppercase mb-2 text-primary/50"
+--- NEW ---
+                  className="text-sm tracking-[0.2em] uppercase mb-2 text-primary/50"
+
+===== BLOCK 69 [replace] old 2075-2075 (1L) new 2009-2009 (1L) =====
+--- OLD ---
+                <p className="text-sm leading-relaxed text-foreground/75">
+--- NEW ---
+                <p className="text-base leading-relaxed text-foreground/75">
+
+===== BLOCK 70 [replace] old 2098-2098 (1L) new 2032-2032 (1L) =====
+--- OLD ---
+          <p className="text-foreground/60 text-sm tracking-[0.3em]">
+--- NEW ---
+          <p className="text-foreground/60 text-base tracking-[0.3em]">
+
+===== BLOCK 71 [replace] old 2101-2101 (1L) new 2035-2035 (1L) =====
+--- OLD ---
+          <p className="text-muted-foreground text-xs tracking-wider">
+--- NEW ---
+          <p className="text-muted-foreground text-sm tracking-wider">
+
+===== BLOCK 72 [replace] old 2139-2139 (1L) new 2073-2073 (1L) =====
+--- OLD ---
+                className={`text-xs tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-primary/80" : "text-muted-foreground/50"}`}
+--- NEW ---
+                className={`text-sm tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-primary/80" : "text-muted-foreground/50"}`}
+
+===== BLOCK 73 [replace] old 2152-2152 (1L) new 2086-2086 (1L) =====
+--- OLD ---
+                    className={`text-sm transition-colors ${isActive ? "text-primary" : "text-muted-foreground/40 group-hover:text-primary/60"}`}
+--- NEW ---
+                    className={`text-base transition-colors ${isActive ? "text-primary" : "text-muted-foreground/40 group-hover:text-primary/60"}`}
+
+===== BLOCK 74 [replace] old 2169-2169 (1L) new 2103-2103 (1L) =====
+--- OLD ---
+                className={`text-sm tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground/70"}`}
+--- NEW ---
+                className={`text-base tracking-wider transition-colors whitespace-nowrap ${isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground/70"}`}
+
+===== BLOCK 75 [replace] old 2177-2177 (1L) new 2111-2111 (1L) =====
+--- OLD ---
+                className={`text-xs tracking-widest transition-colors ${isActive ? "text-primary/70" : "text-muted-foreground/30"}`}
+--- NEW ---
+                className={`text-sm tracking-widest transition-colors ${isActive ? "text-primary/70" : "text-muted-foreground/30"}`}
+
+===== BLOCK 76 [delete] old 2213-2216 (4L) new 2147-2146 (0L) =====
+--- OLD ---
+  // 高德地图相关状态
+  const mapRef = useRef<HTMLDivElement>(null);
+  const amapRef = useRef<any>(null);
+  const [amapReady, setAmapReady] = useState(false);
+--- NEW ---
+
+===== BLOCK 77 [delete] old 2228-2317 (90L) new 2158-2157 (0L) =====
+--- OLD ---
+
+  // ─── 高德地图初始化（动态加载 SDK） ──────────────────────────────
+  useEffect(() => {
+    if (!mapRef.current || amapRef.current) return;
+    const Win = window as any;
+
+    const createMapAndMarkers = () => {
+      if (!mapRef.current) return;
+      const map = new Win.AMap.Map(mapRef.current, {
+        center: AMAP_CONFIG.defaultCenter,
+        zoom: AMAP_CONFIG.defaultZoom,
+        mapStyle: "amap://styles/dark",
+      });
+      amapRef.current = map;
+
+      const markers: any[] = [];
+      SITES.forEach((site) => {
+        const marker = new Win.AMap.Marker({
+          position: [site.lng, site.lat],
+          title: site.name,
+          label: {
+            content:
+              '<div style="color:#c9a227;font-size:10px;font-weight:bold;text-shadow:0 0 6px rgba(200,150,64,0.6)">◆</div>',
+            offset: new Win.AMap.Pixel(0, -8),
+          },
+        });
+        marker.on("click", () => {
+          setSelectedSite(site);
+          setDrawerTab("介绍");
+        });
+        markers.push(marker);
+      });
+      map.add(markers);
+      map.setFitView(null, false, [60, 60, 60, 60]);
+      setAmapReady(true);
+    };
+
+    // 若 AMap 已加载，直接初始化
+    if (Win.AMap) {
+      createMapAndMarkers();
+      return;
+    }
+
+    // key 为空 → 保留示意地图，不加载 SDK
+    const key = AMAP_CONFIG.key;
+    if (!key || key === "YOUR_AMAP_API_KEY_HERE") {
+      console.warn("[地图] 待填入高德 API Key（高德api/config.js → AMAP_CONFIG.key）");
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://webapi.amap.com/maps?v=${AMAP_CONFIG.version}&key=${key}&plugin=${AMAP_CONFIG.plugins.join(",")}`;
+    script.onload = () => createMapAndMarkers();
+    script.onerror = () =>
+      console.error("[地图] 高德 SDK 加载失败，请检查 API Key 和网络");
+    document.head.appendChild(script);
+
+    return () => {
+      if (amapRef.current) {
+        amapRef.current.destroy();
+        amapRef.current = null;
+      }
+    };
+  }, []);
+
+  // ─── 筛选变化时更新地图标记 ──────────────────────────────────────
+  useEffect(() => {
+    if (!amapRef.current || !(window as any).AMap) return;
+    const map = amapRef.current;
+    map.clearMap();
+
+    const markers: any[] = [];
+    filtered.forEach((site) => {
+      const marker = new (window as any).AMap.Marker({
+        position: [site.lng, site.lat],
+        title: site.name,
+        label: {
+          content:
+            '<div style="color:#c9a227;font-size:10px;font-weight:bold;text-shadow:0 0 6px rgba(200,150,64,0.6)">◆</div>',
+          offset: new (window as any).AMap.Pixel(0, -8),
+        },
+      });
+      marker.on("click", () => {
+        setSelectedSite(site);
+        setDrawerTab("介绍");
+      });
+      markers.push(marker);
+    });
+    map.add(markers);
+  }, [filtered]);
+--- NEW ---
+
+===== BLOCK 78 [replace] old 2336-2336 (1L) new 2176-2176 (1L) =====
+--- OLD ---
+            <span className="text-muted-foreground text-xs tracking-widest">
+--- NEW ---
+            <span className="text-muted-foreground text-sm tracking-widest">
+
+===== BLOCK 79 [replace] old 2343-2343 (1L) new 2183-2183 (1L) =====
+--- OLD ---
+                className={`px-4 py-1 text-xs tracking-widest border transition-all duration-200 ${
+--- NEW ---
+                className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 ${
+
+===== BLOCK 80 [replace] old 2352-2352 (1L) new 2192-2192 (1L) =====
+--- OLD ---
+            <span className="ml-auto text-muted-foreground text-xs">
+--- NEW ---
+            <span className="ml-auto text-muted-foreground text-sm">
+
+===== BLOCK 81 [delete] old 2368-2368 (1L) new 2208-2207 (0L) =====
+--- OLD ---
+            ref={mapRef}
+--- NEW ---
+
+===== BLOCK 82 [replace] old 2372-2381 (10L) new 2211-2217 (7L) =====
+--- OLD ---
+            {/* 未配置高德 Key 时的示意地图（石峁壁画 + 比例定位点） */}
+            {!amapReady && (
+              <>
+                {/* Map background — mural tinted */}
+                <img
+                  src={mural2}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-8"
+                />
+                <div className="absolute inset-0 bg-background/70" />
+--- NEW ---
+            {/* Map background — mural tinted */}
+            <img
+              src={mural2}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-8"
+            />
+            <div className="absolute inset-0 bg-background/70" />
+
+===== BLOCK 83 [replace] old 2383-2383 (1L) new 2219-2248 (30L) =====
+--- OLD ---
+                {/* Grid lines */}
+--- NEW ---
+            {/* Grid lines */}
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(201,162,39,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,162,39,0.3) 1px, transparent 1px)",
+                backgroundSize: "60px 60px",
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-primary/15 text-base tracking-[0.3em]">
+                地图加载中 · 需配置高德地图 API Key
+              </span>
+            </div>
+
+            {/* Markers */}
+            {filtered.map((site) => (
+              <button
+                key={site.id}
+                onClick={() => {
+                  setSelectedSite(site);
+                  setDrawerTab("介绍");
+                }}
+                style={{
+                  left: `${site.x}%`,
+                  top: `${site.y}%`,
+                }}
+                className="absolute -translate-x-1/2 -translate-y-1/2 group z-10"
+                title={site.name}
+              >
+
+===== BLOCK 84 [replace] old 2385-2395 (11L) new 2250-2275 (26L) =====
+--- OLD ---
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(rgba(201,162,39,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,162,39,0.3) 1px, transparent 1px)",
+                    backgroundSize: "60px 60px",
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-primary/15 text-sm tracking-[0.3em]">
+                    示意地图 · 在高德api/config.js 填入 Key 后切换真实地图
+                  </span>
+--- NEW ---
+                  className={`relative transition-all duration-200 ${selectedSite?.id === site.id ? "scale-150" : "hover:scale-125"}`}
+                >
+                  {site.status === "实地打卡" && (
+                    <>
+                      <div className="absolute inset-0 w-4 h-4 rounded-full bg-primary animate-ping opacity-25" />
+                      <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg shadow-primary/40" />
+                    </>
+                  )}
+                  {site.status === "线上打卡" && (
+                    <div className="w-3.5 h-3.5 rounded-full bg-secondary border border-secondary/60" />
+                  )}
+                  {site.status === "未打卡" && (
+                    <div
+                      className="w-3 h-3 border border-muted-foreground/40 bg-muted/50"
+                      style={{
+                        clipPath:
+                          "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                      }}
+                    />
+                  )}
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                    <div className="bg-card border border-border px-2 py-1 text-sm text-foreground shadow-lg">
+                      {site.name}
+                    </div>
+                  </div>
+
+===== BLOCK 85 [replace] old 2397-2444 (48L) new 2277-2278 (2L) =====
+--- OLD ---
+
+                {/* Markers */}
+                {filtered.map((site) => (
+                  <button
+                    key={site.id}
+                    onClick={() => {
+                      setSelectedSite(site);
+                      setDrawerTab("介绍");
+                    }}
+                    style={{
+                      left: `${site.x}%`,
+                      top: `${site.y}%`,
+                    }}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 group z-10"
+                    title={site.name}
+                  >
+                    <div
+                      className={`relative transition-all duration-200 ${selectedSite?.id === site.id ? "scale-150" : "hover:scale-125"}`}
+                    >
+                      {site.status === "实地打卡" && (
+                        <>
+                          <div className="absolute inset-0 w-4 h-4 rounded-full bg-primary animate-ping opacity-25" />
+                          <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary-foreground shadow-lg shadow-primary/40" />
+                        </>
+                      )}
+                      {site.status === "线上打卡" && (
+                        <div className="w-3.5 h-3.5 rounded-full bg-secondary border border-secondary/60" />
+                      )}
+                      {site.status === "未打卡" && (
+                        <div
+                          className="w-3 h-3 border border-muted-foreground/40 bg-muted/50"
+                          style={{
+                            clipPath:
+                              "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                          }}
+                        />
+                      )}
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                        <div className="bg-card border border-border px-2 py-1 text-xs text-foreground shadow-lg">
+                          {site.name}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </>
+            )}
+--- NEW ---
+              </button>
+            ))}
+
+===== BLOCK 86 [replace] old 2447-2448 (2L) new 2281-2282 (2L) =====
+--- OLD ---
+            <div className="absolute bottom-3 left-3 z-10 bg-background/85 backdrop-blur-sm border border-border p-3 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+--- NEW ---
+            <div className="absolute bottom-3 left-3 bg-background/85 backdrop-blur-sm border border-border p-3 space-y-1.5">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+
+===== BLOCK 87 [replace] old 2452-2452 (1L) new 2286-2286 (1L) =====
+--- OLD ---
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+--- NEW ---
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+
+===== BLOCK 88 [replace] old 2456-2456 (1L) new 2290-2290 (1L) =====
+--- OLD ---
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+--- NEW ---
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+
+===== BLOCK 89 [replace] old 2471-2471 (1L) new 2305-2305 (1L) =====
+--- OLD ---
+            className={`overflow-hidden transition-all duration-300 flex-shrink-0 ${selectedSite ? "w-80 opacity-100" : "w-0 opacity-0"}`}
+--- NEW ---
+            className={`overflow-hidden transition-all duration-300 flex-shrink-0 ${selectedSite ? "w-[420px] opacity-100" : "w-0 opacity-0"}`}
+
+===== BLOCK 90 [replace] old 2479-2479 (1L) new 2313-2313 (1L) =====
+--- OLD ---
+                    "linear-gradient(160deg, rgba(72,30,12,0.98) 0%, rgba(48,18,6,1) 60%, rgba(88,36,14,0.96) 100%)",
+--- NEW ---
+                    "linear-gradient(160deg, rgba(84,36,14,0.90) 0%, rgba(60,24,10,0.93) 60%, rgba(100,44,18,0.88) 100%)",
+
+===== BLOCK 91 [replace] old 2535-2535 (1L) new 2369-2369 (1L) =====
+--- OLD ---
+                      "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(200,150,64,0.22)",
+--- NEW ---
+                      "0 4px 20px rgba(0,0,0,0.60), 0 0 0 1px rgba(200,150,64,0.28)",
+
+===== BLOCK 92 [replace] old 2548-2549 (2L) new 2382-2382 (1L) =====
+--- OLD ---
+                              : getSiteMainImage(selectedSite.name) ??
+                                DRAWER_IMGS[selectedSite.id % 3]
+--- NEW ---
+                              : DRAWER_IMGS[selectedSite.id % 3]
+
+===== BLOCK 93 [replace] old 2570-2570 (1L) new 2403-2403 (1L) =====
+--- OLD ---
+                      background: "rgba(40,16,6,0.85)",
+--- NEW ---
+                      background: "rgba(52,22,8,0.78)",
+
+===== BLOCK 94 [replace] old 2575-2575 (1L) new 2408-2408 (1L) =====
+--- OLD ---
+                      className="text-[9px] tracking-[0.2em]"
+--- NEW ---
+                      className="text-xs tracking-[0.2em]"
+
+===== BLOCK 95 [replace] old 2589-2589 (1L) new 2422-2422 (1L) =====
+--- OLD ---
+                      background: "rgba(40,16,6,0.75)",
+--- NEW ---
+                      background: "rgba(52,22,8,0.68)",
+
+===== BLOCK 96 [replace] old 2603-2603 (1L) new 2436-2436 (1L) =====
+--- OLD ---
+                      "linear-gradient(160deg, rgba(72,30,12,0.97) 0%, rgba(48,18,6,1) 60%, rgba(88,36,14,0.95) 100%)",
+--- NEW ---
+                      "linear-gradient(160deg, rgba(84,36,14,0.89) 0%, rgba(60,24,10,0.92) 60%, rgba(100,44,18,0.87) 100%)",
+
+===== BLOCK 97 [replace] old 2727-2727 (1L) new 2560-2560 (1L) =====
+--- OLD ---
+                                    className="text-xs tracking-wide"
+--- NEW ---
+                                    className="text-sm tracking-wide"
+
+===== BLOCK 98 [replace] old 2741-2741 (1L) new 2574-2574 (1L) =====
+--- OLD ---
+                              className="text-xs leading-relaxed"
+--- NEW ---
+                              className="text-sm leading-relaxed"
+
+===== BLOCK 99 [replace] old 2790-2790 (1L) new 2623-2623 (1L) =====
+--- OLD ---
+                                  className="text-xs leading-snug"
+--- NEW ---
+                                  className="text-sm leading-snug"
+
+===== BLOCK 100 [replace] old 2921-2921 (1L) new 2754-2754 (1L) =====
+--- OLD ---
+                                      className="text-sm leading-none"
+--- NEW ---
+                                      className="text-base leading-none"
+
+===== BLOCK 101 [replace] old 2936-2936 (1L) new 2769-2769 (1L) =====
+--- OLD ---
+                                    className="text-[9px] tracking-[0.2em]"
+--- NEW ---
+                                    className="text-xs tracking-[0.2em]"
+
+===== BLOCK 102 [replace] old 2973-2973 (1L) new 2806-2806 (1L) =====
+--- OLD ---
+                                      className="text-base leading-none"
+--- NEW ---
+                                      className="text-sm leading-none"
+
+===== BLOCK 103 [replace] old 2986-2986 (1L) new 2819-2819 (1L) =====
+--- OLD ---
+                                    className="text-[9px] tracking-[0.25em]"
+--- NEW ---
+                                    className="text-xs tracking-[0.25em]"
+
+===== BLOCK 104 [replace] old 3058-3058 (1L) new 2891-2891 (1L) =====
+--- OLD ---
+                          className="text-[9px] tracking-[0.35em]"
+--- NEW ---
+                          className="text-xs tracking-[0.35em]"
+
+===== BLOCK 105 [replace] old 3092-3092 (1L) new 2925-2925 (1L) =====
+--- OLD ---
+                              className="flex items-center gap-2 mb-1.5 text-[9px] tracking-[0.3em]"
+--- NEW ---
+                              className="flex items-center gap-2 mb-1.5 text-xs tracking-[0.3em]"
+
+===== BLOCK 106 [replace] old 3171-3171 (1L) new 3004-3004 (1L) =====
+--- OLD ---
+                    "0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.20)",
+--- NEW ---
+                    "0 4px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.28)",
+
+===== BLOCK 107 [replace] old 3195-3195 (1L) new 3028-3028 (1L) =====
+--- OLD ---
+                    background: "rgba(40,16,6,0.82)",
+--- NEW ---
+                    background: "rgba(52,22,8,0.75)",
+
+===== BLOCK 108 [replace] old 3200-3200 (1L) new 3033-3033 (1L) =====
+--- OLD ---
+                    className="text-[9px] text-primary/70 tracking-[0.2em]"
+--- NEW ---
+                    className="text-xs text-primary/70 tracking-[0.2em]"
+
+===== BLOCK 109 [replace] old 3213-3213 (1L) new 3046-3046 (1L) =====
+--- OLD ---
+                    "linear-gradient(160deg, rgba(72,30,12,0.92) 0%, rgba(48,18,6,0.95) 60%, rgba(88,36,14,0.90) 100%)",
+--- NEW ---
+                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
+
+===== BLOCK 110 [replace] old 3293-3293 (1L) new 3126-3126 (1L) =====
+--- OLD ---
+                  className="flex justify-center gap-3 mb-3 text-[9px] tracking-[0.25em] text-primary/45"
+--- NEW ---
+                  className="flex justify-center gap-3 mb-3 text-xs tracking-[0.25em] text-primary/45"
+
+===== BLOCK 111 [replace] old 3307-3307 (1L) new 3140-3140 (1L) =====
+--- OLD ---
+                    className={`text-[9px] tracking-widest flex items-center gap-1 ${site.status === "实地打卡" ? "text-primary/72" : site.status === "线上打卡" ? "text-secondary/72" : "text-muted-foreground/38"}`}
+--- NEW ---
+                    className={`text-xs tracking-widest flex items-center gap-1 ${site.status === "实地打卡" ? "text-primary/72" : site.status === "线上打卡" ? "text-secondary/72" : "text-muted-foreground/38"}`}
+
+===== BLOCK 112 [replace] old 3314-3314 (1L) new 3147-3147 (1L) =====
+--- OLD ---
+                  <span className="text-[9px] tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+--- NEW ---
+                  <span className="text-xs tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+
+===== BLOCK 113 [replace] old 3360-3360 (1L) new 3193-3193 (1L) =====
+--- OLD ---
+          <p className="text-muted-foreground text-sm mt-1 tracking-wider">
+--- NEW ---
+          <p className="text-muted-foreground text-base mt-1 tracking-wider">
+
+===== BLOCK 114 [replace] old 3373-3373 (1L) new 3206-3206 (1L) =====
+--- OLD ---
+              className={`px-4 py-1 text-xs tracking-widest border transition-all duration-200 ${
+--- NEW ---
+              className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 ${
+
+===== BLOCK 115 [replace] old 3404-3404 (1L) new 3237-3237 (1L) =====
+--- OLD ---
+                    "0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.18)",
+--- NEW ---
+                    "0 4px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.28)",
+
+===== BLOCK 116 [replace] old 3420-3420 (1L) new 3253-3253 (1L) =====
+--- OLD ---
+                    background: "rgba(40,16,6,0.82)",
+--- NEW ---
+                    background: "rgba(52,22,8,0.75)",
+
+===== BLOCK 117 [replace] old 3425-3425 (1L) new 3258-3258 (1L) =====
+--- OLD ---
+                    className="text-[9px] text-primary/70 tracking-[0.2em]"
+--- NEW ---
+                    className="text-xs text-primary/70 tracking-[0.2em]"
+
+===== BLOCK 118 [replace] old 3446-3446 (1L) new 3279-3279 (1L) =====
+--- OLD ---
+                    "linear-gradient(160deg, rgba(72,30,12,0.92) 0%, rgba(48,18,6,0.95) 60%, rgba(88,36,14,0.90) 100%)",
+--- NEW ---
+                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
+
+===== BLOCK 119 [replace] old 3530-3530 (1L) new 3363-3363 (1L) =====
+--- OLD ---
+                <p className="text-foreground/50 text-[11px] leading-relaxed line-clamp-2 flex-1">
+--- NEW ---
+                <p className="text-foreground/50 text-xs leading-relaxed line-clamp-2 flex-1">
+
+===== BLOCK 120 [replace] old 3541-3541 (1L) new 3374-3374 (1L) =====
+--- OLD ---
+                  <span className="text-[9px] tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+--- NEW ---
+                  <span className="text-xs tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+
+===== BLOCK 121 [replace] old 3565-3565 (1L) new 3398-3398 (1L) =====
+--- OLD ---
+                "linear-gradient(160deg, rgba(72,30,12,0.98) 0%, rgba(48,18,6,1) 60%, rgba(88,36,14,0.96) 100%)",
+--- NEW ---
+                "linear-gradient(160deg, rgba(84,36,14,0.90) 0%, rgba(60,24,10,0.93) 60%, rgba(100,44,18,0.88) 100%)",
+
+===== BLOCK 122 [replace] old 3622-3622 (1L) new 3455-3455 (1L) =====
+--- OLD ---
+                  "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(200,150,64,0.22)",
+--- NEW ---
+                  "0 4px 20px rgba(0,0,0,0.60), 0 0 0 1px rgba(200,150,64,0.28)",
+
+===== BLOCK 123 [replace] old 3646-3646 (1L) new 3479-3479 (1L) =====
+--- OLD ---
+                    background: "rgba(40,16,6,0.85)",
+--- NEW ---
+                    background: "rgba(52,22,8,0.78)",
+
+===== BLOCK 124 [replace] old 3651-3651 (1L) new 3484-3484 (1L) =====
+--- OLD ---
+                    className="text-[9px] tracking-[0.2em]"
+--- NEW ---
+                    className="text-xs tracking-[0.2em]"
+
+===== BLOCK 125 [replace] old 3663-3663 (1L) new 3496-3496 (1L) =====
+--- OLD ---
+                    background: "rgba(40,16,6,0.85)",
+--- NEW ---
+                    background: "rgba(52,22,8,0.78)",
+
+===== BLOCK 126 [replace] old 3668-3668 (1L) new 3501-3501 (1L) =====
+--- OLD ---
+                    className="text-[9px] tracking-[0.2em]"
+--- NEW ---
+                    className="text-xs tracking-[0.2em]"
+
+===== BLOCK 127 [replace] old 3683-3683 (1L) new 3516-3516 (1L) =====
+--- OLD ---
+                  background: "rgba(40,16,6,0.75)",
+--- NEW ---
+                  background: "rgba(52,22,8,0.68)",
+
+===== BLOCK 128 [replace] old 3771-3771 (1L) new 3604-3604 (1L) =====
+--- OLD ---
+                        className="text-xs tracking-wide"
+--- NEW ---
+                        className="text-sm tracking-wide"
+
+===== BLOCK 129 [replace] old 3793-3793 (1L) new 3626-3626 (1L) =====
+--- OLD ---
+                  className="text-xs leading-relaxed"
+--- NEW ---
+                  className="text-sm leading-relaxed"
+
+===== BLOCK 130 [replace] old 3887-3887 (1L) new 3720-3720 (1L) =====
+--- OLD ---
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
+--- NEW ---
+                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+
+===== BLOCK 131 [replace] old 3957-3957 (1L) new 3790-3790 (1L) =====
+--- OLD ---
+                  className="flex-1 bg-transparent outline-none py-1 text-base"
+--- NEW ---
+                  className="flex-1 bg-transparent outline-none py-1 text-sm"
+
+===== BLOCK 132 [replace] old 3966-3966 (1L) new 3799-3799 (1L) =====
+--- OLD ---
+                  className="px-4 py-1.5 text-xs tracking-[0.3em] transition-all hover:opacity-80 flex-shrink-0"
+--- NEW ---
+                  className="px-4 py-1.5 text-sm tracking-[0.3em] transition-all hover:opacity-80 flex-shrink-0"
+
+===== BLOCK 133 [replace] old 3985-3985 (1L) new 3818-3818 (1L) =====
+--- OLD ---
+                    "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
+--- NEW ---
+                    "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+
+===== BLOCK 134 [replace] old 4054-4054 (1L) new 3887-3887 (1L) =====
+--- OLD ---
+                            "0 1px 4px rgba(0,0,0,0.60), 1px 1px 0 rgba(0,0,0,0.40)",
+--- NEW ---
+                            "0 1px 4px rgba(0,0,0,0.55), 1px 1px 0 rgba(0,0,0,0.35)",
+
+===== BLOCK 135 [replace] old 4073-4073 (1L) new 3906-3906 (1L) =====
+--- OLD ---
+                          className="text-xs"
+--- NEW ---
+                          className="text-sm"
+
+===== BLOCK 136 [replace] old 4090-4090 (1L) new 3923-3923 (1L) =====
+--- OLD ---
+                          className="text-xs tracking-[0.15em]"
+--- NEW ---
+                          className="text-sm tracking-[0.15em]"
+
+===== BLOCK 137 [replace] old 4152-4152 (1L) new 3985-3985 (1L) =====
+--- OLD ---
+                        className="text-xs"
+--- NEW ---
+                        className="text-sm"
+
+===== BLOCK 138 [replace] old 4165-4165 (1L) new 3998-3998 (1L) =====
+--- OLD ---
+                        className="text-xs"
+--- NEW ---
+                        className="text-sm"
+
+===== BLOCK 139 [replace] old 4214-4214 (1L) new 4047-4047 (1L) =====
+--- OLD ---
+                            "0 8px 28px rgba(0,0,0,0.60), 0 0 0 1px rgba(200,150,64,0.22)",
+--- NEW ---
+                            "0 4px 20px rgba(0,0,0,0.58), 0 0 0 1px rgba(200,150,64,0.28)",
+
+===== BLOCK 140 [replace] old 4219-4220 (2L) new 4052-4054 (3L) =====
+--- OLD ---
+                            COMMUNITY_IMAGES[post.id]?.[i] ??
+                            POST_IMGS[i % POST_IMGS.length]
+--- NEW ---
+                            POST_IMGS[
+                              (post.id + i) % POST_IMGS.length
+                            ]
+
+===== BLOCK 141 [replace] old 4245-4245 (1L) new 4079-4079 (1L) =====
+--- OLD ---
+                              className="text-xs"
+--- NEW ---
+                              className="text-sm"
+
+===== BLOCK 142 [replace] old 4270-4270 (1L) new 4104-4104 (1L) =====
+--- OLD ---
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
+--- NEW ---
+                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+
+===== BLOCK 143 [replace] old 4326-4326 (1L) new 4160-4160 (1L) =====
+--- OLD ---
+                className="text-xs tracking-[0.35em] mb-4 flex items-center gap-2"
+--- NEW ---
+                className="text-sm tracking-[0.35em] mb-4 flex items-center gap-2"
+
+===== BLOCK 144 [replace] old 4350-4350 (1L) new 4184-4184 (1L) =====
+--- OLD ---
+                        className="text-xs w-4"
+--- NEW ---
+                        className="text-sm w-4"
+
+===== BLOCK 145 [replace] old 4359-4359 (1L) new 4193-4193 (1L) =====
+--- OLD ---
+                        className="text-sm transition-colors"
+--- NEW ---
+                        className="text-base transition-colors"
+
+===== BLOCK 146 [replace] old 4369-4369 (1L) new 4203-4203 (1L) =====
+--- OLD ---
+                      className="text-xs"
+--- NEW ---
+                      className="text-sm"
+
+===== BLOCK 147 [replace] old 4387-4387 (1L) new 4221-4221 (1L) =====
+--- OLD ---
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
+--- NEW ---
+                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+
+===== BLOCK 148 [replace] old 4443-4443 (1L) new 4277-4277 (1L) =====
+--- OLD ---
+                className="text-xs tracking-[0.35em] mb-4 flex items-center gap-2"
+--- NEW ---
+                className="text-sm tracking-[0.35em] mb-4 flex items-center gap-2"
+
+===== BLOCK 149 [replace] old 4466-4466 (1L) new 4300-4300 (1L) =====
+--- OLD ---
+                      className="w-9 h-9 flex-shrink-0 flex items-center justify-center text-base"
+--- NEW ---
+                      className="w-9 h-9 flex-shrink-0 flex items-center justify-center text-sm"
+
+===== BLOCK 150 [replace] old 4479-4479 (1L) new 4313-4313 (1L) =====
+--- OLD ---
+                        className="text-base"
+--- NEW ---
+                        className="text-sm"
+
+===== BLOCK 151 [replace] old 4488-4488 (1L) new 4322-4322 (1L) =====
+--- OLD ---
+                        className="text-sm mt-0.5"
+--- NEW ---
+                        className="text-base mt-0.5"
+
+===== BLOCK 152 [replace] old 4497-4497 (1L) new 4331-4331 (1L) =====
+--- OLD ---
+                        className="text-xs mt-0.5"
+--- NEW ---
+                        className="text-sm mt-0.5"
+
+===== BLOCK 153 [replace] old 4516-4516 (1L) new 4350-4350 (1L) =====
+--- OLD ---
+                  "linear-gradient(160deg, rgba(52,20,8,0.96) 0%, rgba(36,13,4,0.97) 60%, rgba(62,24,8,0.95) 100%)",
+--- NEW ---
+                  "linear-gradient(160deg, rgba(76,32,12,0.81) 0%, rgba(60,24,8,0.84) 60%, rgba(88,38,14,0.79) 100%)",
+
+===== BLOCK 154 [replace] old 4572-4572 (1L) new 4406-4406 (1L) =====
+--- OLD ---
+                className="text-xs tracking-[0.35em] mb-4 flex items-center gap-2"
+--- NEW ---
+                className="text-sm tracking-[0.35em] mb-4 flex items-center gap-2"
+
+===== BLOCK 155 [replace] old 4589-4589 (1L) new 4423-4423 (1L) =====
+--- OLD ---
+                className="text-sm leading-relaxed mb-4"
+--- NEW ---
+                className="text-base leading-relaxed mb-4"
+
+===== BLOCK 156 [replace] old 4599-4599 (1L) new 4433-4433 (1L) =====
+--- OLD ---
+                className="flex items-center gap-1.5 text-xs tracking-widest transition-opacity hover:opacity-70"
+--- NEW ---
+                className="flex items-center gap-1.5 text-sm tracking-widest transition-opacity hover:opacity-70"
+
+===== BLOCK 157 [replace] old 4656-4656 (1L) new 4490-4490 (1L) =====
+--- OLD ---
+              <p className="text-muted-foreground text-sm mt-1">
+--- NEW ---
+              <p className="text-muted-foreground text-base mt-1">
+
+===== BLOCK 158 [replace] old 4672-4672 (1L) new 4506-4506 (1L) =====
+--- OLD ---
+                        className={`text-lg ${i === 0 ? "text-primary" : "text-foreground"}`}
+--- NEW ---
+                        className={`text-base ${i === 0 ? "text-primary" : "text-foreground"}`}
+
+===== BLOCK 159 [replace] old 4676-4676 (1L) new 4510-4510 (1L) =====
+--- OLD ---
+                      <div className="text-muted-foreground text-xs tracking-wider">
+--- NEW ---
+                      <div className="text-muted-foreground text-sm tracking-wider">
+
+===== BLOCK 160 [replace] old 4731-4731 (1L) new 4565-4565 (1L) =====
+--- OLD ---
+                className={`text-xs leading-tight ${badge.unlocked ? "text-foreground" : "text-muted-foreground"}`}
+--- NEW ---
+                className={`text-sm leading-tight ${badge.unlocked ? "text-foreground" : "text-muted-foreground"}`}
+
+===== BLOCK 161 [replace] old 4735-4735 (1L) new 4569-4569 (1L) =====
+--- OLD ---
+              <div className="text-muted-foreground/50 text-xs mt-0.5 leading-tight">
+--- NEW ---
+              <div className="text-muted-foreground/50 text-sm mt-0.5 leading-tight">
+
+===== BLOCK 162 [replace] old 4749-4749 (1L) new 4583-4583 (1L) =====
+--- OLD ---
+              className={`px-6 py-3 text-sm tracking-widest transition-colors ${personalTab === t ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+--- NEW ---
+              className={`px-6 py-3 text-base tracking-widest transition-colors ${personalTab === t ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
+
+===== BLOCK 163 [replace] old 4764-4764 (1L) new 4598-4598 (1L) =====
+--- OLD ---
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+--- NEW ---
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+
+===== BLOCK 164 [replace] old 4792-4792 (1L) new 4626-4626 (1L) =====
+--- OLD ---
+                    className={`text-xs tracking-wide mb-1 leading-tight ${site.status !== "未打卡" ? "text-foreground" : "text-muted-foreground/50"}`}
+--- NEW ---
+                    className={`text-sm tracking-wide mb-1 leading-tight ${site.status !== "未打卡" ? "text-foreground" : "text-muted-foreground/50"}`}
+
+===== BLOCK 165 [replace] old 4797-4797 (1L) new 4631-4631 (1L) =====
+--- OLD ---
+                    className={`text-xs leading-tight ${site.status !== "未打卡" ? "text-muted-foreground" : "text-muted-foreground/30"}`}
+--- NEW ---
+                    className={`text-sm leading-tight ${site.status !== "未打卡" ? "text-muted-foreground" : "text-muted-foreground/30"}`}
+
+===== BLOCK 166 [replace] old 4823-4823 (1L) new 4657-4657 (1L) =====
+--- OLD ---
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+--- NEW ---
+              <span className="text-base text-muted-foreground whitespace-nowrap">
+
+===== BLOCK 167 [replace] old 4838-4838 (1L) new 4672-4672 (1L) =====
+--- OLD ---
+              <span className="text-primary text-sm whitespace-nowrap">
+--- NEW ---
+              <span className="text-primary text-base whitespace-nowrap">
+
+===== BLOCK 168 [replace] old 4847-4847 (1L) new 4681-4681 (1L) =====
+--- OLD ---
+            <p className="text-sm tracking-widest">
+--- NEW ---
+            <p className="text-base tracking-widest">
+
+===== BLOCK 169 [replace] old 4850-4850 (1L) new 4684-4684 (1L) =====
+--- OLD ---
+            <button className="mt-6 px-6 py-2.5 border border-primary text-primary text-xs tracking-widest hover:bg-primary/10 transition-colors">
+--- NEW ---
+            <button className="mt-6 px-6 py-2.5 border border-primary text-primary text-sm tracking-widest hover:bg-primary/10 transition-colors">
+
+===== BLOCK 170 [replace] old 4858-4858 (1L) new 4692-4692 (1L) =====
+--- OLD ---
+            <p className="text-sm tracking-widest">
+--- NEW ---
+            <p className="text-base tracking-widest">
+
+===== BLOCK 171 [replace] old 4944-4944 (1L) new 4778-4778 (1L) =====
+--- OLD ---
+              <div className="text-foreground text-sm tracking-wide">
+--- NEW ---
+              <div className="text-foreground text-base tracking-wide">
+
+===== BLOCK 172 [replace] old 4950-4950 (1L) new 4784-4784 (1L) =====
+--- OLD ---
+              <span className="text-muted-foreground text-xs">
+--- NEW ---
+              <span className="text-muted-foreground text-sm">
+
+===== BLOCK 173 [replace] old 4971-4971 (1L) new 4805-4805 (1L) =====
+--- OLD ---
+                  className={`max-w-[80%] px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-muted-foreground"}`}
+--- NEW ---
+                  className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-muted-foreground"}`}
+
+===== BLOCK 174 [replace] old 4985-4985 (1L) new 4819-4819 (1L) =====
+--- OLD ---
+              <div className="text-muted-foreground text-xs tracking-wider mb-2">
+--- NEW ---
+              <div className="text-muted-foreground text-sm tracking-wider mb-2">
+
+===== BLOCK 175 [replace] old 4993-4993 (1L) new 4827-4827 (1L) =====
+--- OLD ---
+                    className="w-full text-left px-3 py-2 border border-border text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+--- NEW ---
+                    className="w-full text-left px-3 py-2 border border-border text-sm text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+
+===== BLOCK 176 [replace] old 5011-5011 (1L) new 4845-4845 (1L) =====
+--- OLD ---
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+--- NEW ---
+              className="flex-1 bg-transparent text-base text-foreground placeholder:text-muted-foreground outline-none"
+
+===== BLOCK 177 [replace] old 5065-5065 (1L) new 4899-4899 (1L) =====
+--- OLD ---
+              className="text-primary text-sm tracking-widest leading-none"
+--- NEW ---
+              className="text-primary text-lg tracking-widest leading-none"
+
+===== BLOCK 178 [replace] old 5077-5077 (1L) new 4911-4911 (1L) =====
+--- OLD ---
+                className={`relative px-4 py-2 text-sm tracking-wider transition-colors ${activeTab === tab.key ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+--- NEW ---
+                className={`relative px-4 py-2 text-lg tracking-wider transition-colors ${activeTab === tab.key ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+
+===== BLOCK 179 [replace] old 5095-5095 (1L) new 4929-4929 (1L) =====
+--- OLD ---
+              className="w-8 h-8 bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-sm"
+--- NEW ---
+              className="w-8 h-8 bg-primary/20 border border-primary/30 flex items-center justify-center text-primary text-lg"
+
+===== BLOCK 180 [replace] old 5118-5118 (1L) new 4952-4952 (1L) =====
+--- OLD ---
+                className={`w-full px-6 py-3 text-left text-sm tracking-wider flex items-center gap-3 ${activeTab === tab.key ? "text-primary bg-primary/5" : "text-muted-foreground"}`}
+--- NEW ---
+                className={`w-full px-6 py-3 text-left text-lg tracking-wider flex items-center gap-3 ${activeTab === tab.key ? "text-primary bg-primary/5" : "text-muted-foreground"}`}
+
+===== BLOCK 181 [replace] old 5122-5122 (1L) new 4956-4956 (1L) =====
+--- OLD ---
+                  className="text-xs text-muted-foreground/40 tracking-[0.2em]"
+--- NEW ---
+                  className="text-base text-muted-foreground/40 tracking-[0.2em]"
+
+===== BLOCK 182 [replace] old 5148-5148 (1L) new 4982-4982 (1L) =====
+--- OLD ---
+                <div className="w-6 h-6 border border-primary/40 flex items-center justify-center text-primary text-xs">
+--- NEW ---
+                <div className="w-6 h-6 border border-primary/40 flex items-center justify-center text-primary text-sm">
+
+===== BLOCK 183 [replace] old 5151-5151 (1L) new 4985-4985 (1L) =====
+--- OLD ---
+                <span className="text-foreground text-sm tracking-widest">
+--- NEW ---
+                <span className="text-foreground text-base tracking-widest">
+
+===== BLOCK 184 [replace] old 5155-5155 (1L) new 4989-4989 (1L) =====
+--- OLD ---
+              <p className="text-muted-foreground text-xs leading-relaxed">
+--- NEW ---
+              <p className="text-muted-foreground text-sm leading-relaxed">
+
+===== BLOCK 185 [replace] old 5160-5160 (1L) new 4994-4994 (1L) =====
+--- OLD ---
+              <div className="text-primary/60 text-xs tracking-[0.25em] uppercase mb-4">
+--- NEW ---
+              <div className="text-primary/60 text-sm tracking-[0.25em] uppercase mb-4">
+
+===== BLOCK 186 [replace] old 5173-5173 (1L) new 5007-5007 (1L) =====
+--- OLD ---
+                    className="text-muted-foreground text-xs hover:text-primary transition-colors cursor-pointer flex items-center gap-1"
+--- NEW ---
+                    className="text-muted-foreground text-sm hover:text-primary transition-colors cursor-pointer flex items-center gap-1"
+
+===== BLOCK 187 [replace] old 5185-5185 (1L) new 5019-5019 (1L) =====
+--- OLD ---
+              <div className="text-primary/60 text-xs tracking-[0.25em] uppercase mb-4">
+--- NEW ---
+              <div className="text-primary/60 text-sm tracking-[0.25em] uppercase mb-4">
+
+===== BLOCK 188 [replace] old 5188-5188 (1L) new 5022-5022 (1L) =====
+--- OLD ---
+              <div className="space-y-1.5 text-muted-foreground text-xs leading-relaxed">
+--- NEW ---
+              <div className="space-y-1.5 text-muted-foreground text-sm leading-relaxed">
+
+===== BLOCK 189 [replace] old 5198-5198 (1L) new 5032-5032 (1L) =====
+--- OLD ---
+            <span className="text-muted-foreground/50 text-xs tracking-wider">
+--- NEW ---
+            <span className="text-muted-foreground/50 text-sm tracking-wider">
+
+===== BLOCK 190 [replace] old 5201-5201 (1L) new 5035-5035 (1L) =====
+--- OLD ---
+            <div className="flex items-center gap-2 text-muted-foreground/40 text-xs">
+--- NEW ---
+            <div className="flex items-center gap-2 text-muted-foreground/40 text-sm">
+
