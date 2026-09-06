@@ -1304,11 +1304,11 @@ function CinematicPrologue({
           <h1
             className="text-foreground leading-none mb-6 tracking-wider"
             style={{
-              fontSize: "clamp(4rem, 11vw, 8.5rem)",
+              fontSize: "clamp(2.75rem, 8.5vw, 7rem)",
               fontFamily: FD,
             }}
           >
-            <SplitTitle text="中华文明探源" gilt delay={250} step={110} />
+            <SplitTitle text="中华文明探源之旅" gilt delay={250} step={110} />
           </h1>
           <div className="h-px w-24 bg-primary/60 mx-auto mb-6" />
           <div className="space-y-2 text-primary/60 text-base tracking-widest">
