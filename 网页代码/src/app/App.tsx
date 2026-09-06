@@ -1584,13 +1584,13 @@ function CinematicPrologue({
                 源，聚多源之水，奔涌成流。
               </p>
               <p
-                className="text-foreground/85 text-2xl leading-relaxed mb-4"
+                className="chapter-desc text-2xl leading-relaxed mb-4"
                 style={{ fontFamily: FS }}
               >
                 数万年前，中华先民在黄河、长江、辽河等流域繁衍生息。他们以石为器，以土为陶，在广袤大地上书写最初的文明篇章；历经不断繁衍，逐渐由原始聚落演变为定居的农耕社会，表现为社会分工日趋复杂，礼仪制度初步显现，权力阶层悄然形成。
               </p>
               <p
-                className="text-foreground/85 text-2xl leading-relaxed"
+                className="chapter-desc text-2xl leading-relaxed"
                 style={{ fontFamily: FS }}
               >
                 中华文明的特质——多元一体、连绵不断、兼容并蓄——在这一时期已见雏形。探源，正是寻找这一切的起点，亦是理解当下中华文化生命力的必由之路。
@@ -1964,7 +1964,7 @@ function CinematicPrologue({
                       {item.zh}
                     </h3>
                     <p
-                      className="text-white text-2xl leading-relaxed"
+                      className="chapter-desc text-2xl leading-relaxed"
                       style={{ fontFamily: FS }}
                     >
                       {item.desc}
@@ -2084,7 +2084,7 @@ function CinematicPrologue({
                       {item.zh}
                     </h3>
                     <p
-                      className="text-white text-2xl leading-relaxed"
+                      className="chapter-desc text-2xl leading-relaxed"
                       style={{ fontFamily: FS }}
                     >
                       {item.desc}

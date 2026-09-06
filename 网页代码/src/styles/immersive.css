@@ -22,12 +22,12 @@
 .gilt-text {
   background-image: linear-gradient(
     105deg,
-    #8a6a24 0%,
-    #c89640 24%,
-    #f0e6cc 44%,
-    #c9a227 58%,
-    #8a6a24 78%,
-    #c89640 100%
+    #b8923e 0%,
+    #d2a44c 24%,
+    #f4e8cd 44%,
+    #d6ae35 58%,
+    #b8923e 78%,
+    #d2a44c 100%
   );
   background-size: 220% 100%;
   -webkit-background-clip: text;
@@ -280,4 +280,12 @@
   [style*="shimmer-sweep"] {
     animation: none !important;
   }
+}
+
+/* ── M4: 序章章节正文统一色（8 段共用，调深浅只改此变量） ── */
+:root {
+  --chapter-prose: rgba(244, 228, 204, 0.88);
+}
+.chapter-desc {
+  color: var(--chapter-prose);
 }
