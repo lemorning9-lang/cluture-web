@@ -82,6 +82,7 @@ import actChuWu from "../imports/__.png";
 
 // ─── Typography ──────────────────────────────────────────────────────────────
 // H1 display: 演示春风楷 (LXGW WenKai is the closest free web equivalent)
+const FQ = "'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif";
 const FD =
   "'Zhi Mang Xing', 'LXGW WenKai', 'KaiTi', 'STKaiti', serif";
 // 楷体（序章正文与章节条目试效专用）
@@ -2612,7 +2613,7 @@ function ModuleTimeSpace() {
       )}
 
       {/* Sticky filter bar */}
-      <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-md border-b border-border px-6">
+      <div className="sticky top-28 z-30 bg-background/95 backdrop-blur-md border-b border-border px-6">
         <div className="max-w-7xl mx-auto">
           {/* Timeline */}
           <HorizontalTimeline
@@ -3727,7 +3728,7 @@ function ModuleCulturalTreasures({
         </div>
       </Reveal>
 
-      <div className="sticky top-16 z-30 bg-background/90 backdrop-blur-md border-b border-border px-6 py-3 mt-6">
+      <div className="sticky top-28 z-30 bg-background/90 backdrop-blur-md border-b border-border px-6 py-3 mt-6">
         <div className="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
           <Filter size={13} className="text-muted-foreground" />
           {ACTIVITY_CATEGORIES.map((cat) => (
@@ -5598,14 +5599,13 @@ export default function App() {
       style={{ fontFamily: FB }}
     >
       {/* Navigation */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center gap-8">
-          <div className="flex items-center gap-3 flex-shrink-0">
+      <header className="nav-stone sticky top-0 z-40 border-b border-primary/25 backdrop-blur-md">
+        {/* ── 第一行：馆名居中（苍劲楷书）+ 工具钮靠右 ── */}
+        <div className="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
+          <div className="flex items-center gap-3">
             <div
-              className="w-9 h-9 rounded-full border border-primary/60 overflow-hidden flex-shrink-0"
-              style={{
-                boxShadow: "0 0 10px rgba(200,150,64,0.25)",
-              }}
+              className="w-10 h-10 rounded-full border border-primary/60 overflow-hidden flex-shrink-0"
+              style={{ boxShadow: '0 0 12px rgba(200,150,64,0.3)' }}
             >
               <img
                 loading="lazy"
@@ -5613,38 +5613,37 @@ export default function App() {
                 alt="仰韶彩陶"
                 className="w-full h-full object-cover"
                 style={{
-                  filter: "brightness(1.05) contrast(1.05)",
+                  filter: 'brightness(1.05) contrast(1.05)',
                 }}
               />
             </div>
             <div
-              className="text-primary text-lg tracking-widest leading-none"
-              style={{ fontFamily: FH }}
+              className="text-primary text-2xl md:text-3xl leading-none tracking-[0.18em] whitespace-nowrap"
+              style={{
+                fontFamily: FQ,
+                textShadow: '0 2px 14px rgba(200,150,64,0.35)',
+              }}
             >
               中华文明探源工程
             </div>
+            <span
+              aria-hidden="true"
+              className="hidden sm:inline-flex items-center justify-center w-6 h-6 text-[13px] leading-none text-[#F4E4CC] flex-shrink-0 mt-1"
+              style={{
+                background: '#8b1a1a',
+                fontFamily: FH,
+                boxShadow: '0 1px 6px rgba(139,26,26,0.45), inset 0 0 0 1px rgba(244,228,204,0.35)',
+              }}
+            >
+              源
+            </span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-1 flex-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`relative px-4 py-2 text-lg tracking-wider transition-colors ${activeTab === tab.key ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                {tab.label}
-                {activeTab === tab.key && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-                )}
-              </button>
-            ))}
-          </nav>
-
-          <div className="ml-auto flex items-center gap-3">
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
+            <button className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
               <Search size={16} />
             </button>
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+            <button className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors">
               <Bell size={16} />
             </button>
             <div
@@ -5661,6 +5660,36 @@ export default function App() {
             </button>
           </div>
         </div>
+
+        {/* ── 第二行：四大板块，金线菱形分隔，active 碑刻双线 ── */}
+        <nav aria-label="主导航" className="border-t border-primary/15">
+          <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-center gap-2 md:gap-5 overflow-x-auto">
+            {tabs.map((tab, i) => (
+              <Fragment key={tab.key}>
+                {i > 0 && (
+                  <span aria-hidden="true" className="hidden md:flex items-center gap-1.5 flex-shrink-0">
+                    <span className="h-4 w-px bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
+                    <span className="text-primary/40 text-[8px] leading-none">◆</span>
+                    <span className="h-4 w-px bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
+                  </span>
+                )}
+                <button
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`relative flex-shrink-0 px-3 md:px-5 py-2 text-[17px] tracking-[0.15em] whitespace-nowrap transition-colors ${activeTab === tab.key ? "text-primary" : "text-foreground/70 hover:text-foreground"}`}
+                  style={{ fontFamily: FH }}
+                >
+                  {tab.label}
+                  {activeTab === tab.key && (
+                    <>
+                      <span className="absolute bottom-[3px] left-3 right-3 h-px bg-primary/50" />
+                      <span className="absolute bottom-0 left-1 right-1 h-[2px] bg-primary" />
+                    </>
+                  )}
+                </button>
+              </Fragment>
+            ))}
+          </div>
+        </nav>
 
         {menuOpen && (
           <div className="md:hidden border-t border-border bg-background/95">
