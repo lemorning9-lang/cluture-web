@@ -268,3 +268,16 @@
     transition: none;
   }
 }
+
+/* ── M4: reduced-motion 补口（ping 脉冲 / 卡片高光 / 壁画流光） ── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ping {
+    animation: none;
+  }
+  .tilt-card:hover .sheen::before {
+    animation: none;
+  }
+  [style*="shimmer-sweep"] {
+    animation: none !important;
+  }
+}

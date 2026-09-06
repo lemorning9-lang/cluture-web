@@ -1230,7 +1230,7 @@ function ChapterDivider({ phrase }: { phrase: string }) {
           width={80}
           height={10}
           flip
-          className="text-primary/45 flex-shrink-0"
+          className="text-primary/60 flex-shrink-0"
         />
         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/70 to-primary/40" />
         <span
@@ -1243,7 +1243,7 @@ function ChapterDivider({ phrase }: { phrase: string }) {
         <MeanderRule
           width={80}
           height={10}
-          className="text-primary/45 flex-shrink-0"
+          className="text-primary/60 flex-shrink-0"
         />
       </div>
       {/* 印章式首字（绛红底 + 绢米字）+ 其余三字 */}
@@ -1261,7 +1261,7 @@ function ChapterDivider({ phrase }: { phrase: string }) {
           {seal}
         </span>
         <p
-          className="text-primary/60 text-lg tracking-[0.4em]"
+          className="text-primary/85 text-lg tracking-[0.4em]"
           style={{ fontFamily: "'KaiTi', 'STKaiti', serif" }}
         >
           {rest.join("")}
@@ -1367,7 +1367,7 @@ function CinematicPrologue({
                 aria-current={active ? "true" : undefined}
                 aria-label={c.label}
                 title={c.label}
-                className="group relative flex items-center justify-center w-8 h-8 cursor-pointer transition-all duration-300"
+                className="group relative flex items-center justify-center w-11 h-11 cursor-pointer transition-all duration-300"
                 style={{
                   background: active
                     ? "#8b1a1a"
@@ -1384,7 +1384,7 @@ function CinematicPrologue({
                     fontFamily: FH,
                     color: active
                       ? "#F4E4CC"
-                      : "rgba(200,150,64,0.55)",
+                      : "rgba(200,150,64,0.75)",
                   }}
                 >
                   {c.char}
@@ -1512,6 +1512,7 @@ function CinematicPrologue({
       {/* Section 2 — 源 (Origin chapter) */}
       <section data-chapter="yuan" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
         <img
+          loading="lazy"
           src={mural2}
           alt="石峁博物馆壁画 — 狩猎图"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
@@ -1791,6 +1792,7 @@ function CinematicPrologue({
       {/* Section 3 — 流 (Civilizational flow) */}
       <section data-chapter="liu" className="relative flex items-center overflow-hidden">
         <img
+          loading="lazy"
           src={mural3}
           alt="石峁博物馆壁画 — 玉首骑马图"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
@@ -2627,7 +2629,7 @@ function ModuleTimeSpace() {
               <button
                 key={d}
                 onClick={() => setDomain(d)}
-                className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 hover:-translate-y-px ${
+                className={`px-4 py-1 min-h-[44px] text-sm tracking-widest border transition-all duration-200 hover:-translate-y-px ${
                   domain === d
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -2661,6 +2663,7 @@ function ModuleTimeSpace() {
               <>
                 {/* Map background — mural tinted */}
                 <img
+                  loading="lazy"
                   src={mural2}
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover opacity-8"
@@ -2677,7 +2680,7 @@ function ModuleTimeSpace() {
                   }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-primary/15 text-sm tracking-[0.3em]">
+                  <span className="text-primary/50 text-sm tracking-[0.3em]">
                     示意地图 · 在高德api/config.js 填入 Key 后切换真实地图
                   </span>
                 </div>
@@ -2874,7 +2877,7 @@ function ModuleTimeSpace() {
                   {/* Close button */}
                   <button
                     onClick={() => setSelectedSite(null)}
-                    className="absolute top-2 left-2 w-5 h-5 flex items-center justify-center transition-opacity hover:opacity-60"
+                    className="absolute top-2 left-2 w-11 h-11 flex items-center justify-center transition-opacity hover:opacity-60"
                     style={{
                       background: "rgba(52,22,8,0.68)",
                       border: "1px solid rgba(200,150,64,0.22)",
@@ -3462,6 +3465,7 @@ function ModuleTimeSpace() {
                 }}
               >
                 <img
+                  loading="lazy"
                   src={SITE_CARD_IMGS[i]}
                   alt={site.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -3580,7 +3584,7 @@ function ModuleTimeSpace() {
                 />
 
                 <div
-                  className="flex justify-center gap-3 mb-3 text-xs tracking-[0.25em] text-primary/45"
+                  className="flex justify-center gap-3 mb-3 text-xs tracking-[0.25em] text-primary/60"
                   style={{ fontFamily: FH }}
                 >
                   <span>{site.period}时期</span>
@@ -3601,7 +3605,7 @@ function ModuleTimeSpace() {
                     />
                     {site.status}
                   </span>
-                  <span className="text-xs tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+                  <span className="text-xs tracking-widest text-primary/85 group-hover:text-primary transition-colors flex items-center gap-0.5">
                     查看
                     <ArrowRight
                       size={8}
@@ -3651,6 +3655,7 @@ function ModuleCulturalTreasures({
     <div className="min-h-screen">
       <div className="relative h-52 flex items-end overflow-hidden">
         <img
+          loading="lazy"
           src={IMGS.bronzeVessel}
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-40"
@@ -3729,7 +3734,7 @@ function ModuleCulturalTreasures({
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 hover:-translate-y-px ${
+              className={`px-4 py-1 min-h-[44px] text-sm tracking-widest border transition-all duration-200 hover:-translate-y-px ${
                 activeCategory === cat
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -3874,7 +3879,7 @@ function ModuleCulturalTreasures({
                 />
                 <div className="flex items-start justify-between mb-2">
                   <span
-                    className="text-primary/55 text-[10px] tracking-widest"
+                    className="text-foreground/65 text-[10px] tracking-widest"
                     style={{ fontFamily: FH }}
                   >
                     {act.culture}
@@ -3903,14 +3908,14 @@ function ModuleCulturalTreasures({
                   {act.description}
                 </p>
                 <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground/55">
+                  <div className="flex items-center gap-1 text-[10px] text-foreground/60">
                     <MapPin
                       size={9}
-                      className="text-primary/45"
+                      className="text-primary/60"
                     />
                     {act.location}
                   </div>
-                  <span className="text-xs tracking-widest text-primary/32 group-hover:text-primary/68 transition-colors flex items-center gap-0.5">
+                  <span className="text-xs tracking-widest text-primary/85 group-hover:text-primary transition-colors flex items-center gap-0.5">
                     详情
                     <ArrowRight
                       size={8}
@@ -4468,7 +4473,7 @@ function ModuleCommunity() {
                         <span
                           className="text-sm"
                           style={{
-                            color: "rgba(200,150,64,0.48)",
+                            color: "rgba(220,195,150,0.8)",
                             fontFamily: FH,
                           }}
                         >
@@ -4485,7 +4490,7 @@ function ModuleCommunity() {
                         <span
                           className="text-sm tracking-[0.15em]"
                           style={{
-                            color: "rgba(200,150,64,0.55)",
+                            color: "rgba(240,228,204,0.7)",
                             fontFamily: FH,
                           }}
                         >
@@ -4554,7 +4559,7 @@ function ModuleCommunity() {
                     </button>
                     <button
                       className="flex items-center gap-1.5 transition-opacity hover:opacity-80"
-                      style={{ color: "rgba(200,150,64,0.40)" }}
+                      style={{ color: "rgba(200,150,64,0.75)" }}
                     >
                       <MessageCircle size={14} />
                       <span
@@ -4584,7 +4589,7 @@ function ModuleCommunity() {
                     </button>
                     <button
                       className="flex items-center gap-1.5 transition-opacity hover:opacity-80 ml-auto"
-                      style={{ color: "rgba(200,150,64,0.40)" }}
+                      style={{ color: "rgba(200,150,64,0.75)" }}
                     >
                       <Share2 size={14} />
                     </button>
@@ -4754,7 +4759,7 @@ function ModuleCommunity() {
                       <span
                         className="text-base transition-colors"
                         style={{
-                          color: "rgba(200,188,168,0.72)",
+                          color: "rgba(200,188,168,0.78)",
                           fontFamily: FH,
                         }}
                       >
@@ -4764,7 +4769,7 @@ function ModuleCommunity() {
                     <span
                       className="text-sm"
                       style={{
-                        color: "rgba(200,150,64,0.42)",
+                        color: "rgba(200,150,64,0.75)",
                         fontFamily: FH,
                       }}
                     >
@@ -4883,7 +4888,7 @@ function ModuleCommunity() {
                       <div
                         className="text-base mt-0.5"
                         style={{
-                          color: "rgba(200,188,168,0.58)",
+                          color: "rgba(200,188,168,0.75)",
                           fontFamily: FH,
                         }}
                       >
@@ -4984,7 +4989,7 @@ function ModuleCommunity() {
               <p
                 className="text-base leading-relaxed mb-4"
                 style={{
-                  color: "rgba(200,188,168,0.72)",
+                  color: "rgba(200,188,168,0.78)",
                   fontFamily: FH,
                 }}
               >
@@ -5136,9 +5141,9 @@ function ModuleCommunity() {
                     }}
                   />
                   <div
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground/55"
+                    className="flex items-center gap-1 text-[10px] text-foreground/60"
                   >
-                    <MapPin size={9} className="text-primary/45" />
+                    <MapPin size={9} className="text-primary/60" />
                     {craft.location}
                   </div>
                   <div className="heritage-more">
@@ -5190,6 +5195,7 @@ function ModulePersonal() {
               }}
             >
               <img
+                loading="lazy"
                 src={liangzhuFace}
                 alt="良渚兽面纹"
                 className="w-full h-full object-cover"
@@ -5602,6 +5608,7 @@ export default function App() {
               }}
             >
               <img
+                loading="lazy"
                 src={pottery}
                 alt="仰韶彩陶"
                 className="w-full h-full object-cover"
