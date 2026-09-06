@@ -5,3 +5,13 @@
   0%   { transform: translateX(-120%); }
   100% { transform: translateX(220%);  }
 }
+
+/* 标题楷书子集（自托管，仅含「中华文明探源之旅工程」10 字，绕开被墙的 gstatic） */
+@font-face {
+  font-family: 'Ma Shan Zheng';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/mashanzheng-subset.woff2') format('woff2');
+  unicode-range: U+4e2d, U+4e4b, U+534e, U+5de5, U+63a2, U+6587, U+65c5, U+660e, U+6e90, U+7a0b;
+}
