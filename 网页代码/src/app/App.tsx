@@ -31,6 +31,9 @@ import {
 import { getSiteMainImage, COMMUNITY_IMAGES } from "../data/siteImages";
 import AMAP_CONFIG from "../../高德api/config.js";
 
+// 沉浸式质感升级 M1：全站可复用系统（滚动渐显 / 回纹装饰 / 逐字标题 / hero 粒子）
+import { Reveal, SplitTitle, MeanderRule, HeroDust } from "./immersive";
+
 // 石峁博物馆壁画 — used as cinematic prologue backgrounds
 import mural1 from "../imports/____-1.jpg";
 import mural2 from "../imports/____-2.jpg";
@@ -1089,7 +1092,22 @@ const AI_ANSWERS: Record<string, string> = {
 
 function Divider() {
   return (
-    <div className="h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent my-8" />
+    <div className="my-8 flex items-center gap-4" aria-hidden="true">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/40 to-primary/25" />
+      <MeanderRule
+        width={56}
+        height={8}
+        className="text-primary/55 flex-shrink-0"
+      />
+      <GoldDiamond />
+      <MeanderRule
+        width={56}
+        height={8}
+        flip
+        className="text-primary/55 flex-shrink-0"
+      />
+      <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/40 to-primary/25" />
+    </div>
   );
 }
 
@@ -1109,6 +1127,10 @@ function CornerBrackets() {
 function SectionLabel({ en }: { en: string }) {
   return (
     <div className="flex items-center gap-3 mb-2">
+      <span
+        aria-hidden="true"
+        className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50"
+      />
       <GoldDiamond />
       <span
         className="text-primary/70 text-base tracking-[0.25em] uppercase"
@@ -1117,6 +1139,10 @@ function SectionLabel({ en }: { en: string }) {
         {en}
       </span>
       <GoldDiamond />
+      <span
+        aria-hidden="true"
+        className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50"
+      />
     </div>
   );
 }
@@ -1142,22 +1168,58 @@ function StarRating({ rating }: { rating: number }) {
 // ─── Chapter Divider ─────────────────────────────────────────────────────────
 
 function ChapterDivider({ phrase }: { phrase: string }) {
+  const chars = Array.from(phrase);
+  const [seal, ...rest] = chars;
   return (
-    <div className="flex flex-col items-center justify-center py-10 bg-[#0E0604]">
-      <div className="h-px w-48 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
-      <div
-        className="my-3 text-primary/80 text-xl"
-        style={{ fontFamily: "'Zhi Mang Xing', serif" }}
-      >
-        ◆
+    <div
+      className="flex flex-col items-center justify-center py-10 bg-[#0E0604]"
+      role="presentation"
+    >
+      <span className="sr-only">{phrase}</span>
+      {/* 两侧回纹线 + 中心菱形 */}
+      <div className="flex items-center gap-5 w-full max-w-xl px-6" aria-hidden="true">
+        <MeanderRule
+          width={80}
+          height={10}
+          flip
+          className="text-primary/45 flex-shrink-0"
+        />
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/70 to-primary/40" />
+        <span
+          className="text-primary/80 text-xl"
+          style={{ fontFamily: "'Zhi Mang Xing', serif" }}
+        >
+          ◆
+        </span>
+        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/70 to-primary/40" />
+        <MeanderRule
+          width={80}
+          height={10}
+          className="text-primary/45 flex-shrink-0"
+        />
       </div>
-      <p
-        className="text-primary/45 text-sm tracking-[0.35em]"
-        style={{ fontFamily: "'KaiTi', 'STKaiti', serif" }}
-      >
-        {phrase}
-      </p>
-      <div className="h-px w-48 bg-gradient-to-r from-transparent via-primary/70 to-transparent mt-3" />
+      {/* 印章式首字（绛红底 + 绢米字）+ 其余三字 */}
+      <div className="my-4 flex items-center gap-4" aria-hidden="true">
+        <span
+          aria-hidden="true"
+          className="inline-flex items-center justify-center w-10 h-10 text-2xl text-[#F4E4CC] select-none flex-shrink-0"
+          style={{
+            background: "#8b1a1a",
+            fontFamily: "'KaiTi', 'STKaiti', serif",
+            boxShadow:
+              "0 2px 8px rgba(139,26,26,0.45), inset 0 0 0 1px rgba(244,228,204,0.35)",
+          }}
+        >
+          {seal}
+        </span>
+        <p
+          className="text-primary/60 text-lg tracking-[0.4em]"
+          style={{ fontFamily: "'KaiTi', 'STKaiti', serif" }}
+        >
+          {rest.join("")}
+        </p>
+      </div>
+      <div className="h-px w-48 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
     </div>
   );
 }
@@ -1195,6 +1257,8 @@ function CinematicPrologue({
               "radial-gradient(ellipse 85% 80% at 50% 50%, transparent 35%, rgba(30,12,8,0.12) 100%)",
           }}
         />
+        {/* 金沙粒子 — 全站唯一 WebGL 动效层（移动端/低端/reduced-motion 自动降级为静态渐变） */}
+        <HeroDust />
         {/* Film grain */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.055]"
@@ -1244,7 +1308,7 @@ function CinematicPrologue({
               fontFamily: FD,
             }}
           >
-            中华文明探源
+            <SplitTitle text="中华文明探源" gilt delay={250} step={110} />
           </h1>
           <div className="h-px w-24 bg-primary/60 mx-auto mb-6" />
           <div className="space-y-2 text-primary/60 text-base tracking-widest">
@@ -2356,7 +2420,7 @@ function ModuleTimeSpace() {
               <button
                 key={d}
                 onClick={() => setDomain(d)}
-                className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 ${
+                className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 hover:-translate-y-px ${
                   domain === d
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -3151,10 +3215,10 @@ function ModuleTimeSpace() {
       <Divider />
 
       {/* Featured sites */}
-      <div className="max-w-7xl mx-auto px-6 pb-16">
+      <Reveal className="max-w-7xl mx-auto px-6 pb-16">
         <SectionLabel en="FEATURED HERITAGE SITES" />
         <h2
-          className="text-4xl text-foreground tracking-wider mb-8"
+          className="gilt-text text-4xl tracking-wider mb-8"
           style={{ fontFamily: FD }}
         >
           精选探源遗址
@@ -3168,7 +3232,7 @@ function ModuleTimeSpace() {
           ].map((site, i) => (
             <div
               key={site.id}
-              className="relative cursor-pointer group flex flex-col"
+              className="relative cursor-pointer group flex flex-col lift"
               onClick={() => {
                 setSelectedSite(site);
                 setDrawerTab("介绍");
@@ -3339,7 +3403,7 @@ function ModuleTimeSpace() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }
@@ -3368,7 +3432,7 @@ function ModuleCulturalTreasures() {
         <div className="relative z-10 px-8 pb-8 max-w-7xl mx-auto w-full">
           <SectionLabel en="CULTURAL TREASURES" />
           <h1
-            className="text-5xl text-foreground tracking-wider"
+            className="gilt-text text-5xl tracking-wider"
             style={{ fontFamily: FD }}
           >
             文化遗珍
@@ -3386,7 +3450,7 @@ function ModuleCulturalTreasures() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 ${
+              className={`px-4 py-1 text-sm tracking-widest border transition-all duration-200 hover:-translate-y-px ${
                 activeCategory === cat
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -3398,7 +3462,7 @@ function ModuleCulturalTreasures() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <Reveal className="max-w-7xl mx-auto px-6 py-8">
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
           {filtered.map((act, i) => (
             <div
@@ -3566,7 +3630,7 @@ function ModuleCulturalTreasures() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
 
       {selectedActivity && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
@@ -3884,7 +3948,7 @@ function ModuleCommunity() {
         <div className="relative z-10 px-8 pb-8 max-w-7xl mx-auto w-full">
           <SectionLabel en="EXPLORER COMMUNITY" />
           <h1
-            className="text-5xl text-foreground tracking-wider"
+            className="gilt-text text-5xl tracking-wider"
             style={{ fontFamily: FD }}
           >
             探源社区
@@ -3893,7 +3957,7 @@ function ModuleCommunity() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-8">
+        <Reveal className="flex gap-8">
           {/* Feed */}
           <div className="flex-1 space-y-6 min-w-0">
             <div
@@ -4623,7 +4687,7 @@ function ModuleCommunity() {
               </a>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   );
@@ -4704,7 +4768,7 @@ function ModulePersonal() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 pb-16">
+      <Reveal className="max-w-7xl mx-auto px-8 pb-16">
         {/* Achievement badges */}
         <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
           {[
@@ -4876,7 +4940,7 @@ function ModulePersonal() {
             </p>
           </div>
         )}
-      </div>
+      </Reveal>
     </div>
   );
 }

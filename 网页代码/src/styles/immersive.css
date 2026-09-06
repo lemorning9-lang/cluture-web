@@ -1,0 +1,118 @@
+/* ── 沉浸式质感升级 M1 全局系统 ──────────────────────────────────────────────
+   依赖 Imperial Han 色板（theme.css），不引入新色系：
+   鎏金 #c9a227 / 主金 #C89640 / 绢米 #f0e6cc / 绛红 #8b1a1a / 深金影 #8a6a24
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. 滚动渐显（Reveal 组件） ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal-visible {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* ── 2. 鎏金渐变标题（金箔 background-clip: text） ── */
+.gilt-text {
+  background-image: linear-gradient(
+    105deg,
+    #8a6a24 0%,
+    #c89640 24%,
+    #f0e6cc 44%,
+    #c9a227 58%,
+    #8a6a24 78%,
+    #c89640 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: gilt-shift 10s ease-in-out infinite alternate;
+}
+@keyframes gilt-shift {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
+/* ── 3. hero 标题逐字入场（SplitTitle） ── */
+.split-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.42em);
+  animation: char-rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--si, 0) * 90ms + var(--sd, 150ms));
+}
+@keyframes char-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 4. hero WebGL 粒子层（金沙浮尘） ── */
+.dust-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  animation: dust-fade 1.8s ease 0.4s forwards;
+}
+@keyframes dust-fade {
+  to {
+    opacity: 0.85;
+  }
+}
+
+/* ── 5. 微交互：hover 金色描边亮起 + 轻微位移 ── */
+.lift {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  border-color: rgba(200, 150, 64, 0.65);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.45),
+    0 0 14px rgba(200, 150, 64, 0.18);
+}
+
+/* ── 6. 无障碍：prefers-reduced-motion 全量降级 ── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .gilt-text {
+    animation: none;
+    background-position: 40% 0;
+  }
+  .split-char {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .dust-layer {
+    animation: none;
+    opacity: 0.6;
+  }
+  .lift,
+  .lift:hover {
+    transition: none;
+    transform: none;
+  }
+}
