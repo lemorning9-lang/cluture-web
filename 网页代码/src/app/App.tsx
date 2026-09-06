@@ -1274,12 +1274,75 @@ function ChapterDivider({ phrase }: { phrase: string }) {
 
 // ─── Cinematic Prologue ───────────────────────────────────────────────────────
 
+// 序章章节定义（M3 滚动叙事进度轨道用；字符取自各章现有章眼大字）
+const PROLOGUE_CHAPTERS = [
+  { key: "xu", char: "序", label: "序章" },
+  { key: "yuan", char: "源", label: "第一章 · 源" },
+  { key: "liu", char: "流", label: "第二章 · 流" },
+  { key: "hui", char: "汇", label: "第三章 · 汇" },
+];
+
 function CinematicPrologue({
   onEnterMap,
 }: {
   onEnterMap: () => void;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [activeChapter, setActiveChapter] = useState<string | null>(
+    null,
+  );
+
+  // 滚动驱动章节进度：各章 section 覆盖视口中带（42%–58%）者为当前章（M3）。
+  // 用 rAF 节流的滚动监听而非 IntersectionObserver——后者在部分内嵌环境下不派发。
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const sections = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-chapter]"),
+    );
+    if (!sections.length) return;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const bandTop = window.innerHeight * 0.42;
+      const bandBottom = window.innerHeight * 0.58;
+      let next: string | null = null;
+      for (const s of sections) {
+        const r = s.getBoundingClientRect();
+        if (r.top < bandBottom && r.bottom > bandTop) {
+          next = s.dataset.chapter ?? null;
+          break;
+        }
+      }
+      setActiveChapter(next);
+    };
+    // 直接在滚动事件中更新（4 次 rect 只读，开销可忽略）；
+    // 不用 rAF 门控——后台标签页 rAF 不执行会永久卡住更新。
+    const onScroll = () => update();
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const jumpToChapter = (key: string) => {
+    const el = rootRef.current?.querySelector<HTMLElement>(
+      `[data-chapter="${key}"]`,
+    );
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    el?.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      block: "start",
+    });
+  };
 
   const scrollToMap = () => {
     mapRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -1287,9 +1350,74 @@ function CinematicPrologue({
   };
 
   return (
-    <div>
+    <div ref={rootRef}>
+      {/* 章节进度轨道（M3）：右缘竖排，滚动驱动高亮，点击跳章；离开序章后淡出 */}
+      <nav
+        aria-label="序章章节进度"
+        className={`hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col items-center transition-opacity duration-500 ${
+          activeChapter ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {PROLOGUE_CHAPTERS.map((c, i) => {
+          const active = activeChapter === c.key;
+          return (
+            <Fragment key={c.key}>
+              <button
+                onClick={() => jumpToChapter(c.key)}
+                aria-current={active ? "true" : undefined}
+                aria-label={c.label}
+                title={c.label}
+                className="group relative flex items-center justify-center w-8 h-8 cursor-pointer transition-all duration-300"
+                style={{
+                  background: active
+                    ? "#8b1a1a"
+                    : "rgba(60,26,12,0.55)",
+                  border: `1px solid ${active ? "rgba(244,228,204,0.5)" : "rgba(200,150,64,0.30)"}`,
+                  boxShadow: active
+                    ? "0 2px 10px rgba(139,26,26,0.5), inset 0 0 0 1px rgba(244,228,204,0.3)"
+                    : "none",
+                }}
+              >
+                <span
+                  className="text-sm leading-none transition-colors"
+                  style={{
+                    fontFamily: FH,
+                    color: active
+                      ? "#F4E4CC"
+                      : "rgba(200,150,64,0.55)",
+                  }}
+                >
+                  {c.char}
+                </span>
+                <span
+                  className="absolute right-full mr-3 px-2 py-0.5 text-xs tracking-[0.25em] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                  style={{
+                    background: "rgba(36,13,4,0.85)",
+                    border: "1px solid rgba(200,150,64,0.30)",
+                    color: "rgba(240,215,165,0.85)",
+                    fontFamily: FH,
+                  }}
+                >
+                  {c.label}
+                </span>
+              </button>
+              {i < PROLOGUE_CHAPTERS.length - 1 && (
+                <span
+                  aria-hidden="true"
+                  className="w-px h-6"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom, rgba(200,150,64,0.45), rgba(200,150,64,0.12))",
+                  }}
+                />
+              )}
+            </Fragment>
+          );
+        })}
+      </nav>
+
       {/* Section 1 — Grand Opening */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+      <section data-chapter="xu" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         <img
           src={mural1}
           alt="石峁博物馆壁画 — 农耕文明"
@@ -1382,7 +1510,7 @@ function CinematicPrologue({
       </section>
 
       {/* Section 2 — 源 (Origin chapter) */}
-      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      <section data-chapter="yuan" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
         <img
           src={mural2}
           alt="石峁博物馆壁画 — 狩猎图"
@@ -1661,7 +1789,7 @@ function CinematicPrologue({
       </section>
 
       {/* Section 3 — 流 (Civilizational flow) */}
-      <section className="relative flex items-center overflow-hidden">
+      <section data-chapter="liu" className="relative flex items-center overflow-hidden">
         <img
           src={mural3}
           alt="石峁博物馆壁画 — 玉首骑马图"
@@ -1848,7 +1976,7 @@ function CinematicPrologue({
       </section>
 
       {/* Section 4 — 汇 (Convergence) */}
-      <section className="relative flex flex-col justify-center overflow-hidden">
+      <section data-chapter="hui" className="relative flex flex-col justify-center overflow-hidden">
         <img
           src={mural1}
           alt="石峁博物馆壁画 — 先民生活"
@@ -2259,6 +2387,7 @@ function HorizontalTimeline({
           return (
             <button
               key={era.key}
+              id={`era-node-${era.key}`}
               onClick={() => onChange(era.key)}
               className="flex flex-col items-center gap-1.5 group relative"
             >
@@ -2354,6 +2483,44 @@ function ModuleTimeSpace() {
     return timeOk && domainOk;
   });
 
+  // ─── 地图⇄时间轴双向联动（M3） ──────────────────────────────────
+  // 时间轴点击 → 地图飞行定位 + 高亮；标记点击 → 时间轴滚到对应年代。
+  // timelineFlyRef 标记本次筛选是否来自时间轴（标记点击引发的筛选不做飞行，
+  // 避免视野突然离开用户刚点中的遗址）。
+  const timelineFlyRef = useRef(false);
+  const highlightTimerRef = useRef<number | null>(null);
+
+  const handleTimelineChange = (key: string) => {
+    if (key === timePeriod) return;
+    timelineFlyRef.current = true;
+    setTimePeriod(key);
+  };
+
+  // 时间轴横向滚动：将对应年代节点滚到可视区中央（仅滚动横向容器，不影响页面）
+  const focusEraOnTimeline = (period: string) => {
+    const node = document.getElementById(`era-node-${period}`);
+    const scroller = node?.closest(".overflow-x-auto") as HTMLElement | null;
+    if (node && scroller) {
+      scroller.scrollTo({
+        left:
+          node.offsetLeft -
+          scroller.clientWidth / 2 +
+          node.clientWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleMarkerClick = (site: Site) => {
+    setSelectedSite(site);
+    setDrawerTab("介绍");
+    focusEraOnTimeline(site.period);
+    if (site.period !== timePeriod) {
+      timelineFlyRef.current = false;
+      setTimePeriod(site.period);
+    }
+  };
+
   // ─── 高德地图初始化（动态加载 SDK） ──────────────────────────────
   useEffect(() => {
     if (!mapRef.current || amapRef.current) return;
@@ -2379,10 +2546,7 @@ function ModuleTimeSpace() {
             offset: new Win.AMap.Pixel(0, -8),
           },
         });
-        marker.on("click", () => {
-          setSelectedSite(site);
-          setDrawerTab("介绍");
-        });
+        marker.on("click", () => handleMarkerClick(site));
         markers.push(marker);
       });
       map.add(markers);
@@ -2411,6 +2575,9 @@ function ModuleTimeSpace() {
     document.head.appendChild(script);
 
     return () => {
+      if (highlightTimerRef.current) {
+        window.clearTimeout(highlightTimerRef.current);
+      }
       if (amapRef.current) {
         amapRef.current.destroy();
         amapRef.current = null;
@@ -2435,13 +2602,27 @@ function ModuleTimeSpace() {
           offset: new (window as any).AMap.Pixel(0, -8),
         },
       });
-      marker.on("click", () => {
-        setSelectedSite(site);
-        setDrawerTab("介绍");
-      });
+      marker.on("click", () => handleMarkerClick(site));
       markers.push(marker);
     });
     map.add(markers);
+
+    // 时间轴点击触发的筛选：飞行定位到该年代遗址群并短暂高亮（M3）
+    if (timelineFlyRef.current && markers.length > 0) {
+      timelineFlyRef.current = false;
+      map.setFitView(markers, false, [80, 80, 80, 80]);
+      markers.forEach((m) =>
+        m.setAnimation?.("AMAP_ANIMATION_BOUNCE"),
+      );
+      if (highlightTimerRef.current) {
+        window.clearTimeout(highlightTimerRef.current);
+      }
+      highlightTimerRef.current = window.setTimeout(() => {
+        markers.forEach((m) =>
+          m.setAnimation?.("AMAP_ANIMATION_NONE"),
+        );
+      }, 2200);
+    }
   }, [filtered]);
 
   return (
@@ -2456,7 +2637,7 @@ function ModuleTimeSpace() {
           {/* Timeline */}
           <HorizontalTimeline
             active={timePeriod}
-            onChange={setTimePeriod}
+            onChange={handleTimelineChange}
           />
 
           {/* Domain filter + site count */}
@@ -2527,10 +2708,7 @@ function ModuleTimeSpace() {
                 {filtered.map((site) => (
                   <button
                     key={site.id}
-                    onClick={() => {
-                      setSelectedSite(site);
-                      setDrawerTab("介绍");
-                    }}
+                    onClick={() => handleMarkerClick(site)}
                     style={{
                       left: `${site.x}%`,
                       top: `${site.y}%`,
@@ -3260,7 +3438,8 @@ function ModuleTimeSpace() {
         </div>
       </div>
 
-      <Divider />
+      {/* 章节分隔（M3）：复用 ChapterDivider，衔接序章与精选遗址 */}
+      <ChapterDivider phrase="殊途同归" />
 
       {/* Featured sites */}
       <Reveal className="max-w-7xl mx-auto px-6 pb-16">
