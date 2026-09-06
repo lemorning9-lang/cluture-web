@@ -64,6 +64,7 @@ import mural1 from "../imports/____-1.jpg";
 import mural2 from "../imports/____-2.jpg";
 import mural3 from "../imports/____-3.jpg";
 import pottery from "../imports/___________.png";
+import navBand from "../assets/nav/taotie-band.png";
 import liangzhuFace from "../imports/__________.png";
 import taosiArtifact from "../imports/________________.png";
 import liangzhuArtifact from "../imports/_______.png";
@@ -5599,7 +5600,15 @@ export default function App() {
       style={{ fontFamily: FB }}
     >
       {/* Navigation */}
-      <header className="nav-stone sticky top-0 z-40 border-b border-primary/25 backdrop-blur-md">
+      <header
+        className="nav-stone sticky top-0 z-40 border-b border-primary/25 backdrop-blur-md"
+        style={{
+          backgroundImage: `linear-gradient(rgba(16,7,3,0.52), rgba(16,7,3,0.52)), url(${navBand})`,
+          backgroundSize: "auto, auto 100%",
+          backgroundRepeat: "repeat, repeat-x",
+          backgroundPosition: "center, center bottom",
+        }}
+      >
         {/* ── 第一行：馆名居中（苍劲楷书）+ 工具钮靠右 ── */}
         <div className="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
           <div className="flex items-center gap-3">
