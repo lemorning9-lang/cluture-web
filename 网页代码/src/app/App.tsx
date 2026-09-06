@@ -5602,7 +5602,16 @@ export default function App() {
       <header className="nav-stone sticky top-0 z-40 border-b border-primary/25 backdrop-blur-md">
         {/* ── 第一行：馆名居中（苍劲楷书）+ 工具钮靠右 ── */}
         <div className="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 px-6 py-1.5"
+            style={{
+              background:
+                "linear-gradient(180deg, #20120a 0%, #120903 55%, #1a0f07 100%)",
+              border: "1px solid rgba(200,150,64,0.38)",
+              boxShadow:
+                "0 6px 18px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(200,150,64,0.14)",
+            }}
+          >
             <div
               className="w-10 h-10 rounded-full border border-primary/60 overflow-hidden flex-shrink-0"
               style={{ boxShadow: '0 0 12px rgba(200,150,64,0.3)' }}
@@ -5621,7 +5630,7 @@ export default function App() {
               className="text-primary text-2xl md:text-3xl leading-none tracking-[0.18em] whitespace-nowrap"
               style={{
                 fontFamily: FQ,
-                textShadow: '0 2px 14px rgba(200,150,64,0.35)',
+                textShadow: '0 1px 0 rgba(0,0,0,0.9), 0 -1px 0 rgba(255,230,180,0.14), 0 0 20px rgba(200,150,64,0.18)',
               }}
             >
               中华文明探源工程
@@ -5668,22 +5677,19 @@ export default function App() {
               <Fragment key={tab.key}>
                 {i > 0 && (
                   <span aria-hidden="true" className="hidden md:flex items-center gap-1.5 flex-shrink-0">
-                    <span className="h-4 w-px bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
+                    <span className="h-5 w-px bg-gradient-to-b from-transparent via-primary/25 to-transparent" />
                     <span className="text-primary/40 text-[8px] leading-none">◆</span>
-                    <span className="h-4 w-px bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
+                    <span className="h-5 w-px bg-gradient-to-b from-transparent via-primary/25 to-transparent" />
                   </span>
                 )}
                 <button
                   onClick={() => setActiveTab(tab.key)}
-                  className={`relative flex-shrink-0 px-3 md:px-5 py-2 text-[17px] tracking-[0.15em] whitespace-nowrap transition-colors ${activeTab === tab.key ? "text-primary" : "text-foreground/70 hover:text-foreground"}`}
+                  className={`relative flex-shrink-0 px-3 md:px-5 py-2 text-[17px] tracking-[0.15em] whitespace-nowrap transition-colors ${activeTab === tab.key ? "text-primary [text-shadow:0_0_14px_rgba(200,150,64,0.45)]" : "text-foreground/45 [text-shadow:0_1px_1px_rgba(0,0,0,0.85)] hover:text-foreground/80"}`}
                   style={{ fontFamily: FH }}
                 >
                   {tab.label}
                   {activeTab === tab.key && (
-                    <>
-                      <span className="absolute bottom-[3px] left-3 right-3 h-px bg-primary/50" />
-                      <span className="absolute bottom-0 left-1 right-1 h-[2px] bg-primary" />
-                    </>
+                    <span className="absolute bottom-1 left-4 right-4 h-px bg-primary/45" />
                   )}
                 </button>
               </Fragment>
