@@ -1220,7 +1220,7 @@ function ChapterDivider({ phrase }: { phrase: string }) {
   const [seal, ...rest] = chars;
   return (
     <div
-      className="flex flex-col items-center justify-center py-10 bg-[#0E0604]"
+      className="flex flex-col items-center justify-center py-10"
       role="presentation"
     >
       <span className="sr-only">{phrase}</span>
@@ -2472,54 +2472,19 @@ function ModuleTimeSpace() {
   const amapRef = useRef<any>(null);
   const [amapReady, setAmapReady] = useState(false);
 
-  const filtered = SITES.filter((s) => {
-    const timeOk =
-      timePeriod === "全部" || s.period === timePeriod;
-    const domainOk =
-      domain === "全部" ||
+  // 地图标记筛选匹配（M3 修订）：地图始终显示全部 29 处标记，
+  // 筛选时非匹配标记变淡、匹配标记突出，而非移除。
+  const siteMatchesFilter = (s: Site) =>
+    (timePeriod === "全部" || s.period === timePeriod) &&
+    (domain === "全部" ||
       (domain === "黄河流域" && s.domain === "黄河") ||
       (domain === "长江流域" && s.domain === "长江") ||
-      (domain === "其他地区" && s.domain === "其他");
-    return timeOk && domainOk;
-  });
+      (domain === "其他地区" && s.domain === "其他"));
 
-  // ─── 地图⇄时间轴双向联动（M3） ──────────────────────────────────
-  // 时间轴点击 → 地图飞行定位 + 高亮；标记点击 → 时间轴滚到对应年代。
-  // timelineFlyRef 标记本次筛选是否来自时间轴（标记点击引发的筛选不做飞行，
-  // 避免视野突然离开用户刚点中的遗址）。
-  const timelineFlyRef = useRef(false);
+  const filtered = SITES.filter(siteMatchesFilter);
+
+  // ─── 高亮定时器（时间轴/文化域筛选时短暂弹跳高亮匹配标记，M3） ───
   const highlightTimerRef = useRef<number | null>(null);
-
-  const handleTimelineChange = (key: string) => {
-    if (key === timePeriod) return;
-    timelineFlyRef.current = true;
-    setTimePeriod(key);
-  };
-
-  // 时间轴横向滚动：将对应年代节点滚到可视区中央（仅滚动横向容器，不影响页面）
-  const focusEraOnTimeline = (period: string) => {
-    const node = document.getElementById(`era-node-${period}`);
-    const scroller = node?.closest(".overflow-x-auto") as HTMLElement | null;
-    if (node && scroller) {
-      scroller.scrollTo({
-        left:
-          node.offsetLeft -
-          scroller.clientWidth / 2 +
-          node.clientWidth / 2,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const handleMarkerClick = (site: Site) => {
-    setSelectedSite(site);
-    setDrawerTab("介绍");
-    focusEraOnTimeline(site.period);
-    if (site.period !== timePeriod) {
-      timelineFlyRef.current = false;
-      setTimePeriod(site.period);
-    }
-  };
 
   // ─── 高德地图初始化（动态加载 SDK） ──────────────────────────────
   useEffect(() => {
@@ -2546,7 +2511,10 @@ function ModuleTimeSpace() {
             offset: new Win.AMap.Pixel(0, -8),
           },
         });
-        marker.on("click", () => handleMarkerClick(site));
+        marker.on("click", () => {
+          setSelectedSite(site);
+          setDrawerTab("介绍");
+        });
         markers.push(marker);
       });
       map.add(markers);
@@ -2585,14 +2553,17 @@ function ModuleTimeSpace() {
     };
   }, []);
 
-  // ─── 筛选变化时更新地图标记 ──────────────────────────────────────
+  // ─── 筛选变化时更新地图标记（M3 修订：29 处全部常显） ────────────
+  // 筛选不再移除标记：非匹配标记透明度降至 0.25，匹配标记满透明度并
+  // 飞行定位 + 短暂弹跳高亮。标记点击始终为「打开抽屉」。
   useEffect(() => {
     if (!amapRef.current || !(window as any).AMap) return;
     const map = amapRef.current;
     map.clearMap();
 
     const markers: any[] = [];
-    filtered.forEach((site) => {
+    const matching: any[] = [];
+    SITES.forEach((site) => {
       const marker = new (window as any).AMap.Marker({
         position: [site.lng, site.lat],
         title: site.name,
@@ -2602,28 +2573,35 @@ function ModuleTimeSpace() {
           offset: new (window as any).AMap.Pixel(0, -8),
         },
       });
-      marker.on("click", () => handleMarkerClick(site));
+      marker.on("click", () => {
+        setSelectedSite(site);
+        setDrawerTab("介绍");
+      });
+      if (siteMatchesFilter(site)) {
+        matching.push(marker);
+      } else {
+        marker.setOpacity?.(0.25);
+      }
       markers.push(marker);
     });
     map.add(markers);
 
-    // 时间轴点击触发的筛选：飞行定位到该年代遗址群并短暂高亮（M3）
-    if (timelineFlyRef.current && markers.length > 0) {
-      timelineFlyRef.current = false;
-      map.setFitView(markers, false, [80, 80, 80, 80]);
-      markers.forEach((m) =>
+    const hasFilter = timePeriod !== "全部" || domain !== "全部";
+    if (hasFilter && matching.length > 0) {
+      map.setFitView(matching, false, [80, 80, 80, 80]);
+      matching.forEach((m) =>
         m.setAnimation?.("AMAP_ANIMATION_BOUNCE"),
       );
       if (highlightTimerRef.current) {
         window.clearTimeout(highlightTimerRef.current);
       }
       highlightTimerRef.current = window.setTimeout(() => {
-        markers.forEach((m) =>
+        matching.forEach((m) =>
           m.setAnimation?.("AMAP_ANIMATION_NONE"),
         );
       }, 2200);
     }
-  }, [filtered]);
+  }, [timePeriod, domain]);
 
   return (
     <div className="min-h-screen">
@@ -2637,7 +2615,7 @@ function ModuleTimeSpace() {
           {/* Timeline */}
           <HorizontalTimeline
             active={timePeriod}
-            onChange={handleTimelineChange}
+            onChange={setTimePeriod}
           />
 
           {/* Domain filter + site count */}
@@ -2705,10 +2683,15 @@ function ModuleTimeSpace() {
                 </div>
 
                 {/* Markers */}
-                {filtered.map((site) => (
+                {SITES.map((site) => {
+                  const isMatch = siteMatchesFilter(site);
+                  return (
                   <button
                     key={site.id}
-                    onClick={() => handleMarkerClick(site)}
+                    onClick={() => {
+                      setSelectedSite(site);
+                      setDrawerTab("介绍");
+                    }}
                     style={{
                       left: `${site.x}%`,
                       top: `${site.y}%`,
@@ -2717,7 +2700,7 @@ function ModuleTimeSpace() {
                     title={site.name}
                   >
                     <div
-                      className={`relative transition-all duration-200 ${selectedSite?.id === site.id ? "scale-150" : "hover:scale-125"}`}
+                      className={`relative transition-all duration-200 ${selectedSite?.id === site.id ? "scale-150" : isMatch ? "hover:scale-125" : "scale-75 opacity-30 hover:opacity-80"}`}
                     >
                       {site.status === "实地打卡" && (
                         <>
@@ -2745,7 +2728,8 @@ function ModuleTimeSpace() {
                       </div>
                     </div>
                   </button>
-                ))}
+                  );
+                  })}
               </>
             )}
 
@@ -3438,8 +3422,7 @@ function ModuleTimeSpace() {
         </div>
       </div>
 
-      {/* 章节分隔（M3）：复用 ChapterDivider，衔接序章与精选遗址 */}
-      <ChapterDivider phrase="殊途同归" />
+      <Divider />
 
       {/* Featured sites */}
       <Reveal className="max-w-7xl mx-auto px-6 pb-16">
