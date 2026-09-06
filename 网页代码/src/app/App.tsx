@@ -28,11 +28,32 @@ import {
 } from "lucide-react";
 
 // 遗址/社区图片映射 + 高德地图配置
-import { getSiteMainImage, COMMUNITY_IMAGES } from "../data/siteImages";
+import {
+  getSiteMainImage,
+  COMMUNITY_IMAGES,
+  SITE_IMAGES,
+} from "../data/siteImages";
 import AMAP_CONFIG from "../../高德api/config.js";
 
+// shadcn Dialog（文物深度查看层，M2）
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "./components/ui/dialog";
+
 // 沉浸式质感升级 M1：全站可复用系统（滚动渐显 / 回纹装饰 / 逐字标题 / hero 粒子）
-import { Reveal, SplitTitle, MeanderRule, HeroDust } from "./immersive";
+// M2 增补：MeanderCorners（卡片回纹四角）、TiltCard（3D 倾斜）、CountUp（数字滚动）
+import {
+  Reveal,
+  SplitTitle,
+  MeanderRule,
+  MeanderCorners,
+  HeroDust,
+  TiltCard,
+  CountUp,
+} from "./immersive";
 
 // 石峁博物馆壁画 — used as cinematic prologue backgrounds
 import mural1 from "../imports/____-1.jpg";
@@ -993,6 +1014,9 @@ const ACTIVITIES: Activity[] = [
   },
 ];
 
+// 非遗技艺卡（M2）：取自体验活动中「手工技艺」类目，文案沿用现有数据
+const HERITAGE_CRAFTS = ACTIVITIES.filter((a) => a.category === "手工技艺");
+
 const ACTIVITY_CATEGORIES = [
   "全部",
   "手工技艺",
@@ -1001,6 +1025,17 @@ const ACTIVITY_CATEGORIES = [
   "美食",
   "汉服体验",
 ];
+
+// 体验活动 → 时空探源遗址档案（仅收录地点/文化可直接对应的条目，不牵强关联；
+// 楚文化/汉文化等活动在 SITES 中无对应遗址，故不设链接）
+const ACTIVITY_SITE_LINK: Record<number, string> = {
+  1: "良渚遗址", // 良渚琢玉体验 · 良渚文化 / 良渚博物院
+  2: "铸鼎原遗址群", // 仰韶彩陶绘制 · 仰韶文化 / 河南三门峡（铸鼎原位于三门峡灵宝）
+  5: "三星堆遗址", // 古蜀青铜铸造 · 古蜀文化 / 三星堆博物馆
+  6: "牛河梁遗址", // 红山玉雕研习 · 红山文化
+  7: "城子崖遗址", // 龙山黑陶制作 · 龙山文化 / 城子崖遗址
+  8: "铸鼎原遗址群", // 仰韶民俗餐宴 · 仰韶文化 / 河南三门峡
+};
 
 const POSTS: Post[] = [
   {
@@ -1040,6 +1075,15 @@ const POSTS: Post[] = [
     imageCount: 3,
   },
 ];
+
+// 探源影像库（M2）：社区帖子实拍 → 画廊条目（说明文字取自帖子真实数据）
+const GALLERY_ITEMS = POSTS.flatMap((post) =>
+  (COMMUNITY_IMAGES[post.id] ?? []).map((src) => ({
+    src,
+    site: post.site,
+    author: post.author,
+  })),
+);
 
 const TRENDING = [
   { tag: "#良渚文明5000年#", count: "2.3万" },
@@ -3410,7 +3454,11 @@ function ModuleTimeSpace() {
 
 // ─── Module 2: 文化遗珍 ───────────────────────────────────────────────────────
 
-function ModuleCulturalTreasures() {
+function ModuleCulturalTreasures({
+  onOpenSite,
+}: {
+  onOpenSite?: (siteName: string) => void;
+}) {
   const [activeCategory, setActiveCategory] = useState("全部");
   const [selectedActivity, setSelectedActivity] =
     useState<Activity | null>(null);
@@ -3419,6 +3467,24 @@ function ModuleCulturalTreasures() {
     activeCategory === "全部"
       ? ACTIVITIES
       : ACTIVITIES.filter((a) => a.category === activeCategory);
+
+  // 当前查看活动对应的站内遗址（ACTIVITY_SITE_LINK 无对应项则为 undefined，不强行关联）
+  const linkedSite = selectedActivity
+    ? ACTIVITY_SITE_LINK[selectedActivity.id]
+    : undefined;
+
+  // CountUp 统计条数据（全部取自站内真实数据，运行时计算，非虚构）：
+  // 核心遗址 = SITES 档案数（与全站文案「二十九处遗址」一致）；
+  // 影像资料 = siteImages 注册表中遗址影像 + 社区影像总数；
+  // 文明跨度 = 现有文案最早年代锚点（大地湾遗址「跨度距今8000–4800年」）
+  const TOTAL_IMAGES =
+    Object.values(SITE_IMAGES).reduce((n, arr) => n + arr.length, 0) +
+    Object.values(COMMUNITY_IMAGES).reduce((n, arr) => n + arr.length, 0);
+  const TREASURE_STATS = [
+    { value: SITES.length, unit: "处", label: "核心遗址" },
+    { value: TOTAL_IMAGES, unit: "幅", label: "影像资料" },
+    { value: 8000, unit: "年", label: "文明跨度" },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -3443,7 +3509,55 @@ function ModuleCulturalTreasures() {
         </div>
       </div>
 
-      <div className="sticky top-16 z-30 bg-background/90 backdrop-blur-md border-b border-border px-6 py-3">
+      {/* CountUp 数字统计条（数据取自站内遗址档案与影像资料库，非虚构） */}
+      <Reveal className="max-w-7xl mx-auto px-6 pt-6">
+        <div
+          className="relative flex flex-wrap items-center justify-around gap-x-8 gap-y-4 px-6 py-5"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(84,36,14,0.62) 0%, rgba(60,24,10,0.68) 60%, rgba(100,44,18,0.58) 100%)",
+            border: "1px solid rgba(200,150,64,0.22)",
+          }}
+        >
+          <MeanderCorners size={16} />
+          {TREASURE_STATS.map((s, i) => (
+            <div key={s.label} className="flex items-center gap-5">
+              <CountUp
+                value={s.value}
+                className="gilt-text text-4xl leading-none"
+                style={{ fontFamily: FD }}
+                duration={1400 + i * 250}
+              />
+              <div className="flex flex-col">
+                <span
+                  className="text-primary/70 text-sm tracking-[0.25em] leading-tight"
+                  style={{ fontFamily: FH }}
+                >
+                  {s.unit}
+                </span>
+                <span
+                  className="text-muted-foreground/70 text-xs tracking-[0.3em] leading-tight mt-0.5"
+                  style={{ fontFamily: FH }}
+                >
+                  {s.label}
+                </span>
+              </div>
+              {i < TREASURE_STATS.length - 1 && (
+                <span
+                  aria-hidden="true"
+                  className="hidden md:block w-px h-9 ml-8"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom, transparent, rgba(200,150,64,0.4), transparent)",
+                  }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </Reveal>
+
+      <div className="sticky top-16 z-30 bg-background/90 backdrop-blur-md border-b border-border px-6 py-3 mt-6">
         <div className="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
           <Filter size={13} className="text-muted-foreground" />
           {ACTIVITY_CATEGORIES.map((cat) => (
@@ -3465,11 +3579,23 @@ function ModuleCulturalTreasures() {
       <Reveal className="max-w-7xl mx-auto px-6 py-8">
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
           {filtered.map((act, i) => (
-            <div
+            <TiltCard
               key={act.id}
-              className="relative cursor-pointer group flex flex-col break-inside-avoid mb-5"
+              className="treasure-card relative cursor-pointer group flex flex-col break-inside-avoid mb-5"
               onClick={() => setSelectedActivity(act)}
+              role="button"
+              tabIndex={0}
+              aria-haspopup="dialog"
+              aria-label={`查看「${act.name}」详情`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setSelectedActivity(act);
+                }
+              }}
             >
+              {/* 高光扫过（M2） */}
+              <span aria-hidden="true" className="sheen" />
               {/* Image — floats above card */}
               <div
                 className="relative z-10 mx-3 overflow-hidden transition-transform duration-500 group-hover:-translate-y-2"
@@ -3487,7 +3613,8 @@ function ModuleCulturalTreasures() {
                 <img
                   src={act.img}
                   alt={act.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.07]"
                   style={{
                     filter: "brightness(0.85) contrast(1.05)",
                   }}
@@ -3518,13 +3645,13 @@ function ModuleCulturalTreasures() {
                 />
               </div>
 
-              {/* Card body */}
+              {/* Card body — 边框色走 --edge 变量，hover 时金线亮起（M2） */}
               <div
-                className="relative -mt-6 pt-9 px-4 pb-4 flex flex-col flex-1"
+                className="treasure-body relative -mt-6 pt-9 px-4 pb-4 flex flex-col flex-1"
                 style={{
                   background:
                     "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
-                  border: "1px solid rgba(200,150,64,0.25)",
+                  border: "1px solid var(--edge, rgba(200,150,64,0.25))",
                 }}
               >
                 {/* 回字纹四角 */}
@@ -3627,26 +3754,27 @@ function ModuleCulturalTreasures() {
                   </span>
                 </div>
               </div>
-            </div>
+            </TiltCard>
           ))}
         </div>
       </Reveal>
 
       {selectedActivity && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-          <div
-            className="absolute inset-0 bg-black/75 backdrop-blur-sm"
-            onClick={() => setSelectedActivity(null)}
-          />
-          <div
-            className="relative z-10 w-full max-w-sm flex flex-col"
-            style={{
-              background:
-                "linear-gradient(160deg, rgba(84,36,14,0.90) 0%, rgba(60,24,10,0.93) 60%, rgba(100,44,18,0.88) 100%)",
-              border: "1px solid rgba(200,150,64,0.25)",
-              maxHeight: "88vh",
-            }}
-          >
+        <Dialog
+          open={!!selectedActivity}
+          onOpenChange={(open) => {
+            if (!open) setSelectedActivity(null);
+          }}
+        >
+        <DialogContent
+          className="flex flex-col gap-0 rounded-none border p-0 sm:max-w-sm"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(84,36,14,0.90) 0%, rgba(60,24,10,0.93) 60%, rgba(100,44,18,0.88) 100%)",
+            border: "1px solid rgba(200,150,64,0.25)",
+            maxHeight: "88vh",
+          }}
+        >
             {/* 回字纹四角 */}
             {(
               [
@@ -3719,8 +3847,7 @@ function ModuleCulturalTreasures() {
                 }}
               />
               {/* Category + culture tags */}
-              <div className="absolute top-2 left-2 flex gap-1.5">
-                <div
+              <div className="absolute top-2 left-2 flex gap-1.5">                <div
                   className="px-1.5 py-0.5"
                   style={{
                     background: "rgba(52,22,8,0.78)",
@@ -3755,18 +3882,6 @@ function ModuleCulturalTreasures() {
                   </span>
                 </div>
               </div>
-              {/* Close button */}
-              <button
-                onClick={() => setSelectedActivity(null)}
-                className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center transition-opacity hover:opacity-60"
-                style={{
-                  background: "rgba(52,22,8,0.68)",
-                  border: "1px solid rgba(200,150,64,0.22)",
-                  color: "rgba(200,150,64,0.65)",
-                }}
-              >
-                <X size={10} />
-              </button>
             </div>
 
             {/* Card body */}
@@ -3789,8 +3904,8 @@ function ModuleCulturalTreasures() {
               <div className="px-5 pt-5 pb-6 space-y-4">
                 {/* Name */}
                 <div className="text-center">
-                  <h2
-                    className="text-2xl leading-tight"
+                  <DialogTitle
+                    className="text-2xl leading-tight font-normal"
                     style={{
                       fontFamily: FD,
                       color: "rgba(240,215,165,0.95)",
@@ -3799,7 +3914,7 @@ function ModuleCulturalTreasures() {
                     }}
                   >
                     {selectedActivity.name}
-                  </h2>
+                  </DialogTitle>
                   <div
                     className="h-px mt-2.5"
                     style={{
@@ -3857,6 +3972,42 @@ function ModuleCulturalTreasures() {
                       </span>
                     </div>
                   ))}
+
+                  {/* 所属遗址（M2）：仅列出站内档案可直接对应的遗址，点击前往时空探源 */}
+                  {linkedSite && (
+                    <button
+                      onClick={() => onOpenSite?.(linkedSite)}
+                      className="flex items-baseline justify-between w-full group/site cursor-pointer"
+                    >
+                      <span
+                        className="text-[10px] tracking-[0.2em] flex-shrink-0"
+                        style={{
+                          color: "rgba(200,150,64,0.65)",
+                          fontFamily: FH,
+                        }}
+                      >
+                        所属遗址
+                      </span>
+                      <div
+                        className="flex-1 mx-2 border-b border-dotted"
+                        style={{
+                          borderColor: "rgba(200,150,64,0.18)",
+                        }}
+                      />
+                      <span
+                        className="text-sm tracking-wide transition-colors group-hover/site:text-primary flex items-center gap-1"
+                        style={{
+                          color: "rgba(240,215,165,0.82)",
+                        }}
+                      >
+                        {linkedSite}
+                        <ArrowRight
+                          size={10}
+                          className="opacity-60 group-hover/site:translate-x-0.5 transition-transform"
+                        />
+                      </span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Divider */}
@@ -3869,7 +4020,7 @@ function ModuleCulturalTreasures() {
                 />
 
                 {/* Description */}
-                <p
+                <DialogDescription
                   className="text-sm leading-relaxed"
                   style={{
                     color: "rgba(220,195,150,0.78)",
@@ -3877,7 +4028,7 @@ function ModuleCulturalTreasures() {
                   }}
                 >
                   {selectedActivity.description}
-                </p>
+                </DialogDescription>
 
                 {/* Action buttons */}
                 <div className="flex gap-3 pt-1">
@@ -3906,8 +4057,8 @@ function ModuleCulturalTreasures() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+        </DialogContent>
+        </Dialog>
       )}
     </div>
   );
@@ -4688,6 +4839,159 @@ function ModuleCommunity() {
             </div>
           </div>
         </Reveal>
+
+        {/* 探源影像库（M2）：瀑布流画廊，hover/focus 揭示说明，触屏常显 */}
+        <Reveal className="mt-12">
+          <SectionLabel en="COMMUNITY GALLERY" />
+          <h2
+            className="gilt-text text-4xl tracking-wider"
+            style={{ fontFamily: FD }}
+          >
+            探源影像库
+          </h2>
+          <p className="text-muted-foreground text-base mt-1 mb-7 tracking-wider">
+            来自探源者的现场影像
+          </p>
+          <div className="columns-2 md:columns-3 gap-4">
+            {GALLERY_ITEMS.map((item, i) => (
+              <figure
+                key={i}
+                tabIndex={0}
+                className="gallery-item relative overflow-hidden break-inside-avoid mb-4 cursor-pointer group"
+                style={{
+                  boxShadow:
+                    "0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,150,64,0.25)",
+                }}
+              >
+                <img
+                  src={item.src}
+                  alt={`${item.site} · 社区影像`}
+                  loading="lazy"
+                  className="w-full block"
+                  style={{ filter: "brightness(0.86) contrast(1.05)" }}
+                />
+                <div
+                  className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none"
+                />
+                <figcaption className="gallery-cap absolute inset-x-0 bottom-0 p-3">
+                  <div
+                    className="text-sm tracking-[0.2em]"
+                    style={{
+                      color: "rgba(200,150,64,0.88)",
+                      fontFamily: FH,
+                    }}
+                  >
+                    {item.site}
+                  </div>
+                  <div
+                    className="text-xs mt-0.5"
+                    style={{
+                      color: "rgba(220,195,150,0.72)",
+                      fontFamily: FH,
+                    }}
+                  >
+                    记录者 · {item.author}
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </Reveal>
+
+        {/* 非遗技艺（M2）：hover 展开技艺详情，文案取自现有体验活动数据 */}
+        <Reveal className="mt-12 pb-16">
+          <SectionLabel en="INTANGIBLE CRAFTS" />
+          <h2
+            className="gilt-text text-4xl tracking-wider"
+            style={{ fontFamily: FD }}
+          >
+            非遗技艺
+          </h2>
+          <p className="text-muted-foreground text-base mt-1 mb-7 tracking-wider">
+            源自各文化的传统技艺，可在所属体验中亲手研习
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {HERITAGE_CRAFTS.map((craft) => (
+              <div
+                key={craft.id}
+                tabIndex={0}
+                className="heritage-card relative cursor-pointer group overflow-hidden"
+                style={{
+                  background:
+                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
+                  border: "1px solid rgba(200,150,64,0.25)",
+                }}
+              >
+                <div
+                  className="relative overflow-hidden"
+                  style={{ height: "170px" }}
+                >
+                  <img
+                    src={craft.img}
+                    alt={craft.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                    style={{ filter: "brightness(0.84) contrast(1.05)" }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <div
+                    className="absolute top-2 right-2 px-1.5 py-0.5"
+                    style={{
+                      background: "rgba(52,22,8,0.75)",
+                      border: "1px solid rgba(200,150,64,0.30)",
+                    }}
+                  >
+                    <span
+                      className="text-xs text-primary/70 tracking-[0.2em]"
+                      style={{ fontFamily: FH }}
+                    >
+                      {craft.culture}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <h3
+                      className="text-lg leading-snug"
+                      style={{
+                        fontFamily: FD,
+                        color: "rgba(240,215,165,0.93)",
+                        textShadow: "0 0 18px rgba(200,150,64,0.38)",
+                      }}
+                    >
+                      {craft.name}
+                    </h3>
+                    <StarRating rating={craft.rating} />
+                  </div>
+                  <div
+                    className="h-px my-2"
+                    style={{
+                      background:
+                        "linear-gradient(to right, transparent, rgba(200,150,64,0.35), transparent)",
+                    }}
+                  />
+                  <div
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/55"
+                  >
+                    <MapPin size={9} className="text-primary/45" />
+                    {craft.location}
+                  </div>
+                  <div className="heritage-more">
+                    <p
+                      className="text-xs leading-relaxed pt-2"
+                      style={{
+                        color: "rgba(220,195,150,0.75)",
+                        fontFamily: FH,
+                      }}
+                    >
+                      {craft.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </div>
   );
@@ -5214,7 +5518,9 @@ export default function App() {
 
       <main>
         {activeTab === "探源" && <ModuleTimeSpace />}
-        {activeTab === "遗珍" && <ModuleCulturalTreasures />}
+        {activeTab === "遗珍" && (
+          <ModuleCulturalTreasures onOpenSite={() => setActiveTab("探源")} />
+        )}
         {activeTab === "社区" && <ModuleCommunity />}
         {activeTab === "个人" && <ModulePersonal />}
       </main>

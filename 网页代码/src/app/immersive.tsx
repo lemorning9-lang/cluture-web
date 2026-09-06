@@ -9,6 +9,8 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type HTMLAttributes,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 import Particles from "./components/reactbits/Particles";
@@ -262,5 +264,110 @@ export function HeroDust({ className = "" }: { className?: string }) {
         particleColors={["#C89640", "#c9a227", "#F4E4CC"]}
       />
     </div>
+  );
+}
+
+// ── 6. M2: 3D 倾斜卡片（鼠标跟随 rotateX/rotateY + 高光定位） ─────────────────
+// 仅在「精确指针 + 未开启减少动效」时启用；触屏/降级时是普通 div。
+// 通过 CSS 变量 --rx/--ry/--gx/--gy 驱动 transform 与高光位置（见 immersive.css）。
+// 其余 props（onClick/role/tabIndex…）原样透传给根元素。
+
+export function TiltCard({
+  children,
+  className = "",
+  max = 6,
+  ...rest
+}: HTMLAttributes<HTMLDivElement> & { max?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const [finePointer] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: fine)").matches,
+  );
+  const active = !reduced && finePointer;
+
+  const onMove = (e: ReactMouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!active || !el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--rx", `${(-py * max).toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${(px * max).toFixed(2)}deg`);
+    el.style.setProperty("--gx", `${((px + 0.5) * 100).toFixed(1)}%`);
+    el.style.setProperty("--gy", `${((py + 0.5) * 100).toFixed(1)}%`);
+  };
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={`tilt-card ${active ? "" : "tilt-static"} ${className}`.trim()}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      {...rest}
+    >
+      {active && <span aria-hidden="true" className="tilt-glare" />}
+      {children}
+    </div>
+  );
+}
+
+// ── 7. M2: CountUp 数字滚动 ──────────────────────────────────────────────────
+// 进入视口才启动、只跑一次；prefers-reduced-motion 时直接显示终值。
+// fontVariantNumeric: tabular-nums 防止滚动中数字宽度抖动。
+
+export function CountUp({
+  value,
+  duration = 1600,
+  className = "",
+  suffix = "",
+  style,
+}: {
+  value: number;
+  duration?: number;
+  className?: string;
+  suffix?: string;
+  style?: CSSProperties;
+}) {
+  const reduced = usePrefersReducedMotion();
+  const { ref, inView } = useInView<HTMLSpanElement>();
+  const [display, setDisplay] = useState(reduced ? value : 0);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (!inView || started.current) return;
+    started.current = true;
+    if (reduced) {
+      setDisplay(value);
+      return;
+    }
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min((t - t0) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      setDisplay(Math.round(eased * value));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, reduced, value, duration]);
+
+  return (
+    <span
+      ref={ref}
+      className={className}
+      style={{ fontVariantNumeric: "tabular-nums", ...style }}
+    >
+      {display}
+      {suffix}
+    </span>
   );
 }

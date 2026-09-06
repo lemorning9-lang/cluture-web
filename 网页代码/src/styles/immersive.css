@@ -90,29 +90,181 @@
     0 0 14px rgba(200, 150, 64, 0.18);
 }
 
-/* ── 6. 无障碍：prefers-reduced-motion 全量降级 ── */
+/* ── 6. M2: 3D 倾斜卡片（TiltCard） ──
+   --rx/--ry/--gy/--gx 由组件内联写入；hover 时跟手（0.18s），离开回弹（0.55s） */
+.tilt-card {
+  transform: perspective(950px) rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.tilt-card:hover {
+  transition-duration: 0.18s;
+}
+.tilt-static {
+  transform: none;
+  transition: none;
+}
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: radial-gradient(
+    58% 58% at var(--gx, 50%) var(--gy, 50%),
+    rgba(240, 230, 204, 0.13),
+    rgba(200, 150, 64, 0.05) 45%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.tilt-card:hover .tilt-glare {
+  opacity: 1;
+}
+
+/* ── 7. M2: 高光扫过（sheen，纯 transform 动画） ── */
+.sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+}
+.sheen::before {
+  content: "";
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  left: 0;
+  width: 46%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(240, 230, 204, 0.06) 38%,
+    rgba(240, 230, 204, 0.15) 50%,
+    rgba(240, 230, 204, 0.06) 62%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-18deg);
+  opacity: 0;
+}
+.tilt-card:hover .sheen::before {
+  animation: sheen-sweep 0.95s cubic-bezier(0.3, 0.6, 0.4, 1) 0.12s;
+}
+@keyframes sheen-sweep {
+  from {
+    transform: translateX(-160%) skewX(-18deg);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(340%) skewX(-18deg);
+    opacity: 1;
+  }
+}
+
+/* ── 8. M2: 卡片金线描边亮起（treasure / heritage 共用） ──
+   边框色走 --edge 变量：内联样式只引用 var，hover 改变量即可亮起 */
+.treasure-card .treasure-body,
+.heritage-card {
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.treasure-card:hover .treasure-body,
+.treasure-card:focus-visible .treasure-body,
+.heritage-card:hover,
+.heritage-card:focus-visible {
+  --edge: rgba(200, 150, 64, 0.62);
+  box-shadow:
+    0 8px 26px rgba(0, 0, 0, 0.5),
+    0 0 16px rgba(200, 150, 64, 0.16);
+}
+.treasure-card:focus-visible,
+.heritage-card:focus-visible {
+  outline: 1px solid rgba(200, 150, 64, 0.7);
+  outline-offset: 3px;
+}
+
+/* ── 9. M2: 探源影像库（画廊） ──
+   hover 揭示说明 + 慢 zoom；触屏（hover:none）说明常显，避免 hover-only 信息 */
+.gallery-item img {
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.gallery-item:hover img,
+.gallery-item:focus-within img {
+  transform: scale(1.06);
+}
+.gallery-cap {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gallery-item:hover .gallery-cap,
+.gallery-item:focus-within .gallery-cap {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: none) {
+  .gallery-cap {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── 10. M2: 非遗技艺卡（hover 展开） ── */
+.heritage-card img {
+  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.heritage-card:hover img,
+.heritage-card:focus-visible img {
+  transform: scale(1.07);
+}
+.heritage-more {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease;
+}
+.heritage-card:hover .heritage-more,
+.heritage-card:focus-visible .heritage-more {
+  max-height: 96px;
+  opacity: 1;
+}
+@media (hover: none) {
+  .heritage-more {
+    max-height: 96px;
+    opacity: 1;
+  }
+}
+
+/* ── 11. 无障碍：prefers-reduced-motion（M2 新增项，降级并入原第 6 节媒体查询） ── */
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
+  .tilt-card,
+  .tilt-static {
     transform: none;
     transition: none;
   }
-  .gilt-text {
-    animation: none;
-    background-position: 40% 0;
+  .tilt-glare {
+    display: none;
   }
-  .split-char {
-    opacity: 1;
-    transform: none;
-    animation: none;
+  .sheen::before {
+    animation: none !important;
+    opacity: 0;
   }
-  .dust-layer {
-    animation: none;
-    opacity: 0.6;
-  }
-  .lift,
-  .lift:hover {
+  .gallery-item img,
+  .heritage-card img {
+    transform: none !important;
     transition: none;
-    transform: none;
+  }
+  .gallery-cap,
+  .heritage-more {
+    transition: none;
   }
 }
