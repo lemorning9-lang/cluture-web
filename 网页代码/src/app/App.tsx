@@ -1304,7 +1304,7 @@ function CinematicPrologue({
           <h1
             className="text-foreground leading-none mb-6 tracking-wider"
             style={{
-              fontSize: "clamp(2.75rem, 8.5vw, 7rem)",
+              fontSize: "clamp(2.4rem, 8.5vw, 6rem)",
               fontFamily: FD,
             }}
           >
