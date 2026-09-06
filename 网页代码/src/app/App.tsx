@@ -5602,16 +5602,7 @@ export default function App() {
       <header className="nav-stone sticky top-0 z-40 border-b border-primary/25 backdrop-blur-md">
         {/* ── 第一行：馆名居中（苍劲楷书）+ 工具钮靠右 ── */}
         <div className="relative max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
-          <div
-            className="flex items-center gap-3 px-6 py-1.5"
-            style={{
-              background:
-                "linear-gradient(180deg, #20120a 0%, #120903 55%, #1a0f07 100%)",
-              border: "1px solid rgba(200,150,64,0.38)",
-              boxShadow:
-                "0 6px 18px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(200,150,64,0.14)",
-            }}
-          >
+          <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full border border-primary/60 overflow-hidden flex-shrink-0"
               style={{ boxShadow: '0 0 12px rgba(200,150,64,0.3)' }}
@@ -5635,17 +5626,6 @@ export default function App() {
             >
               中华文明探源工程
             </div>
-            <span
-              aria-hidden="true"
-              className="hidden sm:inline-flex items-center justify-center w-6 h-6 text-[13px] leading-none text-[#F4E4CC] flex-shrink-0 mt-1"
-              style={{
-                background: '#8b1a1a',
-                fontFamily: FH,
-                boxShadow: '0 1px 6px rgba(139,26,26,0.45), inset 0 0 0 1px rgba(244,228,204,0.35)',
-              }}
-            >
-              源
-            </span>
           </div>
 
           <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
@@ -5685,7 +5665,7 @@ export default function App() {
                 <button
                   onClick={() => setActiveTab(tab.key)}
                   className={`relative flex-shrink-0 px-3 md:px-5 py-2 text-[17px] tracking-[0.15em] whitespace-nowrap transition-colors ${activeTab === tab.key ? "text-primary [text-shadow:0_0_14px_rgba(200,150,64,0.45)]" : "text-foreground/45 [text-shadow:0_1px_1px_rgba(0,0,0,0.85)] hover:text-foreground/80"}`}
-                  style={{ fontFamily: FH }}
+                  style={{ fontFamily: FQ }}
                 >
                   {tab.label}
                   {activeTab === tab.key && (
