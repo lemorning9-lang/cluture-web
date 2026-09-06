@@ -1,4 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  Fragment,
+} from "react";
 import {
   MapPin,
   Sparkles,
@@ -3506,7 +3511,7 @@ function ModuleCulturalTreasures({
       {/* CountUp 数字统计条（数据取自站内遗址档案与影像资料库，非虚构） */}
       <Reveal className="max-w-7xl mx-auto px-6 pt-6">
         <div
-          className="relative flex flex-wrap items-center justify-around gap-x-8 gap-y-4 px-6 py-5"
+          className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-x-10 gap-y-4 px-6 py-5"
           style={{
             background:
               "linear-gradient(160deg, rgba(84,36,14,0.62) 0%, rgba(60,24,10,0.68) 60%, rgba(100,44,18,0.58) 100%)",
@@ -3515,36 +3520,42 @@ function ModuleCulturalTreasures({
         >
           <MeanderCorners size={16} />
           {TREASURE_STATS.map((s, i) => (
-            <div key={s.label} className="flex items-baseline gap-2.5">
-              <CountUp
-                value={s.value}
-                className="gilt-text text-4xl leading-none"
-                style={{ fontFamily: FD }}
-                duration={1400 + i * 250}
-              />
-              <span
-                className="text-primary/70 text-sm tracking-[0.25em]"
-                style={{ fontFamily: FH }}
+            <Fragment key={s.label}>
+              <div
+                className={`flex items-baseline gap-3 ${
+                  i === 0 ? "justify-end" : "justify-start"
+                }`}
               >
-                {s.unit}
-              </span>
-              <span
-                className="text-muted-foreground/70 text-sm tracking-[0.3em]"
-                style={{ fontFamily: FH }}
-              >
-                {s.label}
-              </span>
+                <CountUp
+                  value={s.value}
+                  className="gilt-text text-4xl leading-none"
+                  style={{ fontFamily: FD }}
+                  duration={1400 + i * 250}
+                />
+                <span
+                  className="text-primary/70 text-4xl leading-none tracking-[0.12em]"
+                  style={{ fontFamily: FH }}
+                >
+                  {s.unit}
+                </span>
+                <span
+                  className="text-muted-foreground/70 text-4xl leading-none tracking-[0.15em]"
+                  style={{ fontFamily: FH }}
+                >
+                  {s.label}
+                </span>
+              </div>
               {i < TREASURE_STATS.length - 1 && (
                 <span
                   aria-hidden="true"
-                  className="hidden md:block w-px h-9 ml-8 self-center"
+                  className="hidden md:block w-px h-10 self-center"
                   style={{
                     background:
                       "linear-gradient(to bottom, transparent, rgba(200,150,64,0.4), transparent)",
                   }}
                 />
               )}
-            </div>
+            </Fragment>
           ))}
         </div>
       </Reveal>
