@@ -31,7 +31,6 @@ import {
 import {
   getSiteMainImage,
   COMMUNITY_IMAGES,
-  SITE_IMAGES,
 } from "../data/siteImages";
 import AMAP_CONFIG from "../../高德api/config.js";
 
@@ -3473,16 +3472,11 @@ function ModuleCulturalTreasures({
     ? ACTIVITY_SITE_LINK[selectedActivity.id]
     : undefined;
 
-  // CountUp 统计条数据（全部取自站内真实数据，运行时计算，非虚构）：
+  // CountUp 统计条数据（全部取自站内真实数据，非虚构）：
   // 核心遗址 = SITES 档案数（与全站文案「二十九处遗址」一致）；
-  // 影像资料 = siteImages 注册表中遗址影像 + 社区影像总数；
   // 文明跨度 = 现有文案最早年代锚点（大地湾遗址「跨度距今8000–4800年」）
-  const TOTAL_IMAGES =
-    Object.values(SITE_IMAGES).reduce((n, arr) => n + arr.length, 0) +
-    Object.values(COMMUNITY_IMAGES).reduce((n, arr) => n + arr.length, 0);
   const TREASURE_STATS = [
     { value: SITES.length, unit: "处", label: "核心遗址" },
-    { value: TOTAL_IMAGES, unit: "幅", label: "影像资料" },
     { value: 8000, unit: "年", label: "文明跨度" },
   ];
 
@@ -3521,31 +3515,29 @@ function ModuleCulturalTreasures({
         >
           <MeanderCorners size={16} />
           {TREASURE_STATS.map((s, i) => (
-            <div key={s.label} className="flex items-center gap-5">
+            <div key={s.label} className="flex items-baseline gap-2.5">
               <CountUp
                 value={s.value}
                 className="gilt-text text-4xl leading-none"
                 style={{ fontFamily: FD }}
                 duration={1400 + i * 250}
               />
-              <div className="flex flex-col">
-                <span
-                  className="text-primary/70 text-sm tracking-[0.25em] leading-tight"
-                  style={{ fontFamily: FH }}
-                >
-                  {s.unit}
-                </span>
-                <span
-                  className="text-muted-foreground/70 text-xs tracking-[0.3em] leading-tight mt-0.5"
-                  style={{ fontFamily: FH }}
-                >
-                  {s.label}
-                </span>
-              </div>
+              <span
+                className="text-primary/70 text-sm tracking-[0.25em]"
+                style={{ fontFamily: FH }}
+              >
+                {s.unit}
+              </span>
+              <span
+                className="text-muted-foreground/70 text-sm tracking-[0.3em]"
+                style={{ fontFamily: FH }}
+              >
+                {s.label}
+              </span>
               {i < TREASURE_STATS.length - 1 && (
                 <span
                   aria-hidden="true"
-                  className="hidden md:block w-px h-9 ml-8"
+                  className="hidden md:block w-px h-9 ml-8 self-center"
                   style={{
                     background:
                       "linear-gradient(to bottom, transparent, rgba(200,150,64,0.4), transparent)",
