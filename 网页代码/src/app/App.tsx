@@ -1512,7 +1512,7 @@ function CinematicPrologue({
       </section>
 
       {/* Section 2 — 源 (Origin chapter) */}
-      <section data-chapter="yuan" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      <section data-chapter="yuan" className="fq-page relative min-h-screen flex flex-col justify-center overflow-hidden">
         <img
           loading="lazy"
           src={mural2}

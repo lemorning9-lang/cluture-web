@@ -327,3 +327,11 @@ h1 span[aria-hidden] {
     animation: none;
   }
 }
+
+/* ── 实验：源章整页字体替换为马善政楷书（与首页标题同款） ──
+   回溯方式：删除 App.tsx 源章 section 上的 fq-page 类即可完全还原；
+   也可 git revert 对应提交。确认满意后可去掉 !important 改为正式样式 */
+.fq-page,
+.fq-page * {
+  font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
+}
