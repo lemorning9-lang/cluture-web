@@ -3686,12 +3686,12 @@ function ModuleCulturalTreasures({
         </div>
       </div>
 
-      <Reveal className="max-w-7xl mx-auto px-6 py-8">
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
+      <Reveal className="max-w-7xl mx-auto px-6 py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-14">
           {filtered.map((act, i) => (
             <TiltCard
               key={act.id}
-              className="treasure-card relative cursor-pointer group flex flex-col break-inside-avoid mb-5"
+              className="treasure-window group cursor-pointer flex flex-col items-center text-center"
               onClick={() => setSelectedActivity(act)}
               role="button"
               tabIndex={0}
@@ -3704,166 +3704,54 @@ function ModuleCulturalTreasures({
                 }
               }}
             >
-              {/* 高光扫过（M2） */}
-              <span aria-hidden="true" className="sheen" />
-              {/* Image — floats above card */}
-              <div
-                className="relative z-10 mx-3 overflow-hidden transition-transform duration-500 group-hover:-translate-y-2"
-                style={{
-                  height:
-                    act.height === "tall"
-                      ? "220px"
-                      : act.height === "medium"
-                        ? "170px"
-                        : "130px",
-                  boxShadow:
-                    "0 4px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,150,64,0.28)",
-                }}
-              >
-                <img
-                  src={act.img}
-                  alt={act.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.07]"
-                  style={{
-                    filter: "brightness(0.85) contrast(1.05)",
-                  }}
+              {/* 器物圆窗 + 纹样圆环（双配色交替，呼应陕历博圆窗） */}
+              <div className="relative w-48 h-48 md:w-52 md:h-52">
+                <span
+                  aria-hidden="true"
+                  className={`absolute -inset-3 rounded-full border ${i % 2 === 0 ? "border-primary/35" : "border-[#8a6a2e]/55"}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-                {/* Category tag */}
+                <span
+                  aria-hidden="true"
+                  className={`absolute -inset-1.5 rounded-full border ${i % 2 === 0 ? "border-[#2c3a58]/50" : "border-primary/45"}`}
+                />
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-0 rounded-full ${i % 2 === 0 ? "bg-[#5e2416]" : "bg-[#233550]"}`}
+                />
                 <div
-                  className="absolute top-2 right-2 px-1.5 py-0.5"
-                  style={{
-                    background: "rgba(52,22,8,0.75)",
-                    border: "1px solid rgba(200,150,64,0.30)",
-                  }}
+                  className="absolute inset-1.5 rounded-full overflow-hidden"
+                  style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}
                 >
-                  <span
-                    className="text-xs text-primary/70 tracking-[0.2em]"
-                    style={{ fontFamily: FH }}
-                  >
-                    {act.category}
-                  </span>
-                </div>
-                {/* Bottom spotlight */}
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-8 opacity-60 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse 80% 100% at 50% 100%, rgba(200,150,64,0.22), transparent)",
-                  }}
-                />
-              </div>
-
-              {/* Card body — 边框色走 --edge 变量，hover 时金线亮起（M2） */}
-              <div
-                className="treasure-body relative -mt-6 pt-9 px-4 pb-4 flex flex-col flex-1"
-                style={{
-                  background:
-                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
-                  border: "1px solid var(--edge, rgba(200,150,64,0.25))",
-                }}
-              >
-                {/* 回字纹四角 */}
-                {(
-                  [
-                    [
-                      "top-0 left-0",
-                      "M0 20 L0 0 L20 0",
-                      "M3 17 L3 3 L17 3",
-                    ],
-                    [
-                      "top-0 right-0",
-                      "M20 20 L20 0 L0 0",
-                      "M17 17 L17 3 L3 3",
-                    ],
-                    [
-                      "bottom-0 left-0",
-                      "M0 0 L0 20 L20 20",
-                      "M3 3 L3 17 L17 17",
-                    ],
-                    [
-                      "bottom-0 right-0",
-                      "M20 0 L20 20 L0 20",
-                      "M17 3 L17 17 L3 17",
-                    ],
-                  ] as const
-                ).map(([pos, p1, p2]) => (
-                  <svg
-                    key={pos}
-                    className={`absolute ${pos}`}
-                    width="18"
-                    height="18"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                  >
-                    <path
-                      d={p1}
-                      stroke="rgba(200,150,64,0.52)"
-                      strokeWidth="1"
-                    />
-                    <path
-                      d={p2}
-                      stroke="rgba(200,150,64,0.24)"
-                      strokeWidth="0.7"
-                    />
-                  </svg>
-                ))}
-                {/* Spotlight glow */}
-                <div
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-8 pointer-events-none opacity-50 group-hover:opacity-90 transition-opacity duration-500"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse at 50% 0%, rgba(200,150,64,0.20), transparent 70%)",
-                  }}
-                />
-                <div className="flex items-start justify-between mb-2">
-                  <span
-                    className="text-foreground/65 text-[10px] tracking-widest"
-                    style={{ fontFamily: FH }}
-                  >
-                    {act.culture}
-                  </span>
-                  <StarRating rating={act.rating} />
-                </div>
-                <h3
-                  className="text-lg leading-snug mb-1"
-                  style={{
-                    fontFamily: FD,
-                    color: "rgba(240,215,165,0.93)",
-                    textShadow:
-                      "0 0 18px rgba(200,150,64,0.38)",
-                  }}
-                >
-                  {act.name}
-                </h3>
-                <div
-                  className="h-px mb-2"
-                  style={{
-                    background:
-                      "linear-gradient(to right, transparent, rgba(200,150,64,0.35), transparent)",
-                  }}
-                />
-                <p className="text-foreground/50 text-xs leading-relaxed line-clamp-2 flex-1">
-                  {act.description}
-                </p>
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-[10px] text-foreground/60">
-                    <MapPin
-                      size={9}
-                      className="text-primary/60"
-                    />
-                    {act.location}
-                  </div>
-                  <span className="text-xs tracking-widest text-primary/85 group-hover:text-primary transition-colors flex items-center gap-0.5">
-                    详情
-                    <ArrowRight
-                      size={8}
-                      className="group-hover:translate-x-0.5 transition-transform"
-                    />
-                  </span>
+                  <img
+                    src={act.img}
+                    alt={act.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.08]"
+                    style={{ filter: "brightness(0.92)" }}
+                  />
                 </div>
               </div>
+              <h3
+                className="mt-5 text-2xl tracking-[0.15em]"
+                style={{
+                  fontFamily: FQ,
+                  color: "rgba(240,215,165,0.95)",
+                  textShadow: "0 0 18px rgba(200,150,64,0.4)",
+                }}
+              >
+                {act.name}
+              </h3>
+              <div className="mt-1.5 h-px w-10 bg-primary/50" />
+              <p className="mt-2 text-sm text-foreground/60 tracking-widest">
+                {act.culture} · {act.location}
+              </p>
+              <span className="mt-2 text-xs tracking-[0.3em] text-primary/70 group-hover:text-primary flex items-center gap-1">
+                详情
+                <ArrowRight
+                  size={10}
+                  className="group-hover:translate-x-0.5 transition-transform"
+                />
+              </span>
             </TiltCard>
           ))}
         </div>
