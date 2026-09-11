@@ -173,22 +173,10 @@ h1 span[aria-hidden] {
 
 /* ── 8. M2: 卡片金线描边亮起（treasure / heritage 共用） ──
    边框色走 --edge 变量：内联样式只引用 var，hover 改变量即可亮起 */
-.treasure-card .treasure-body,
 .heritage-card {
-  transition:
-    border-color 0.35s ease,
-    box-shadow 0.35s ease;
+  transition: box-shadow 0.35s ease;
 }
-.treasure-card:hover .treasure-body,
-.treasure-card:focus-visible .treasure-body,
-.heritage-card:hover,
-.heritage-card:focus-visible {
-  --edge: rgba(200, 150, 64, 0.62);
-  box-shadow:
-    0 8px 26px rgba(0, 0, 0, 0.5),
-    0 0 16px rgba(200, 150, 64, 0.16);
-}
-.treasure-card:focus-visible,
+.treasure-window:focus-visible,
 .heritage-card:focus-visible {
   outline: 1px solid rgba(200, 150, 64, 0.7);
   outline-offset: 3px;

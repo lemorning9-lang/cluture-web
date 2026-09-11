@@ -2485,8 +2485,30 @@ function ModuleTimeSpace() {
 
   const filtered = SITES.filter(siteMatchesFilter);
 
+  // 精选遗址点击：地图居中定位到该遗址，标记短暂弹跳高亮（真实地图）
+  const focusMapOnSite = (site: Site) => {
+    const Win = window as any;
+    if (amapRef.current && Win.AMap) {
+      const map = amapRef.current;
+      map.setCenter([site.lng, site.lat]);
+      if (map.getZoom() < 9) map.setZoom(9);
+      const m = markersRef.current.get(site.id);
+      if (m?.setAnimation) {
+        m.setAnimation("AMAP_ANIMATION_BOUNCE");
+        if (highlightTimerRef.current) {
+          window.clearTimeout(highlightTimerRef.current);
+        }
+        highlightTimerRef.current = window.setTimeout(
+          () => m.setAnimation?.("AMAP_ANIMATION_NONE"),
+          2200,
+        );
+      }
+    }
+  };
+
   // ─── 高亮定时器（时间轴/文化域筛选时短暂弹跳高亮匹配标记，M3） ───
   const highlightTimerRef = useRef<number | null>(null);
+  const markersRef = useRef<Map<number, any>>(new Map());
 
   // ─── 高德地图初始化（动态加载 SDK） ──────────────────────────────
   useEffect(() => {
@@ -2565,6 +2587,7 @@ function ModuleTimeSpace() {
 
     const markers: any[] = [];
     const matching: any[] = [];
+    markersRef.current = new Map();
     SITES.forEach((site) => {
       const marker = new (window as any).AMap.Marker({
         position: [site.lng, site.lat],
@@ -2579,6 +2602,7 @@ function ModuleTimeSpace() {
         setSelectedSite(site);
         setDrawerTab("介绍");
       });
+      markersRef.current.set(site.id, marker);
       if (siteMatchesFilter(site)) {
         matching.push(marker);
       } else {
@@ -3449,6 +3473,7 @@ function ModuleTimeSpace() {
               onClick={() => {
                 setSelectedSite(site);
                 setDrawerTab("介绍");
+                focusMapOnSite(site);
                 window.scrollTo({
                   top: 800,
                   behavior: "smooth",
@@ -4908,83 +4933,62 @@ function ModuleCommunity() {
           <p className="text-muted-foreground text-base mt-1 mb-7 tracking-wider">
             源自各文化的传统技艺，可在所属体验中亲手研习
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {HERITAGE_CRAFTS.map((craft) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+            {HERITAGE_CRAFTS.map((craft, i) => (
               <div
                 key={craft.id}
                 tabIndex={0}
-                className="heritage-card relative cursor-pointer group overflow-hidden"
-                style={{
-                  background:
-                    "linear-gradient(160deg, rgba(84,36,14,0.84) 0%, rgba(60,24,10,0.87) 60%, rgba(100,44,18,0.82) 100%)",
-                  border: "1px solid rgba(200,150,64,0.25)",
-                }}
+                className="heritage-card group cursor-pointer flex flex-col items-center text-center"
               >
-                <div
-                  className="relative overflow-hidden"
-                  style={{ height: "170px" }}
-                >
-                  <img
-                    src={craft.img}
-                    alt={craft.name}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                    style={{ filter: "brightness(0.84) contrast(1.05)" }}
+                <div className="relative w-44 h-44 md:w-48 md:h-48">
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -inset-3 rounded-full border ${i % 2 === 0 ? "border-[#8a6a2e]/55" : "border-primary/35"}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -inset-1.5 rounded-full border ${i % 2 === 0 ? "border-[#2c3a58]/50" : "border-primary/45"}`}
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={`absolute inset-0 rounded-full ${i % 2 === 0 ? "bg-[#233550]" : "bg-[#5e2416]"}`}
+                  />
                   <div
-                    className="absolute top-2 right-2 px-1.5 py-0.5"
-                    style={{
-                      background: "rgba(52,22,8,0.75)",
-                      border: "1px solid rgba(200,150,64,0.30)",
-                    }}
+                    className="absolute inset-1.5 rounded-full overflow-hidden"
+                    style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}
                   >
-                    <span
-                      className="text-xs text-primary/70 tracking-[0.2em]"
-                      style={{ fontFamily: FH }}
-                    >
-                      {craft.culture}
-                    </span>
+                    <img
+                      src={craft.img}
+                      alt={craft.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-[1300ms] ease-out group-hover:scale-[1.07]"
+                      style={{ filter: "brightness(0.9)" }}
+                    />
                   </div>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3
-                      className="text-lg leading-snug"
-                      style={{
-                        fontFamily: FD,
-                        color: "rgba(240,215,165,0.93)",
-                        textShadow: "0 0 18px rgba(200,150,64,0.38)",
-                      }}
-                    >
-                      {craft.name}
-                    </h3>
-                    <StarRating rating={craft.rating} />
-                  </div>
-                  <div
-                    className="h-px my-2"
+                <h3
+                  className="mt-5 text-xl tracking-[0.15em]"
+                  style={{
+                    fontFamily: FQ,
+                    color: "rgba(240,215,165,0.95)",
+                    textShadow: "0 0 18px rgba(200,150,64,0.4)",
+                  }}
+                >
+                  {craft.name}
+                </h3>
+                <p className="mt-1.5 text-sm text-foreground/60 tracking-widest">
+                  {craft.culture} · {craft.location}
+                </p>
+                <div className="heritage-more">
+                  <p
+                    className="text-xs leading-relaxed pt-2 max-w-xs"
                     style={{
-                      background:
-                        "linear-gradient(to right, transparent, rgba(200,150,64,0.35), transparent)",
+                      color: "rgba(220,195,150,0.75)",
+                      fontFamily: FH,
                     }}
-                  />
-                  <div
-                    className="flex items-center gap-1 text-[10px] text-foreground/60"
                   >
-                    <MapPin size={9} className="text-primary/60" />
-                    {craft.location}
-                  </div>
-                  <div className="heritage-more">
-                    <p
-                      className="text-xs leading-relaxed pt-2"
-                      style={{
-                        color: "rgba(220,195,150,0.75)",
-                        fontFamily: FH,
-                      }}
-                    >
-                      {craft.description}
-                    </p>
-                  </div>
+                    {craft.description}
+                  </p>
                 </div>
               </div>
             ))}
