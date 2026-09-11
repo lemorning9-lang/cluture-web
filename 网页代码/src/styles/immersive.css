@@ -47,7 +47,9 @@
 
 /* ── 3. hero 标题逐字入场（SplitTitle） ── */
 /* theme.css 的 * 与 h1 基础规则会把字族污染成宋体且压过继承——
-   字符父链（aria-hidden 包裹层）需一并恢复继承，楷书/行书才能下传 */
+   逐字字符父链共三层（外层无类名 span → aria-hidden 包裹层 → 字符），
+   每层都需恢复继承，楷书/行书才能从 h1 下传到每个字 */
+h1 > span,
 h1 span[aria-hidden] {
   font-family: inherit;
 }
