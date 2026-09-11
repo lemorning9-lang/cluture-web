@@ -344,9 +344,3 @@ body * {
   font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
-
-/* ── 遗珍画框卡片: 器物照径向融边(边缘融入绛红底, 免抠图) ── */
-.artifact-bleed {
-  -webkit-mask-image: radial-gradient(ellipse 94% 90% at 50% 46%, #000 50%, transparent 76%);
-  mask-image: radial-gradient(ellipse 94% 90% at 50% 46%, #000 50%, transparent 76%);
-}

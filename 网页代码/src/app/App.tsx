@@ -3704,69 +3704,32 @@ function ModuleCulturalTreasures({
                 }
               }}
             >
-              {/* 绛红画框：金线双框 + 角部花瓣纹 + 器物融边照（参考陕历博画框式） */}
-              <div
-                className="relative overflow-hidden"
-                style={{
-                  background:
-                    "linear-gradient(170deg, #a03d28 0%, #8b3020 55%, #742917 100%)",
-                  border: "1px solid rgba(214,175,85,0.55)",
-                }}
-              >
-                {/* 内衬细金线 */}
+              {/* 器物圆窗 + 纹样圆环（双配色交替，呼应陕历博圆窗） */}
+              <div className="relative w-48 h-48 md:w-52 md:h-52">
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-[7px] border border-[#d6af55]/35"
+                  className={`absolute -inset-3 rounded-full border ${i % 2 === 0 ? "border-primary/35" : "border-[#8a6a2e]/55"}`}
                 />
-                {/* 右下同色花瓣水印 */}
-                <svg
+                <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute -bottom-7 -right-7 w-44 h-44"
-                  viewBox="0 0 120 120"
-                  fill="none"
-                >
-                  <g stroke="rgba(255,205,160,0.30)" stroke-width="1.2">
-                    <ellipse cx="60" cy="34" rx="14" ry="26" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(45 60 60)" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(90 60 60)" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(135 60 60)" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(180 60 60)" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(225 60 60)" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(270 60 60)" />
-                    <ellipse cx="60" cy="34" rx="14" ry="26" transform="rotate(315 60 60)" />
-                    <circle cx="60" cy="60" r="10" />
-                  </g>
-                </svg>
-                {/* 器物照：径向遮罩让边缘融入绛红底 */}
-                <img
-                  src={act.img}
-                  alt={act.name}
-                  loading="lazy"
-                  className="artifact-bleed relative w-full aspect-[4/3] object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+                  className={`absolute -inset-1.5 rounded-full border ${i % 2 === 0 ? "border-[#2c3a58]/50" : "border-primary/45"}`}
                 />
-                {/* 左上花纹簇（青/金/赭三色花瓣叠层） */}
-                <svg
+                <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute -top-2 -left-2 w-28 h-28"
-                  viewBox="0 0 120 120"
-                  fill="none"
+                  className={`absolute inset-0 rounded-full ${i % 2 === 0 ? "bg-[#5e2416]" : "bg-[#233550]"}`}
+                />
+                <div
+                  className="absolute inset-1.5 rounded-full overflow-hidden"
+                  style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}
                 >
-                  <g stroke="#e8d5a8" stroke-width="1">
-                    <g fill="#4a7a72">
-                      <circle cx="22" cy="30" r="14" />
-                      <circle cx="48" cy="26" r="13" fill="#c9a227" />
-                      <circle cx="72" cy="32" r="12" fill="#a04430" />
-                    </g>
-                    <g fill="#c9a227">
-                      <circle cx="30" cy="54" r="13" fill="#a04430" />
-                      <circle cx="56" cy="50" r="12" fill="#4a7a72" />
-                    </g>
-                    <circle cx="42" cy="76" r="11" fill="#c9a227" />
-                    <circle cx="22" cy="30" r="6" fill="#a04430" />
-                    <circle cx="48" cy="26" r="5" fill="#4a7a72" />
-                    <circle cx="56" cy="50" r="5" fill="#a04430" />
-                  </g>
-                </svg>
+                  <img
+                    src={act.img}
+                    alt={act.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.08]"
+                    style={{ filter: "brightness(0.92)" }}
+                  />
+                </div>
               </div>
               <h3
                 className="mt-5 text-2xl tracking-[0.15em]"
