@@ -2342,7 +2342,7 @@ function CinematicPrologue({
       {/* Transition bridge */}
       <div
         ref={mapRef}
-        className="relative py-16 flex flex-col items-center gap-4 overflow-hidden"
+        className="cloud-bridge relative py-16 flex flex-col items-center gap-4 overflow-hidden"
       >
         <img
           src={mural1}
@@ -3644,7 +3644,7 @@ function ModuleCulturalTreasures({
     : undefined;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen wm-layer">
       <div className="relative h-52 flex items-end overflow-hidden">
         <img
           loading="lazy"
@@ -4198,7 +4198,7 @@ function ModuleCommunity() {
     });
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen wm-layer">
       <div className="relative h-44 flex items-end overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1758762906230-1ff96b9abf9a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080"
@@ -5118,7 +5118,7 @@ function ModulePersonal() {
   const onsite = SITES.filter((s) => s.status === "实地打卡");
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen wm-layer">
       <div className="relative overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1758091235715-5352f0130ef0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080"
