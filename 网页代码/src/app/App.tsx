@@ -3474,9 +3474,9 @@ function ModuleTimeSpace() {
                 setSelectedSite(site);
                 setDrawerTab("介绍");
                 focusMapOnSite(site);
-                window.scrollTo({
-                  top: 800,
+                mapRef.current?.scrollIntoView({
                   behavior: "smooth",
+                  block: "center",
                 });
               }}
             >
