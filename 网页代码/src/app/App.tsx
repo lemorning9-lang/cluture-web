@@ -48,15 +48,13 @@ import {
 } from "./components/ui/dialog";
 
 // 沉浸式质感升级 M1：全站可复用系统（滚动渐显 / 回纹装饰 / 逐字标题 / hero 粒子）
-// M2 增补：MeanderCorners（卡片回纹四角）、TiltCard（3D 倾斜）、CountUp（数字滚动）
+// M2 增补：TiltCard（3D 倾斜）等沉浸式组件
 import {
   Reveal,
   SplitTitle,
   MeanderRule,
-  MeanderCorners,
   HeroDust,
   TiltCard,
-  CountUp,
 } from "./immersive";
 
 // 石峁博物馆壁画 — used as cinematic prologue backgrounds
@@ -3645,14 +3643,6 @@ function ModuleCulturalTreasures({
     ? ACTIVITY_SITE_LINK[selectedActivity.id]
     : undefined;
 
-  // CountUp 统计条数据（全部取自站内真实数据，非虚构）：
-  // 核心遗址 = SITES 档案数（与全站文案「二十九处遗址」一致）；
-  // 文明跨度 = 现有文案最早年代锚点（大地湾遗址「跨度距今8000–4800年」）
-  const TREASURE_STATS = [
-    { value: SITES.length, unit: "处", label: "核心遗址" },
-    { value: 8000, unit: "年", label: "文明跨度" },
-  ];
-
   return (
     <div className="min-h-screen">
       <div className="relative h-52 flex items-end overflow-hidden">
@@ -3676,58 +3666,6 @@ function ModuleCulturalTreasures({
           </p>
         </div>
       </div>
-
-      {/* CountUp 数字统计条（数据取自站内遗址档案与影像资料库，非虚构） */}
-      <Reveal className="max-w-7xl mx-auto px-6 pt-6">
-        <div
-          className="relative grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-x-10 gap-y-4 px-6 py-5"
-          style={{
-            background:
-              "linear-gradient(160deg, rgba(84,36,14,0.62) 0%, rgba(60,24,10,0.68) 60%, rgba(100,44,18,0.58) 100%)",
-            border: "1px solid rgba(200,150,64,0.22)",
-          }}
-        >
-          <MeanderCorners size={16} />
-          {TREASURE_STATS.map((s, i) => (
-            <Fragment key={s.label}>
-              <div
-                className={`flex items-baseline gap-3 ${
-                  i === 0 ? "justify-end" : "justify-start"
-                }`}
-              >
-                <CountUp
-                  value={s.value}
-                  className="gilt-text text-4xl leading-none"
-                  style={{ fontFamily: FD }}
-                  duration={1400 + i * 250}
-                />
-                <span
-                  className="text-primary/70 text-4xl leading-none tracking-[0.12em]"
-                  style={{ fontFamily: FH }}
-                >
-                  {s.unit}
-                </span>
-                <span
-                  className="text-muted-foreground/70 text-4xl leading-none tracking-[0.15em]"
-                  style={{ fontFamily: FH }}
-                >
-                  {s.label}
-                </span>
-              </div>
-              {i < TREASURE_STATS.length - 1 && (
-                <span
-                  aria-hidden="true"
-                  className="hidden md:block w-px h-10 self-center"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom, transparent, rgba(200,150,64,0.4), transparent)",
-                  }}
-                />
-              )}
-            </Fragment>
-          ))}
-        </div>
-      </Reveal>
 
       <div className="sticky top-28 z-30 bg-background/90 backdrop-blur-md border-b border-border px-6 py-3 mt-6">
         <div className="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
