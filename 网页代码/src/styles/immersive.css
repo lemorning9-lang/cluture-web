@@ -344,34 +344,6 @@ body * {
   font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
-/* ── sxhm风格 C: 青铜纹样水印 + 云纹漂移层 ── */
-.wm-layer {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cg fill='none' stroke='%23d8b25e' stroke-opacity='0.06' stroke-width='1.4'%3E%3Cpath d='M24 24 H132 V132 H24 Z'/%3E%3Cpath d='M46 46 H110 V110 H46 Z'/%3E%3Ccircle cx='170' cy='78' r='40'/%3E%3Ccircle cx='170' cy='78' r='24'/%3E%3Cpath d='M216 24 H316 V132 H216 Z'/%3E%3Cpath d='M238 46 H294 V110 H238 Z'/%3E%3Cpath d='M24 216 H132 V316 H24 Z'/%3E%3Ccircle cx='170' cy='266' r='40'/%3E%3Ccircle cx='170' cy='266' r='24'/%3E%3Cpath d='M216 216 H316 V316 H216 Z'/%3E%3Cpath d='M238 238 H294 V294 H238 Z'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 340px 340px;
-}
-section[data-chapter="yuan"]::after,
-section[data-chapter="liu"]::after,
-section[data-chapter="hui"]::after,
-.cloud-bridge::before {
-  content: "";
-  position: absolute;
-  top: 6%;
-  left: 0;
-  right: 0;
-  height: 42%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.13;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='180'%3E%3Cg fill='none' stroke='%23d8b25e' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M0 120 Q75 90 150 120 T300 120 T450 120 T600 120'/%3E%3Cpath d='M120 96 q-18 -34 14 -40 q30 -6 26 22 q-3 22 -26 18'/%3E%3Cpath d='M330 92 q-20 -36 16 -42 q34 -6 28 24 q-4 24 -30 18'/%3E%3Ccircle cx='480' cy='84' r='16'/%3E%3Ccircle cx='480' cy='84' r='7'/%3E%3Cpath d='M520 108 q24 -28 52 -6'/%3E%3C/g%3E%3C/svg%3E") repeat-x left center / 600px 180px;
-  animation: cloud-drift 70s linear infinite;
-}
-@keyframes cloud-drift {
-  to { background-position: 600px center; }
-}
-@media (prefers-reduced-motion: reduce) {
-  section[data-chapter]::before, .cloud-bridge::before { animation: none; }
-}
-
 /* ── sxhm风格 A: 源/流/汇 三章撕纸画卷 ──
    宣纸底 + 深色缎带(fefturbulence 撕边 mask + 金箔毛边) + 壁画隐去；
    章内 DOM 零改动，回溯=删除本块 */
