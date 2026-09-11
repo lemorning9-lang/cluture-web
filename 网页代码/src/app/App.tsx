@@ -1480,7 +1480,7 @@ function CinematicPrologue({
             ORIGINS OF CHINESE CIVILIZATION
           </p>
           <h1
-            className="text-foreground leading-none mb-6 tracking-wider"
+            className="hero-title-glow text-foreground leading-none mb-6 tracking-wider"
             style={{
               fontSize: "clamp(2.4rem, 8.5vw, 6rem)",
               fontFamily: FQ,
@@ -1489,7 +1489,7 @@ function CinematicPrologue({
             <SplitTitle text="中华文明探源之旅" gilt delay={250} step={110} />
           </h1>
           <div className="h-px w-24 bg-primary/60 mx-auto mb-6" />
-          <div className="space-y-2 text-primary/60 text-base tracking-widest">
+          <div className="space-y-2 text-primary/80 text-lg tracking-widest">
             <p>
               社会分化·文明曙光 &ensp;·&ensp; 古国四起·文明初成
             </p>

@@ -302,3 +302,28 @@ h1 span[aria-hidden] {
 .nav-stone {
   background-color: rgba(10, 6, 2, 0.6);
 }
+
+/* ── 2b. 标题金色辉光（呼吸式发光；drop-shadow 作用于渐变像素，
+       不会像 text-shadow 一样透过透明字填充破坏鎏金渐变） ── */
+.hero-title-glow {
+  filter: drop-shadow(0 0 12px rgba(240, 205, 130, 0.38))
+    drop-shadow(0 0 34px rgba(230, 180, 90, 0.28));
+  animation: hero-glow-breathe 4.5s ease-in-out infinite alternate;
+}
+@keyframes hero-glow-breathe {
+  from {
+    filter: drop-shadow(0 0 10px rgba(240, 205, 130, 0.32))
+      drop-shadow(0 0 30px rgba(230, 180, 90, 0.22));
+  }
+  to {
+    filter: drop-shadow(0 0 16px rgba(240, 205, 130, 0.5))
+      drop-shadow(0 0 46px rgba(230, 180, 90, 0.38));
+  }
+}
+
+/* reduced-motion: 标题辉光保持静止（阴影仍在，仅停呼吸动画） */
+@media (prefers-reduced-motion: reduce) {
+  .hero-title-glow {
+    animation: none;
+  }
+}
