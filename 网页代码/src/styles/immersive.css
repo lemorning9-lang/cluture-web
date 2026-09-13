@@ -332,3 +332,14 @@ body * {
   font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
+
+/* ── 镇馆之宝底纹（方案1）：各页一件器物实拍，亮度混合融入暗底，仅作氛围 ──
+   回溯：删除 .relic-bg 规则与四个页面节点上的器物 img/类即可 */
+.relic-bg {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: luminosity;
+  filter: brightness(0.9) saturate(0.9);
+}
