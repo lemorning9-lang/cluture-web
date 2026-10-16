@@ -27,14 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: 检查 Cloudflare 凭据是否已配置
         id: creds
         run: |
-          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+          if [ -z "$CF_API_TOKEN" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::未配置 CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID，跳过 Cloudflare 部署"
+            echo "::notice::未配置 CLOUDFLARE_API_TOKEN，跳过 Cloudflare 部署"
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
@@ -62,13 +61,12 @@ jobs:
         run: npm install && npm run build
         working-directory: 网页代码
 
-      # 校验令牌与账号是否匹配，并把结果写成注解，便于直接在运行摘要里看到
+      # 校验令牌可用性，并把账号表写成注解，便于直接在运行摘要里看到
       - name: 检查 Cloudflare 凭据可用性
         if: steps.creds.outputs.ready == 'true'
         working-directory: 网页代码
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set +e
           out=$(npx --yes wrangler@4 whoami 2>&1)
@@ -78,14 +76,28 @@ jobs:
 
       # 直接调用 wrangler，并把真实报错原文写成 error 注解
       # （cloudflare/wrangler-action 会吞掉 wrangler 的错误详情）
+      #
+      # 账号 ID 用令牌自己查，不读 CLOUDFLARE_ACCOUNT_ID Secret：
+      # 手抄 32 位 Account ID 很容易少几位，那会让 API 报 code 7003
+      # "object identifier is invalid"。查不到就留给 wrangler 自行选择。
       - name: Deploy to Cloudflare Workers
         if: steps.creds.outputs.ready == 'true'
         working-directory: 网页代码
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set +e
+          acct=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts?per_page=50" \
+            | grep -oE '"id": *"[0-9a-f]{32}"' | head -1 | grep -oE '[0-9a-f]{32}')
+          if [ -n "$acct" ]; then
+            echo "自动解析到账号 ID，尾四位：${acct: -4}"
+            export CLOUDFLARE_ACCOUNT_ID="$acct"
+            echo "::notice title=账号 ID::自动解析到 ${acct:0:6}…${acct: -4}"
+          else
+            echo "未能自动解析账号 ID，交给 wrangler 自行选择账号"
+          fi
+
           npx --yes wrangler@4 deploy 2>&1 | tee wrangler-deploy.log
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
