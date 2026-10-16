@@ -103,5 +103,8 @@ jobs:
           if [ "$code" -ne 0 ]; then
             one=$(tail -c 900 wrangler-deploy.log | tr '\n' ' ' | tr -s ' ' | sed 's/%/%25/g')
             echo "::error title=wrangler deploy 失败::$one"
+          else
+            url=$(grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev' wrangler-deploy.log | head -1)
+            echo "::notice title=部署成功, 访问地址::${url:-见 Cloudflare 控制台的 Workers & Pages}"
           fi
           exit "$code"
