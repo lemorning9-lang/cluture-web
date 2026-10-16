@@ -38,7 +38,7 @@ npm-debug.log*
 package-lock.json
 
 # API Keys (do not commit config.js, but config.example.js is OK)
-网页代码/高德api/config.js
+网页代码/amap/config.js
 
 # Old Figma exports (not used in current code)
 网页代码/src/imports/image.png

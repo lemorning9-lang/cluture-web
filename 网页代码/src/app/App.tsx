@@ -37,7 +37,7 @@ import {
   getSiteMainImage,
   COMMUNITY_IMAGES,
 } from "../data/siteImages";
-import AMAP_CONFIG from "../../高德api/config.js";
+import AMAP_CONFIG from "../../amap/config.js";
 // 本地资料数据库离线抽取出的语料，由 scripts/build_local_corpus.py 生成
 import localCorpus from "../data/localCorpus.json";
 
@@ -2595,7 +2595,7 @@ function ModuleTimeSpace() {
     // key 为空 → 保留示意地图，不加载 SDK
     const key = AMAP_CONFIG.key;
     if (!key || key === "YOUR_AMAP_API_KEY_HERE") {
-      console.warn("[地图] 待填入高德 API Key（高德api/config.js → AMAP_CONFIG.key）");
+      console.warn("[地图] 待填入高德 API Key（amap/config.js → AMAP_CONFIG.key）");
       return;
     }
 
@@ -2745,7 +2745,7 @@ function ModuleTimeSpace() {
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-primary/50 text-sm tracking-[0.3em]">
-                    示意地图 · 在高德api/config.js 填入 Key 后切换真实地图
+                    示意地图 · 在 amap/config.js 填入 Key 后切换真实地图
                   </span>
                 </div>
 

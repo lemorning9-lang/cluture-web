@@ -29,8 +29,8 @@ jobs:
 
       - name: Create AMAP config from secret
         run: |
-          cp 网页代码/高德api/config.example.js 网页代码/高德api/config.js
-          sed -i "s/YOUR_AMAP_API_KEY_HERE/${{ secrets.AMAP_KEY }}/g" 网页代码/高德api/config.js
+          cp 网页代码/amap/config.example.js 网页代码/amap/config.js
+          sed -i "s/YOUR_AMAP_API_KEY_HERE/${{ secrets.AMAP_KEY }}/g" 网页代码/amap/config.js
         shell: bash
 
       - name: Install dependencies
