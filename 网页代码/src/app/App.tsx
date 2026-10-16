@@ -5294,9 +5294,29 @@ const LOCAL_DOCS: LocalDoc[] = [
   })),
 ].filter((d) => d.text);
 
+/** 疑问词与客套词只在问句里出现，不承载检索信息，先剔除再切词 */
+const QUERY_FILLERS = [
+  "为什么",
+  "怎么样",
+  "什么",
+  "为何",
+  "如何",
+  "怎么",
+  "怎样",
+  "哪里",
+  "哪儿",
+  "哪些",
+  "是否",
+  "请问",
+  "介绍",
+  "一下",
+  "多少",
+];
+
 /** 中文没有词间空格，按相邻二字切分后以命中比例打分 */
 function tokenizeQuery(query: string): string[] {
-  const clean = query.toLowerCase().replace(/[^\u4e00-\u9fa5a-z0-9]/g, "");
+  let clean = query.toLowerCase().replace(/[^\u4e00-\u9fa5a-z0-9]/g, "");
+  for (const f of QUERY_FILLERS) clean = clean.split(f).join("");
   if (clean.length === 0) return [];
   if (clean.length === 1) return [clean];
   const grams: string[] = [];
