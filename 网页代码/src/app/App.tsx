@@ -206,6 +206,19 @@ interface ChatMessage {
   role: "user" | "ai";
   content: string;
   typing?: boolean;
+  /** 回答出处：local=本地资料库命中，web=联网检索，pending=本地未命中待联网 */
+  origin?: "local" | "web" | "pending";
+  /** 出处详情，渲染在气泡内，如 "来自本地资料库 · 遗址档案 · 良渚古城遗址" */
+  citation?: string;
+}
+
+/** 本地检索语料条目，由站内已有的遗址、体验、精选问答三类数据构建 */
+interface LocalDoc {
+  kind: string;
+  title: string;
+  text: string;
+  /** 标题命中权重，用于区分"问到这一条"与"正文顺带提到" */
+  weight: number;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -5254,6 +5267,117 @@ function ModulePersonal() {
 
 // ─── Floating AI Assistant ────────────────────────────────────────────────────
 
+// ── 本地资料库检索 ────────────────────────────────────────────────────────────
+// 悬浮窗按「先本地、再联网」的顺序作答：本地语料命中就直接回答并在气泡内标注
+// 出处；未命中则返回 origin="pending"，那就是接入联网检索（Cloudflare 代理）
+// 的挂载点——届时把 pending 分支换成一次 fetch，并改成标注「来自联网搜索」即可。
+// 语料全部来自站内已有的三类数据，不需要额外文件，也不涉及任何密钥。
+
+const LOCAL_DOCS: LocalDoc[] = [
+  ...QUICK_QUESTIONS.map((q) => ({
+    kind: "精选问答",
+    title: q,
+    text: AI_ANSWERS[q] || "",
+    weight: 3,
+  })),
+  ...SITES.map((s) => ({
+    kind: "遗址档案",
+    title: s.name,
+    text: `${s.name}（${s.culture}，${s.period}期，位于${s.location}）：${s.brief}`,
+    weight: 2.5,
+  })),
+  ...ACTIVITIES.map((a) => ({
+    kind: "文化体验",
+    title: a.name,
+    text: `${a.name}（${a.culture}·${a.category}，${a.location}）：${a.description}`,
+    weight: 2,
+  })),
+].filter((d) => d.text);
+
+/** 中文没有词间空格，按相邻二字切分后以命中比例打分 */
+function tokenizeQuery(query: string): string[] {
+  const clean = query.toLowerCase().replace(/[^\u4e00-\u9fa5a-z0-9]/g, "");
+  if (clean.length === 0) return [];
+  if (clean.length === 1) return [clean];
+  const grams: string[] = [];
+  for (let i = 0; i < clean.length - 1; i += 1) {
+    grams.push(clean.slice(i, i + 2));
+  }
+  return grams;
+}
+
+/** 加权命中低于此值即视为本地资料库没有，交给联网检索 */
+const LOCAL_MIN_SCORE = 0.5;
+
+/**
+ * 检索本地资料库。评分按 IDF 加权：像"遗址""文化"这类几乎每篇都出现的词
+ * 权重被自动压低，避免只共享通用词条目的被误判成相关资料。
+ */
+function searchLocal(query: string) {
+  const grams = tokenizeQuery(query);
+  if (grams.length === 0) return [];
+
+  const total = LOCAL_DOCS.length;
+  const idf = new Map<string, number>();
+  for (const g of grams) {
+    const df = LOCAL_DOCS.filter(
+      (d) =>
+        d.title.toLowerCase().includes(g) || d.text.toLowerCase().includes(g),
+    ).length;
+    idf.set(g, Math.log(1 + total / (1 + df)));
+  }
+  const idfSum = grams.reduce((sum, g) => sum + (idf.get(g) || 0), 0);
+  if (idfSum === 0) return [];
+
+  return LOCAL_DOCS.map((doc) => {
+    const title = doc.title.toLowerCase();
+    const body = doc.text.toLowerCase();
+    let score = 0;
+    for (const g of grams) {
+      const w = idf.get(g) || 0;
+      if (title.includes(g)) score += w * doc.weight;
+      else if (body.includes(g)) score += w;
+    }
+    return { doc, score: score / idfSum };
+  })
+    .filter((h) => h.score >= LOCAL_MIN_SCORE)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+}
+
+/**
+ * 按「先本地、再联网」作答。返回答案、出处与引用条目标题；
+ * origin="pending" 表示本地未命中，对应后续联网检索的接入点。
+ */
+function askLocal(query: string): {
+  reply: string;
+  origin: "local" | "pending";
+  citation: string;
+} {
+  const hits = searchLocal(query);
+
+  if (hits.length === 0) {
+    return {
+      reply:
+        "这个问题超出了本地资料库的范围。按设定，下一步应转为联网检索——该能力尚未接入，接入后会在这里标注「来自联网搜索」并附出处链接。",
+      origin: "pending",
+      citation: "本地资料库未命中 · 待接入联网检索",
+    };
+  }
+
+  const [best, ...rest] = hits;
+  return {
+    reply:
+      rest.length > 0
+        ? `${best.doc.text}\n\n本地资料库中的相关资料：${rest
+            .map((r) => r.doc.title)
+            .join("、")}`
+        : best.doc.text,
+    origin: "local",
+    citation: `来自本地资料库 · ${best.doc.kind} · ${best.doc.title}`,
+  };
+}
+
 function AIAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -5281,14 +5405,15 @@ function AIAssistant() {
     ]);
     setInput("");
     setTyping(true);
-    const answer =
-      AI_ANSWERS[text] ||
-      "这是一个很好的问题。关于中华文明探源，我建议您深入探访29处核心遗址，每一处都记录着华夏先民的智慧与创造力。如需了解特定遗址或文化，请随时告诉我。";
+    // 先查本地资料库，命中即带出处作答；未命中则留下联网检索的接入点
+    const { reply, origin, citation } = askLocal(text);
     let i = 0;
     const aiMsg: ChatMessage = {
       role: "ai",
       content: "",
       typing: true,
+      origin,
+      citation,
     };
     setMessages((prev) => [...prev, aiMsg]);
     const interval = setInterval(() => {
@@ -5296,13 +5421,13 @@ function AIAssistant() {
       setMessages((prev) => {
         const next = [...prev];
         next[next.length - 1] = {
-          role: "ai",
-          content: answer.slice(0, i),
-          typing: i < answer.length,
+          ...next[next.length - 1],
+          content: reply.slice(0, i),
+          typing: i < reply.length,
         };
         return next;
       });
-      if (i >= answer.length) {
+      if (i >= reply.length) {
         clearInterval(interval);
         setTyping(false);
       }
@@ -5360,6 +5485,14 @@ function AIAssistant() {
                   {msg.content}
                   {msg.typing && (
                     <span className="inline-block w-1 h-3 bg-primary/60 ml-0.5 animate-pulse" />
+                  )}
+                  {msg.citation && !msg.typing && (
+                    <div
+                      className={`mt-1.5 pt-1.5 border-t text-xs whitespace-normal flex gap-1 ${msg.origin === "local" ? "border-primary/25 text-primary/85" : "border-border/70 text-muted-foreground/80"}`}
+                    >
+                      <span aria-hidden="true">◆</span>
+                      <span>{msg.citation}</span>
+                    </div>
                   )}
                 </div>
               </div>
