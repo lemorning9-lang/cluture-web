@@ -9,7 +9,7 @@
 #          本工作流才会真正执行；没配置时只输出一条提示并跳过，
 #          不会影响 GitHub Pages 那条部署流程。
 #   CLOUDFLARE_API_TOKEN  —— Cloudflare 控制台 → My Profile → API Tokens →
-#                            用 "Edit Cloudflare Workers" 模板创建
+#                            需要 Account → Workers Scripts → Edit 权限
 #   CLOUDFLARE_ACCOUNT_ID —— Cloudflare 控制台 → Workers & Pages 页面右侧的 Account ID
 #
 # 停用方式：删除本文件，或删除上面两个 Secret。
@@ -62,11 +62,34 @@ jobs:
         run: npm install && npm run build
         working-directory: 网页代码
 
+      # 校验令牌与账号是否匹配，并把结果写成注解，便于直接在运行摘要里看到
+      - name: 检查 Cloudflare 凭据可用性
+        if: steps.creds.outputs.ready == 'true'
+        working-directory: 网页代码
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set +e
+          out=$(npx --yes wrangler@4 whoami 2>&1)
+          echo "$out"
+          one=$(printf '%s' "$out" | tr '\n' ' ' | tr -s ' ' | cut -c1-900 | sed 's/%/%25/g')
+          echo "::warning title=wrangler whoami::$one"
+
+      # 直接调用 wrangler，并把真实报错原文写成 error 注解
+      # （cloudflare/wrangler-action 会吞掉 wrangler 的错误详情）
       - name: Deploy to Cloudflare Workers
         if: steps.creds.outputs.ready == 'true'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: 网页代码
-          command: deploy
+        working-directory: 网页代码
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set +e
+          npx --yes wrangler@4 deploy 2>&1 | tee wrangler-deploy.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            one=$(tail -c 900 wrangler-deploy.log | tr '\n' ' ' | tr -s ' ' | sed 's/%/%25/g')
+            echo "::error title=wrangler deploy 失败::$one"
+          fi
+          exit "$code"
