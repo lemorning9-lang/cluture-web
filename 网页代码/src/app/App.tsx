@@ -38,6 +38,8 @@ import {
   COMMUNITY_IMAGES,
 } from "../data/siteImages";
 import AMAP_CONFIG from "../../高德api/config.js";
+// 本地资料数据库离线抽取出的语料，由 scripts/build_local_corpus.py 生成
+import localCorpus from "../data/localCorpus.json";
 
 // shadcn Dialog（文物深度查看层，M2）
 import {
@@ -212,13 +214,38 @@ interface ChatMessage {
   citation?: string;
 }
 
-/** 本地检索语料条目，由站内已有的遗址、体验、精选问答三类数据构建 */
+/** 本地检索语料条目，由站内数据与「本地资料数据库」共同构建 */
 interface LocalDoc {
   kind: string;
   title: string;
   text: string;
   /** 标题命中权重，用于区分"问到这一条"与"正文顺带提到" */
   weight: number;
+  /**
+   * 条目类型对应的意图词。命中时比正文命中给更高的加权，
+   * 这样「二里头出土了哪些文物」会落到器物条目，而不是同分的「主要单位」字段。
+   */
+  tags?: string[];
+  /** 来源链接，命中后作为出处附在答案里 */
+  url?: string;
+}
+
+/** src/data/localCorpus.json 的结构（由 scripts/build_local_corpus.py 生成） */
+interface LocalCorpus {
+  overview: {
+    region: string;
+    name: string;
+    location: string;
+    core: string;
+    relation: string;
+  }[];
+  dossiers: {
+    region: string;
+    name: string;
+    fields: { label: string; value: string }[];
+  }[];
+  images: { region: string; site: string; item: string }[];
+  links: { region: string; site: string; title: string; url: string }[];
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -5271,7 +5298,13 @@ function ModulePersonal() {
 // 悬浮窗按「先本地、再联网」的顺序作答：本地语料命中就直接回答并在气泡内标注
 // 出处；未命中则返回 origin="pending"，那就是接入联网检索（Cloudflare 代理）
 // 的挂载点——届时把 pending 分支换成一次 fetch，并改成标注「来自联网搜索」即可。
-// 语料全部来自站内已有的三类数据，不需要额外文件，也不涉及任何密钥。
+//
+// 语料有两个来源，都不涉及密钥、运行时也不联网：
+//   1. 站内数据：精选问答 / 遗址简介 / 文化体验
+//   2. 本地资料数据库：由 scripts/build_local_corpus.py 离线抽成 localCorpus.json
+//      （29 处遗址共 310 个档案字段、168 条器物与现场影像、61 条来源链接）
+
+const corpus = localCorpus as LocalCorpus;
 
 const LOCAL_DOCS: LocalDoc[] = [
   ...QUICK_QUESTIONS.map((q) => ({
@@ -5281,7 +5314,7 @@ const LOCAL_DOCS: LocalDoc[] = [
     weight: 3,
   })),
   ...SITES.map((s) => ({
-    kind: "遗址档案",
+    kind: "站内简介",
     title: s.name,
     text: `${s.name}（${s.culture}，${s.period}期，位于${s.location}）：${s.brief}`,
     weight: 2.5,
@@ -5291,6 +5324,40 @@ const LOCAL_DOCS: LocalDoc[] = [
     title: a.name,
     text: `${a.name}（${a.culture}·${a.category}，${a.location}）：${a.description}`,
     weight: 2,
+  })),
+  // 遗址综述：位置和年代 / 核心表达 / 探源工程关系
+  ...corpus.overview.map((o) => ({
+    kind: "遗址综述",
+    title: `${o.name} · 核心表达与探源工程`,
+    text: `${o.name}（${o.location}）。核心表达：${o.core}。探源工程：${o.relation}`,
+    weight: 2.8,
+  })),
+  // 遗址档案：每个字段独立成条，这样「陶寺出土了什么文物」能命中具体字段，
+  // 而不是整段遗址简介糊过去
+  ...corpus.dossiers.flatMap((d) =>
+    d.fields.map((f) => ({
+      kind: "遗址档案",
+      title: `${d.name} · ${f.label}`,
+      text: `${d.name}${f.label}：${f.value}`,
+      weight: 2.8,
+    })),
+  ),
+  // 器物与现场影像：文件名本身就是一句说明
+  ...corpus.images.map((img) => ({
+    kind: "器物影像",
+    title: `${img.site} · ${img.item}`,
+    text: `${img.site}（${img.region}）器物与现场影像：${img.item}`,
+    weight: 2.2,
+    tags: ["文物", "器物", "出土", "藏品", "展品", "遗物", "宝贝"],
+  })),
+  // 已整理好的来源链接
+  ...corpus.links.map((link) => ({
+    kind: "来源链接",
+    title: `${link.site || link.region} · ${link.title}`,
+    text: `${link.site || link.region}相关学习资料：${link.title}`,
+    weight: 2.8,
+    tags: ["视频", "资料", "链接", "纪录片", "文献", "出处", "来源", "学习"],
+    url: link.url,
   })),
 ].filter((d) => d.text);
 
@@ -5344,10 +5411,14 @@ function searchLocal(query: string) {
       (d) =>
         d.title.toLowerCase().includes(g) || d.text.toLowerCase().includes(g),
     ).length;
-    idf.set(g, Math.log(1 + total / (1 + df)));
+    // 语料里压根没有的词（df=0）不参与分母，否则会把真正命中的词稀释掉
+    if (df > 0) idf.set(g, Math.log(1 + total / (1 + df)));
   }
-  const idfSum = grams.reduce((sum, g) => sum + (idf.get(g) || 0), 0);
+  const idfSum = Array.from(idf.values()).reduce((sum, w) => sum + w, 0);
   if (idfSum === 0) return [];
+
+/** 意图词命中的加权倍数：高于正文命中、低于标题命中 */
+const TAG_BONUS = 2;
 
   return LOCAL_DOCS.map((doc) => {
     const title = doc.title.toLowerCase();
@@ -5356,13 +5427,77 @@ function searchLocal(query: string) {
     for (const g of grams) {
       const w = idf.get(g) || 0;
       if (title.includes(g)) score += w * doc.weight;
+      else if (doc.tags?.some((t) => t.includes(g))) score += w * TAG_BONUS;
       else if (body.includes(g)) score += w;
     }
     return { doc, score: score / idfSum };
   })
     .filter((h) => h.score >= LOCAL_MIN_SCORE)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+    .slice(0, 5);
+}
+
+/** 把命中的条目组织成一段答案；来源链接单独成行，便于点开 */
+function composeReply(hits: { doc: LocalDoc; score: number }[]): string {
+  const [best, ...rest] = hits;
+  const parts: string[] = [];
+
+  if (best.doc.kind === "器物影像") {
+    // 列全该遗址在资料库里的器物与影像，而不是只列侥幸过阈值的那几条
+    const prefix = `${best.doc.title.split(" · ")[0]} · `;
+    const items = LOCAL_DOCS.filter(
+      (d) => d.kind === "器物影像" && d.title.startsWith(prefix),
+    ).map((d) => d.title.slice(prefix.length));
+    parts.push(
+      `本地资料库收录的 ${best.doc.title.split(" · ")[0]} 器物与现场影像（${
+        items.length
+      } 项）：\n${items.map((i) => `· ${i}`).join("\n")}`,
+    );
+  } else {
+    parts.push(best.doc.text);
+  }
+
+  const linked = hits.filter((h) => h.doc.url);
+  if (linked.length > 0) {
+    parts.push(
+      `本地资料库中的来源链接：\n${linked
+        .map(
+          (h) =>
+            `· ${h.doc.title.split(" · ").slice(1).join(" · ")}\n  ${h.doc.url}`,
+        )
+        .join("\n")}`,
+    );
+  }
+
+  if (rest.length > 0) {
+    parts.push(
+      `本地资料库中的相关资料：${rest
+        .slice(0, 4)
+        .map((r) => r.doc.title)
+        .join("、")}`,
+    );
+  }
+
+  return parts.join("\n\n");
+}
+
+/** 答案里的链接渲染成可点开的形式（本地资料库的来源链接写在正文里） */
+function renderWithLinks(text: string) {
+  return text.split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
+    part.startsWith("http") ? (
+      <a
+        key={index}
+        href={part}
+        target="_blank"
+        rel="noreferrer"
+        className="text-primary underline break-all"
+      >
+        {part}
+      </a>
+    ) : (
+      <span key={index}>{part}</span>
+    ),
+  );
 }
 
 /**
@@ -5385,14 +5520,9 @@ function askLocal(query: string): {
     };
   }
 
-  const [best, ...rest] = hits;
+  const [best] = hits;
   return {
-    reply:
-      rest.length > 0
-        ? `${best.doc.text}\n\n本地资料库中的相关资料：${rest
-            .map((r) => r.doc.title)
-            .join("、")}`
-        : best.doc.text,
+    reply: composeReply(hits),
     origin: "local",
     citation: `来自本地资料库 · ${best.doc.kind} · ${best.doc.title}`,
   };
@@ -5502,7 +5632,7 @@ function AIAssistant() {
                 <div
                   className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-muted-foreground"}`}
                 >
-                  {msg.content}
+                  {renderWithLinks(msg.content)}
                   {msg.typing && (
                     <span className="inline-block w-1 h-3 bg-primary/60 ml-0.5 animate-pulse" />
                   )}
