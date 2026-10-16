@@ -1,0 +1,72 @@
+# 备用部署通道：由 GitHub Actions 构建，再把产物交给 Cloudflare 发布。
+#
+# 为什么需要它：Cloudflare 自己的构建系统（Workers Builds）会报
+# "An internal error occurred"，那是对方构建环境的问题，改配置解决不了。
+# 而 GitHub Actions 这边已经稳定跑通整套构建（含高德 Key 注入），
+# 所以把构建留在 GitHub 侧、只让 Cloudflare 接收产物，就能绕开对方构建环境。
+#
+# 启用条件：在仓库 Settings → Secrets and variables → Actions 里配置下面两个值，
+#          本工作流才会真正执行；没配置时只输出一条提示并跳过，
+#          不会影响 GitHub Pages 那条部署流程。
+#   CLOUDFLARE_API_TOKEN  —— Cloudflare 控制台 → My Profile → API Tokens →
+#                            用 "Edit Cloudflare Workers" 模板创建
+#   CLOUDFLARE_ACCOUNT_ID —— Cloudflare 控制台 → Workers & Pages 页面右侧的 Account ID
+#
+# 停用方式：删除本文件，或删除上面两个 Secret。
+
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  cloudflare:
+    runs-on: ubuntu-latest
+    env:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: 检查 Cloudflare 凭据是否已配置
+        id: creds
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::未配置 CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID，跳过 Cloudflare 部署"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.creds.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: steps.creds.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create AMAP config from secret
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          cp 网页代码/amap/config.example.js 网页代码/amap/config.js
+          sed -i "s/YOUR_AMAP_API_KEY_HERE/${{ secrets.AMAP_KEY }}/g" 网页代码/amap/config.js
+        shell: bash
+
+      # 不设 BASE_URL：Cloudflare 服务在根路径下
+      - name: Build
+        if: steps.creds.outputs.ready == 'true'
+        run: npm install && npm run build
+        working-directory: 网页代码
+
+      - name: Deploy to Cloudflare Workers
+        if: steps.creds.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: 网页代码
+          command: deploy
