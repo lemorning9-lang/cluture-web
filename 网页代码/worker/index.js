@@ -349,11 +349,18 @@ async function searchWeb(env, question) {
     .map((r, index) => ({ index, ...r }));
 }
 
-/** 搜索结果常返回「标题 - 标题」这种重复，取前半段 */
+/**
+ * 搜索结果常返回「标题 - 标题」「标题_站点」这类重复，取可推定的前半段。
+ * 不用精确相等判断，是因为同一标题两次出现时常有空格或标点差异。
+ */
 function cleanTitle(raw) {
-  const title = String(raw || "").trim();
-  const dup = title.match(/^(.{4,}?)\s+[-|]\s+\1$/);
-  return dup ? dup[1].trim() : title;
+  const title = String(raw || "").trim().replace(/\s+/g, " ");
+  const m = title.match(/^(.{4,}?)\s*[-–—－|_]\s*(.+)$/);
+  if (!m) return title;
+  const head = m[1].trim();
+  const tail = m[2].trim();
+  if (tail === head || tail.startsWith(head) || head.startsWith(tail)) return head;
+  return title;
 }
 
 async function readJson(request) {
