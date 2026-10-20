@@ -54,3 +54,5 @@ package-lock.json
 网页代码/src/imports/____-11___-____.pdf
 网页代码/src/imports/____-11___-____-1.pdf
 网页代码/src/imports/__7_______.pdf
+# wrangler 本地状态目录
+网页代码/.wrangler/
