@@ -5750,8 +5750,15 @@ function AIAssistant() {
         reveal(remote.answer, usedWeb ? "web" : "local", remote.citation, remote.refs);
       })
       .catch(() => {
-        // 后端不可达（国内网络常见）→ 用本地检索结果兜底，功能不中断
-        reveal(local.reply, local.origin, local.citation);
+        // 后端不可达（国内网络常见）→ 用本地检索结果兜底。
+        // 这里必须留下可见标记：否则用户会以为"AI 答得差"，而不是"智能服务没连上"
+        reveal(
+          local.reply,
+          local.origin,
+          local.origin === "local"
+            ? `${local.citation} · 智能服务未连接，未做联网检索`
+            : "网络受限，未能连接智能服务",
+        );
       });
   };
 

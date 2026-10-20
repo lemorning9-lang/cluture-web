@@ -321,7 +321,7 @@ h1 span[aria-hidden] {
    也可 git revert 对应提交。确认满意后可去掉 !important 改为正式样式 */
 .fq-page,
 .fq-page * {
-  font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
+  font-family: "Times New Roman", Times, "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
 /* ── 全站字体：中文用马善政楷书，英文与数字统一 Times New Roman ──

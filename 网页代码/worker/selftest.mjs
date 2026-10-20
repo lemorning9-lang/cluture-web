@@ -138,7 +138,7 @@ console.log("\n[1] 路由与基础校验");
 
 // ─── 2. 本地证据充足：不应联网 ─────────────────────────────────────────────────
 
-console.log("\n[2] 本地证据充足 → 只答本地，不联网");
+console.log("\n[2] 本地证据充足 + 搜索无结果 → 只答本地");
 
 {
   const calls = installMock({
@@ -161,7 +161,12 @@ console.log("\n[2] 本地证据充足 → 只答本地，不联网");
   const body = await res.json();
 
   check("状态 200", res.status === 200, `实际 ${res.status}`);
-  check("没有调用搜索接口", calls.every((c) => !c.url.includes("/tools/search")));
+  check("搜索仍会被调用（每次提问都联网）", calls.some((c) => c.url.includes("/tools/search")));
+  check(
+    "搜索无结果时不再重问模型",
+    calls.filter((c) => c.url.includes("/chat/completions")).length === 1,
+    String(calls.filter((c) => c.url.includes("/chat/completions")).length),
+  );
   check("searchedWeb 为 false", body.meta?.searchedWeb === false, JSON.stringify(body.meta));
   check("local 有 2 条", body.local?.length === 2, String(body.local?.length));
   check(
@@ -474,6 +479,53 @@ console.log("\n[9] 联网查询词使用模型改写结果");
     searchCall?.body?.query === "陶寺遗址 出土 陶器",
     JSON.stringify(searchCall?.body),
   );
+}
+
+// ─── 10. 搜索有结果时，即使模型判定充足也进入第二遍 ────────────────────────────
+
+console.log("\n[10] 每次都联网：搜索有结果就重问一遍，由模型决定是否引用");
+
+{
+  const calls = installMock({
+    chat: [
+      () =>
+        chatReply({
+          answer: "初版答案",
+          sufficient: true,
+          confidence: "high",
+          search_query: "",
+          usedLocal: [0],
+          usedWeb: [],
+          gap: null,
+          note: null,
+        }),
+      () =>
+        chatReply({
+          answer: "终版答案",
+          sufficient: true,
+          confidence: "high",
+          search_query: "",
+          usedLocal: [0],
+          usedWeb: [0],
+          gap: null,
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "补充材料", url: "https://example.com/x", snippet: "y", rerank_score: 2.2, authority: 3 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({ question: "陶寺遗址的规模和证据", evidence: EVIDENCE });
+  const body = await res.json();
+
+  check("共两次模型调用", calls.filter((c) => c.url.includes("/chat/completions")).length === 2);
+  check("searchedWeb 为 true", body.meta?.searchedWeb === true);
+  check("web 有 1 条", body.web?.length === 1, String(body.web?.length));
+  check("采用第二遍答案", body.answer === "终版答案", body.answer);
 }
 
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────

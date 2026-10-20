@@ -67,7 +67,8 @@ sufficient 为 true 时 search_query 填空字符串。
 
 const CHAT_SYSTEM_WITH_WEB = `${CHAT_SYSTEM}
 
-补充：本次已提供联网检索结果 web[]。请据此补全回答，并把你实际使用的 web 条目标号填进 usedWeb。`;
+补充：本次已提供联网检索结果 web[]。请据此补全回答，并把你实际使用的 web 条目标号填进 usedWeb。
+若 evidence 已经能完整回答本轮问题，就不要引用 web，usedWeb 留空数组——不要为了显得信息丰富而补充无关的外部内容。`;
 
 const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划师。
 
@@ -167,24 +168,22 @@ async function handleChat(request, env) {
   let searchedWeb = false;
   let webItems = [];
 
-  // 证据太少时不必等模型判断，直接联网补齐（模型对"够不够"的判断并不稳定）
-  const thinEvidence = evidence.length < 2;
-  // 枚举式提问要的是清单，本地单条字段通常覆盖不全，直接联网
-  const wantsList = /哪些|哪几|列出|盘点|几种/.test(question);
+  // 每次提问都联网检索。
+  // 原因：让模型自己判断「本地够不够」的历史表现并不稳定（同一输入两次结论不同），
+  // 而一次搜索成本极低（¥5/1000 次）。是否采用联网内容交给第二遍的模型决定：
+  // 本地证据已能完整回答时，提示词要求它不要引用 web。
+  // 查询词优先用模型改写的 search_query——带代词的问题直接搜会跑偏。
+  const searchQuery = String(first.search_query || "").trim() || question;
+  const found = await searchWeb(env, searchQuery);
 
-  if (!first.sufficient || thinEvidence || wantsList) {
-    // 用模型改写过的查询词去搜（带代词的问题直接搜会跑偏，例如"它出土了哪些陶器"）
-    const searchQuery = String(first.search_query || "").trim() || question;
-    const found = await searchWeb(env, searchQuery);
-    if (found.length > 0) {
-      searchedWeb = true;
-      webItems = found;
-      result = await chatJSON(env, [
-        { role: "system", content: CHAT_SYSTEM_WITH_WEB },
-        ...history,
-        { role: "user", content: buildUserPayload(question, evidence, webItems) },
-      ]);
-    }
+  if (found.length > 0) {
+    searchedWeb = true;
+    webItems = found;
+    result = await chatJSON(env, [
+      { role: "system", content: CHAT_SYSTEM_WITH_WEB },
+      ...history,
+      { role: "user", content: buildUserPayload(question, evidence, webItems) },
+    ]);
   }
 
   return json(
