@@ -321,15 +321,17 @@ h1 span[aria-hidden] {
    也可 git revert 对应提交。确认满意后可去掉 !important 改为正式样式 */
 .fq-page,
 .fq-page * {
-  font-family: "Times New Roman", Times, "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
+  font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
-/* ── 全站字体：中文用马善政楷书，英文与数字统一 Times New Roman ──
-   字体是按字符逐个回退的：拉丁字母和数字命中 Times New Roman，
-   中文字符在它里面没有字形，自然回退到马善政楷书。
-   回溯：删除本块即恢复原字体体系（宋体正文/楷体标注/Times 英文） */
+/* ── 全站字体统一：马善政楷书（应用户要求自源章推广至全部页面） ──
+   注意：完整字体来自 Google Fonts（fonts.css 第一行）。若无法访问 Google，
+   除自托管那 10 个字以外会回退到系统楷体/宋体，看起来就是「换了一种字体」。
+   不要把 Times New Roman 放进这个栈的首位：那会让英文变 TNR，但中文的
+   回退行为不可控；若确实需要英文用 TNR，应改用带 unicode-range 的 @font-face。
+   回溯：删除本块即恢复原字体体系 */
 body,
 body * {
-  font-family: "Times New Roman", Times, "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
+  font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
