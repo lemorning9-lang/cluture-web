@@ -26,6 +26,8 @@ npm-debug.log*
 # Environment variables
 .env
 .env.local
+# wrangler dev 的本地密钥文件，绝不能提交
+.dev.vars
 
 # Local scripts
 启动网页.bat
