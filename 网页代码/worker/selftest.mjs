@@ -423,6 +423,59 @@ console.log("\n[8] 多轮上下文透传");
   );
 }
 
+// ─── 9. 联网查询词使用模型改写结果 ────────────────────────────────────────────
+
+console.log("\n[9] 联网查询词使用模型改写结果");
+
+{
+  const calls = installMock({
+    chat: [
+      () =>
+        chatReply({
+          answer: "",
+          sufficient: false,
+          confidence: "low",
+          search_query: "陶寺遗址 出土 陶器",
+          usedLocal: [],
+          usedWeb: [],
+          gap: "问题里有指代",
+          note: null,
+        }),
+      () =>
+        chatReply({
+          answer: "陶寺遗址出土陶器包括彩绘蟠龙纹陶盘等。",
+          sufficient: true,
+          confidence: "medium",
+          search_query: "",
+          usedLocal: [],
+          usedWeb: [0],
+          gap: null,
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "陶寺陶器", url: "https://example.com/t", snippet: "x", rerank_score: 2, authority: 3 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({
+    question: "它出土了哪些陶器",
+    evidence: [],
+    history: [{ role: "user", content: "介绍一下陶寺遗址" }],
+  });
+  await res.json();
+
+  const searchCall = calls.find((c) => c.url.includes("/tools/search"));
+  check(
+    "搜索用改写后的查询词，而不是带代词的原文",
+    searchCall?.body?.query === "陶寺遗址 出土 陶器",
+    JSON.stringify(searchCall?.body),
+  );
+}
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);
