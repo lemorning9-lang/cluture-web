@@ -1,16 +1,18 @@
 {
   // Cloudflare Workers 部署配置。
-  // 构建产物 dist/ 作为静态资源直接对外，等价于 Pages 的「输出目录」设置。
   "name": "cluture-web",
   "compatibility_date": "2026-10-01",
+
+  // 接口代码入口。有了 main，Worker 才具备运行时；
+  // 也只有在有 main 之后，控制台的 Runtime variables and secrets 才允许添加。
+  "main": "worker/index.js",
+
   "assets": {
     // 相对本文件所在目录，即 网页代码/dist
     "directory": "./dist",
     // 站点是单页应用（切页靠前端状态，没有真实路由），未命中的路径一律回落到 index.html
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    // /api/* 先交给 Worker 处理；其余请求仍由静态资源直接响应，不消耗 Worker 调用
+    "run_worker_first": ["/api/*"]
   }
-  // 以后接 LLM 后端时在这里补：
-  //   "main": "worker/index.js",
-  //   "run_worker_first": ["/api/*"]
-  // 让 /api/* 走接口，其余仍由静态资源直接响应。
 }

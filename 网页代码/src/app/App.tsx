@@ -208,10 +208,12 @@ interface ChatMessage {
   role: "user" | "ai";
   content: string;
   typing?: boolean;
-  /** 回答出处：local=本地资料库命中，web=联网检索，pending=本地未命中待联网 */
+  /** 回答出处：local=本地资料库命中，web=联网检索，pending=本地未命中且联网失败 */
   origin?: "local" | "web" | "pending";
   /** 出处详情，渲染在气泡内，如 "来自本地资料库 · 遗址档案 · 良渚古城遗址" */
   citation?: string;
+  /** 结构化出处：本地条目与联网来源分开渲染 */
+  refs?: { kind: "local" | "web"; label: string; url?: string }[];
 }
 
 /** 本地检索语料条目，由站内数据与「本地资料数据库」共同构建 */
@@ -5500,6 +5502,123 @@ function renderWithLinks(text: string) {
   );
 }
 
+/** 后端接口地址：GitHub Pages 上跨域调用 Cloudflare；由 Worker 自己托管时走同源 */
+const API_BASE = window.location.hostname.endsWith("github.io")
+  ? "https://cluture-web.lemorning9.workers.dev"
+  : "";
+
+/**
+ * 调后端合成答案。失败时抛出，由调用方降级到本地检索结果。
+ * 契约见仓库根目录 智能体设计.md
+ */
+async function askRemote(
+  question: string,
+  evidence: { site: string; field: string; text: string }[],
+): Promise<{
+  answer: string;
+  citation: string;
+  refs: { kind: "local" | "web"; label: string; url?: string }[];
+}> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 25000);
+  try {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, evidence }),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const detail = await res.json().catch(() => null);
+      throw new Error(detail?.error || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    const refs = [
+      ...(Array.isArray(data.local) ? data.local : []).map((r: any) => ({
+        kind: "local" as const,
+        label: [r.site, r.field].filter(Boolean).join(" · "),
+      })),
+      ...(Array.isArray(data.web) ? data.web : []).map((r: any) => ({
+        kind: "web" as const,
+        label: String(r.title || r.url || ""),
+        url: String(r.url || ""),
+      })),
+    ];
+    const hasWeb = refs.some((r) => r.kind === "web");
+    const hasLocal = refs.some((r) => r.kind === "local");
+    return {
+      answer: String(data.answer || "").trim(),
+      citation: hasWeb
+        ? hasLocal
+          ? "来自本地资料库 + 联网搜索"
+          : "来自联网搜索"
+        : "来自本地资料库",
+      refs,
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** 气泡底部的出处：有结构化 refs 时分成「本地/联网」两组，否则退回单行标注 */
+function renderCitation(msg: ChatMessage) {
+  const refs = msg.refs ?? [];
+  const local = refs.filter((r) => r.kind === "local");
+  const web = refs.filter((r) => r.kind === "web");
+
+  if (local.length === 0 && web.length === 0) {
+    if (!msg.citation) return null;
+    return (
+      <div
+        className={`mt-1.5 pt-1.5 border-t text-xs whitespace-normal flex gap-1 ${
+          msg.origin === "local"
+            ? "border-primary/25 text-primary/85"
+            : "border-border/70 text-muted-foreground/80"
+        }`}
+      >
+        <span aria-hidden="true">◆</span>
+        <span>{msg.citation}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-1.5 pt-1.5 border-t border-primary/25 text-xs whitespace-normal space-y-1 text-primary/85">
+      {local.length > 0 && (
+        <div className="flex gap-1">
+          <span aria-hidden="true">◆</span>
+          <span>来自本地资料库：{local.map((r) => r.label).join("、")}</span>
+        </div>
+      )}
+      {web.length > 0 && (
+        <div className="flex gap-1">
+          <span aria-hidden="true">◆</span>
+          <span>
+            来自联网搜索：
+            {web.map((r, index) => (
+              <span key={index}>
+                {index > 0 ? "、" : ""}
+                {r.url ? (
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline break-all"
+                  >
+                    {r.label}
+                  </a>
+                ) : (
+                  r.label
+                )}
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
  * 按「先本地、再联网」作答。返回答案、出处与引用条目标题；
  * origin="pending" 表示本地未命中，对应后续联网检索的接入点。
@@ -5508,15 +5627,26 @@ function askLocal(query: string): {
   reply: string;
   origin: "local" | "pending";
   citation: string;
+  /** 传给后端的证据包，每条带出处（遗址 + 字段） */
+  evidence: { site: string; field: string; text: string }[];
 } {
   const hits = searchLocal(query);
+  const evidence = hits.map(({ doc }) => {
+    const [head, ...tail] = doc.title.split(" · ");
+    return {
+      site: head,
+      field: [doc.kind, ...tail].filter(Boolean).join(" · "),
+      text: doc.text,
+    };
+  });
 
   if (hits.length === 0) {
     return {
       reply:
-        "这个问题超出了本地资料库的范围。按设定，下一步应转为联网检索——该能力尚未接入，接入后会在这里标注「来自联网搜索」并附出处链接。",
+        "本地资料库没有覆盖这个问题，联网检索也没能完成（当前网络可能受限）。可以换个问法，或者直接问我某处遗址的年代、位置、器物、探源地位。",
       origin: "pending",
-      citation: "本地资料库未命中 · 待接入联网检索",
+      citation: "本地资料库未命中",
+      evidence,
     };
   }
 
@@ -5525,6 +5655,7 @@ function askLocal(query: string): {
     reply: composeReply(hits),
     origin: "local",
     citation: `来自本地资料库 · ${best.doc.kind} · ${best.doc.title}`,
+    evidence,
   };
 }
 
@@ -5547,25 +5678,19 @@ function AIAssistant() {
     });
   }, [messages]);
 
-  const sendMessage = (text: string) => {
-    if (!text.trim() || typing) return;
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: text },
-    ]);
-    setInput("");
-    setTyping(true);
-    // 先查本地资料库，命中即带出处作答；未命中则留下联网检索的接入点
-    const { reply, origin, citation } = askLocal(text);
+  /** 逐字显示答案；内容就绪前气泡里显示占位文字 */
+  const reveal = (
+    reply: string,
+    origin: ChatMessage["origin"],
+    citation: string,
+    refs?: ChatMessage["refs"],
+  ) => {
+    setMessages((prev) => {
+      const next = [...prev];
+      next[next.length - 1] = { ...next[next.length - 1], origin, citation, refs };
+      return next;
+    });
     let i = 0;
-    const aiMsg: ChatMessage = {
-      role: "ai",
-      content: "",
-      typing: true,
-      origin,
-      citation,
-    };
-    setMessages((prev) => [...prev, aiMsg]);
     const interval = setInterval(() => {
       i += 3;
       setMessages((prev) => {
@@ -5582,6 +5707,37 @@ function AIAssistant() {
         setTyping(false);
       }
     }, 18);
+  };
+
+  const sendMessage = (text: string) => {
+    if (!text.trim() || typing) return;
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setInput("");
+    setTyping(true);
+
+    // 本地检索在前端做，拿到证据包后交给后端合成（密钥只存在于后端）
+    const local = askLocal(text);
+    const hasEvidence = local.evidence.length > 0;
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "ai",
+        content: hasEvidence ? "正在结合资料库整理…" : "本地资料库未命中，正在联网检索…",
+        typing: true,
+        origin: local.origin,
+      },
+    ]);
+
+    askRemote(text, local.evidence)
+      .then((remote) => {
+        if (!remote.answer) throw new Error("后端返回空答案");
+        const usedWeb = remote.refs.some((r) => r.kind === "web");
+        reveal(remote.answer, usedWeb ? "web" : "local", remote.citation, remote.refs);
+      })
+      .catch(() => {
+        // 后端不可达（国内网络常见）→ 用本地检索结果兜底，功能不中断
+        reveal(local.reply, local.origin, local.citation);
+      });
   };
 
   return (
@@ -5636,14 +5792,7 @@ function AIAssistant() {
                   {msg.typing && (
                     <span className="inline-block w-1 h-3 bg-primary/60 ml-0.5 animate-pulse" />
                   )}
-                  {msg.citation && !msg.typing && (
-                    <div
-                      className={`mt-1.5 pt-1.5 border-t text-xs whitespace-normal flex gap-1 ${msg.origin === "local" ? "border-primary/25 text-primary/85" : "border-border/70 text-muted-foreground/80"}`}
-                    >
-                      <span aria-hidden="true">◆</span>
-                      <span>{msg.citation}</span>
-                    </div>
-                  )}
+                  {msg.citation && !msg.typing && renderCitation(msg)}
                 </div>
               </div>
             ))}
