@@ -42,6 +42,7 @@ const CHAT_SYSTEM = `你是「探源AI导游」的资料助理，服务于「中
 - 先判断 evidence 是否足以回答问题的核心部分
   · 足够：只依据 evidence 作答，sufficient 置为 true
   · 不足以覆盖核心问题：sufficient 置为 false，并在 gap 中用一句话说明缺什么
+  · 特别地：若本地证据只能列出名称或给出笼统结论，无法说明年代、特征、数量、出土情况等实质内容，同样视为不足
 - 任何具体事实（年代、尺寸、器物名、单位、人名、数量）必须能在输入材料中找到
 - 本地与 web 冲突时：在 note 中指出冲突，答案以本地为准
 - 不得编造链接
@@ -156,7 +157,10 @@ async function handleChat(request, env) {
   let searchedWeb = false;
   let webItems = [];
 
-  if (!first.sufficient || evidence.length === 0) {
+  // 证据太少时不必等模型判断，直接联网补齐（模型对"够不够"的判断并不稳定）
+  const thinEvidence = evidence.length < 2;
+
+  if (!first.sufficient || thinEvidence) {
     // 第二遍：联网检索后重新作答
     const found = await searchWeb(env, question);
     if (found.length > 0) {
