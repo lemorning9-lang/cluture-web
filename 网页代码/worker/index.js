@@ -47,6 +47,7 @@ const CHAT_SYSTEM = `你是「探源AI导游」的资料助理，服务于「中
 - 不得编造链接
 - 语气简练、书面、克制，不用表情符号
 - 长度 150-300 字；用户明确要求详细时才展开
+- 答案正文里不要写「web 1」「evidence 2」这类编号引用，出处由结构化字段体现
 - 与本工程无关的问题（天气、闲聊、编程等）：直接说明超出范围，sufficient 置为 true
 
 把 usedLocal 填成你实际引用过的 evidence 编号数组，usedWeb 填实际引用过的 web 编号数组。
@@ -322,16 +323,31 @@ async function searchWeb(env, question) {
   const strong = list.filter((r) => Number(r.rerank_score ?? 0) >= 1.5);
   const pool = strong.length >= 3 ? strong : list.filter((r) => Number(r.rerank_score ?? 0) >= 1.0);
 
+  const seen = new Set();
   return pool
     .sort((a, b) => Number(b.authority ?? 0) - Number(a.authority ?? 0))
-    .slice(0, 6)
-    .map((r, index) => ({
-      index,
-      title: String(r.title || "").slice(0, 120),
+    .map((r) => ({
+      title: cleanTitle(r.title),
       url: String(r.url || ""),
       snippet: String(r.snippet || r.summary || "").slice(0, 200),
     }))
-    .filter((r) => r.url);
+    .filter((r) => {
+      if (!r.url) return false;
+      // 同一篇文章可能以带 #锚点 的不同 URL 重复返回，按标题+去锚点 URL 去重
+      const key = r.title + "|" + r.url.split("#")[0];
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 6)
+    .map((r, index) => ({ index, ...r }));
+}
+
+/** 搜索结果常返回「标题 - 标题」这种重复，取前半段 */
+function cleanTitle(raw) {
+  const title = String(raw || "").trim();
+  const dup = title.match(/^(.{4,}?)\s+[-|]\s+\1$/);
+  return dup ? dup[1].trim() : title;
 }
 
 async function readJson(request) {

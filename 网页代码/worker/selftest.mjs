@@ -318,6 +318,60 @@ console.log("\n[6] /api/plan 当前返回未启用");
   check("返回 501", res.status === 501, `实际 ${res.status}`);
 }
 
+// ─── 7. 联网结果的标题去重与链接去锚点 ────────────────────────────────────────
+
+console.log("\n[7] 搜索结果清洗：重复标题、同一链接带锚点");
+
+{
+  installMock({
+    chat: [
+      () =>
+        chatReply({
+          answer: "",
+          sufficient: false,
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [],
+          gap: "需联网",
+          note: null,
+        }),
+      () =>
+        chatReply({
+          answer: "据联网资料整理。",
+          sufficient: true,
+          confidence: "medium",
+          usedLocal: [],
+          usedWeb: [0, 1],
+          gap: null,
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "重复标题 - 重复标题", url: "https://example.com/1", snippet: "a", rerank_score: 2, authority: 4 },
+          { title: "重复标题", url: "https://example.com/1#anchor", snippet: "同一篇", rerank_score: 2, authority: 1 },
+          { title: "另一篇", url: "https://example.com/2", snippet: "b", rerank_score: 1.8, authority: 2 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({ question: "某个新发现", evidence: [] });
+  const body = await res.json();
+
+  check("去重后剩 2 条", body.web?.length === 2, JSON.stringify(body.web));
+  check(
+    "重复标题已清理",
+    body.web?.[0]?.title === "重复标题",
+    JSON.stringify(body.web?.[0]),
+  );
+  check(
+    "同一链接的锚点版本被去掉",
+    !(body.web || []).some((w) => w.url.includes("#")),
+    JSON.stringify((body.web || []).map((w) => w.url)),
+  );
+}
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);
