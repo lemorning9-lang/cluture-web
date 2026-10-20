@@ -5502,10 +5502,17 @@ function renderWithLinks(text: string) {
   );
 }
 
-/** 后端接口地址：GitHub Pages 上跨域调用 Cloudflare；由 Worker 自己托管时走同源 */
+/**
+ * 后端接口地址：
+ *  · GitHub Pages 上跨域调用 Cloudflare Worker
+ *  · Vite 开发服务器（5173）指向本地 wrangler dev（8787），方便本地联调
+ *  · 其余情况（由 Worker 自己托管站点）走同源，即空串
+ */
 const API_BASE = window.location.hostname.endsWith("github.io")
   ? "https://cluture-web.lemorning9.workers.dev"
-  : "";
+  : window.location.port === "5173"
+    ? "http://localhost:8787"
+    : "";
 
 /**
  * 调后端合成答案。失败时抛出，由调用方降级到本地检索结果。
