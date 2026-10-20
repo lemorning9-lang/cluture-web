@@ -159,8 +159,10 @@ async function handleChat(request, env) {
 
   // 证据太少时不必等模型判断，直接联网补齐（模型对"够不够"的判断并不稳定）
   const thinEvidence = evidence.length < 2;
+  // 枚举式提问要的是清单，本地单条字段通常覆盖不全，直接联网
+  const wantsList = /哪些|哪几|列出|盘点|几种/.test(question);
 
-  if (!first.sufficient || thinEvidence) {
+  if (!first.sufficient || thinEvidence || wantsList) {
     // 第二遍：联网检索后重新作答
     const found = await searchWeb(env, question);
     if (found.length > 0) {
