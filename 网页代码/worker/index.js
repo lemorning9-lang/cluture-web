@@ -32,20 +32,24 @@ const WEB_TIMEOUT_MS = 20000;
 
 const CHAT_SYSTEM = `你是「探源AI导游」的资料助理，服务于「中华文明探源工程」网站。
 
-你会收到三部分输入：
-1) 用户问题
-2) 本地资料库检索结果 evidence[]，每条含 index（编号）、site（遗址名）、field（字段名）、text（正文）
-3) 可选：联网检索结果 web[]，每条含 index（编号）、title、url、snippet
+你会收到：
+1) 对话历史（可能为空），用于理解追问和指代
+2) 用户本轮问题
+3) 本地资料库检索结果 evidence[]，每条含 index（编号）、site（遗址名）、field（字段名）、text（正文）
+4) 可选：联网检索结果 web[]，每条含 index（编号）、title、url、snippet
 
 回答规则（必须遵守）：
+- 结合对话历史理解用户意图。用户使用「它」「这个遗址」「还有呢」等指代时，指向上文提到的对象，不要反问
 - 只能使用 evidence 和 web 中的内容，不得引入其他知识
 - 先判断 evidence 是否足以回答问题的核心部分
   · 足够：只依据 evidence 作答，sufficient 置为 true
-  · 不足以覆盖核心问题：sufficient 置为 false，并在 gap 中用一句话说明缺什么
-  · 特别地：若本地证据只能列出名称或给出笼统结论，无法说明年代、特征、数量、出土情况等实质内容，同样视为不足
+  · 不足：sufficient 置为 false，并在 gap 中用一句话说明缺什么（gap 只给系统看，不展示给用户）
+  · 若本地证据只能列出名称或给出笼统结论，无法说明年代、特征、数量、出土情况等实质内容，视为不足
 - 任何具体事实（年代、尺寸、器物名、单位、人名、数量）必须能在输入材料中找到
 - 本地与 web 冲突时：在 note 中指出冲突，答案以本地为准
 - 不得编造链接
+- 不要向用户描述资料来源的局限。禁止出现「本地资料库没有」「数据库未收录」「现有资料仅列出」「资料未给出」这类表述；资料不足就直接依据联网结果正常作答
+- 列举多项内容时用分点：每项单独一行、以「· 」开头；只有单一结论时才写成整段
 - 语气简练、书面、克制，不用表情符号
 - 长度 150-300 字；用户明确要求详细时才展开
 - 答案正文里不要写「web 1」「evidence 2」这类编号引用，出处由结构化字段体现
@@ -146,10 +150,12 @@ async function handleChat(request, env) {
   if (!question) throw new ApiError("question 不能为空", 400);
 
   const evidence = normalizeEvidence(body.evidence);
+  const history = normalizeHistory(body.history);
 
   // 第一遍：只依据本地证据作答，让模型自己判断够不够
   const first = await chatJSON(env, [
     { role: "system", content: CHAT_SYSTEM },
+    ...history,
     { role: "user", content: buildUserPayload(question, evidence, []) },
   ]);
 
@@ -170,6 +176,7 @@ async function handleChat(request, env) {
       webItems = found;
       result = await chatJSON(env, [
         { role: "system", content: CHAT_SYSTEM_WITH_WEB },
+        ...history,
         { role: "user", content: buildUserPayload(question, evidence, webItems) },
       ]);
     }
@@ -200,6 +207,18 @@ function normalizeEvidence(raw) {
       text: String(item?.text || "").slice(0, 600),
     }))
     .filter((item) => item.text);
+}
+
+/** 多轮上下文：取最近几条并限制单条长度，避免整段历史挤占上下文 */
+function normalizeHistory(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .slice(-8)
+    .map((m) => ({
+      role: m?.role === "ai" ? "assistant" : "user",
+      content: String(m?.content || "").trim().slice(0, 600),
+    }))
+    .filter((m) => m.content);
 }
 
 function buildUserPayload(question, evidence, web) {

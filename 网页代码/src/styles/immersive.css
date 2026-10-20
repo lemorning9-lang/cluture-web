@@ -324,11 +324,12 @@ h1 span[aria-hidden] {
   font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 
-/* ── 全站字体统一：马善政楷书（应用户要求自源章推广至全部页面） ──
-   回溯：删除本块即恢复原字体体系（宋体正文/楷体标注/Times 英文）；
-   源章的 .fq-page 开关类因此自然冗余，保留以支持「仅回退其他页面」的粒度 */
+/* ── 全站字体：中文用马善政楷书，英文与数字统一 Times New Roman ──
+   字体是按字符逐个回退的：拉丁字母和数字命中 Times New Roman，
+   中文字符在它里面没有字形，自然回退到马善政楷书。
+   回溯：删除本块即恢复原字体体系（宋体正文/楷体标注/Times 英文） */
 body,
 body * {
-  font-family: "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
+  font-family: "Times New Roman", Times, "Ma Shan Zheng", "KaiTi", "STKaiti", serif !important;
 }
 

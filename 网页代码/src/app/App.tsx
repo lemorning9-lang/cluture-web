@@ -5521,6 +5521,7 @@ const API_BASE = window.location.hostname.endsWith("github.io")
 async function askRemote(
   question: string,
   evidence: { site: string; field: string; text: string }[],
+  history: { role: string; content: string }[],
 ): Promise<{
   answer: string;
   citation: string;
@@ -5532,7 +5533,7 @@ async function askRemote(
     const res = await fetch(`${API_BASE}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, evidence }),
+      body: JSON.stringify({ question, evidence, history }),
       signal: controller.signal,
     });
     if (!res.ok) {
@@ -5725,17 +5726,24 @@ function AIAssistant() {
     // 本地检索在前端做，拿到证据包后交给后端合成（密钥只存在于后端）
     const local = askLocal(text);
     const hasEvidence = local.evidence.length > 0;
+
+    // 把最近几轮对话带上，让后端理解追问与指代（此时 messages 还不含本轮提问）
+    const history = messages
+      .slice(-8)
+      .map((m) => ({ role: m.role, content: m.content }))
+      .filter((m) => m.content);
+
     setMessages((prev) => [
       ...prev,
       {
         role: "ai",
-        content: hasEvidence ? "正在结合资料库整理…" : "本地资料库未命中，正在联网检索…",
+        content: hasEvidence ? "正在结合资料库整理…" : "正在检索资料…",
         typing: true,
         origin: local.origin,
       },
     ]);
 
-    askRemote(text, local.evidence)
+    askRemote(text, local.evidence, history)
       .then((remote) => {
         if (!remote.answer) throw new Error("后端返回空答案");
         const usedWeb = remote.refs.some((r) => r.kind === "web");
@@ -5793,7 +5801,7 @@ function AIAssistant() {
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-muted-foreground"}`}
+                  className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-white"}`}
                 >
                   {renderWithLinks(msg.content)}
                   {msg.typing && (

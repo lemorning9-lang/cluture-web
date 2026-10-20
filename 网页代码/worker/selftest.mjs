@@ -372,6 +372,57 @@ console.log("\n[7] 搜索结果清洗：重复标题、同一链接带锚点");
   );
 }
 
+// ─── 8. 多轮上下文透传 ────────────────────────────────────────────────────────
+
+console.log("\n[8] 多轮上下文透传");
+
+{
+  const calls = installMock({
+    chat: [
+      () =>
+        chatReply({
+          answer: "结合上文，陶寺遗址出土的陶器包括彩绘蟠龙纹陶盘。",
+          sufficient: true,
+          confidence: "high",
+          usedLocal: [0],
+          usedWeb: [],
+          gap: null,
+          note: null,
+        }),
+    ],
+    search: [() => searchReply([])],
+  });
+
+  const res = await postChat({
+    question: "它出土了哪些陶器",
+    evidence: [EVIDENCE[1]],
+    history: [
+      { role: "user", content: "介绍一下陶寺遗址" },
+      { role: "ai", content: "陶寺遗址位于山西临汾，是四大都邑之一。" },
+    ],
+  });
+  await res.json();
+
+  const msgs = calls.find((c) => c.url.includes("/chat/completions"))?.body?.messages || [];
+  check("状态 200", res.status === 200);
+  check("历史进了 messages（system+2+本轮）", msgs.length === 4, String(msgs.length));
+  check(
+    "角色映射 ai→assistant",
+    msgs[1]?.role === "user" && msgs[2]?.role === "assistant",
+    JSON.stringify(msgs.map((m) => m.role)),
+  );
+  check(
+    "历史内容原样带入",
+    (msgs[1]?.content || "").includes("陶寺") && (msgs[2]?.content || "").includes("山西"),
+    JSON.stringify(msgs.slice(1, 3)),
+  );
+  check(
+    "本轮问题在最后一条",
+    /它出土了哪些陶器/.test(msgs[msgs.length - 1]?.content || ""),
+    (msgs[msgs.length - 1]?.content || "").slice(0, 80),
+  );
+}
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);
