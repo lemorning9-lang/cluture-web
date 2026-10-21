@@ -36,39 +36,41 @@ const CHAT_SYSTEM = `你是「探源AI导游」的资料助理，服务于「中
 1) 对话历史（可能为空），用于理解追问和指代
 2) 用户本轮问题
 3) 本地资料库检索结果 evidence[]，每条含 index（编号）、site（遗址名）、field（字段名）、text（正文）
-4) 可选：联网检索结果 web[]，每条含 index（编号）、title、url、snippet
+4) 联网检索结果 web[]，可能为空，每条含 index（编号）、title、url、snippet
 
-回答规则（必须遵守）：
-- 结合对话历史理解用户意图。用户使用「它」「这个遗址」「还有呢」等指代时，指向上文提到的对象，不要反问
-- 只能使用 evidence 和 web 中的内容，不得引入其他知识
-- 先判断 evidence 是否足以回答问题的核心部分
-  · 足够：只依据 evidence 作答，sufficient 置为 true
-  · 不足：sufficient 置为 false，并在 gap 中用一句话说明缺什么（gap 只给系统看，不展示给用户）
-  · 若本地证据只能列出名称或给出笼统结论，无法说明年代、特征、数量、出土情况等实质内容，视为不足
-- 任何具体事实（年代、尺寸、器物名、单位、人名、数量）必须能在输入材料中找到
-- 本地与 web 冲突时：在 note 中指出冲突，答案以本地为准
+回答必须分成两段，每段只用各自的来源：
+- local_answer：只依据 evidence 作答
+- web_answer：只依据 web 作答（web 为空时留空字符串）
+
+判断与落段规则（必须遵守）：
+- 先判断 evidence 是否直接回答了本轮问题的核心
+  · 是：把内容写进 local_answer
+  · 否：local_answer 留空字符串。不要为了显得有内容而把不相关的本地信息硬塞进去
+    （例：问「附近有哪些景点」，而 evidence 只有该遗址自身的位置与性质 → local_answer 留空）
+- web 与问题无关时，web_answer 留空字符串
+- 结合对话历史理解指代：「它」「这个遗址」「还有呢」指向上文提到的对象，不要反问
+- 任何具体事实（年代、尺寸、器物名、单位、人名、数量）必须能在对应来源中找到
 - 不得编造链接
-- 只输出答案本身。不讨论资料是否充分、不解释检索过程、不做道歉或解释原因；禁止出现「本地资料库没有」「数据库未收录」「现有资料仅列出」「资料未给出」「无法补全」「尚不足以回答」这类表述。信息有限时就简洁作答
-- 只要涉及两项及以上内容（器物、遗址、年代、特点、建议等），一律分点：每项单独一行、以「· 」开头；禁止把多项内容挤成一段
-- 语气简练、书面、克制，不用表情符号
-- 长度 150-300 字；用户明确要求详细时才展开
+- 两段都要分点：每项单独一行、以「· 」开头；即使只有一条也用分点，保持格式统一
+- 只输出答案本身：不讨论资料是否充分、不解释检索过程、不道歉；
+  禁止出现「本地资料库没有」「数据库未收录」「现有资料仅列出」「资料未给出」「无法补全」「尚不足以回答」这类表述
 - 答案正文里不要写「web 1」「evidence 2」这类编号引用，出处由结构化字段体现
-- 与本工程无关的问题（天气、闲聊、编程等）：直接说明超出范围，sufficient 置为 true
+- 语气简练、书面、克制，不用表情符号
+- 与本工程无关的问题（天气、闲聊、编程等）：只写一句说明超出范围，放进 web_answer，两段都不用分点
+- 本地与 web 内容冲突时：以本地为准，冲突说明写入 note
 
-若 sufficient 为 false，请在 search_query 中给出一个可以直接拿去搜索的查询词：
+请始终给出 search_query：可以直接拿去搜索引擎检索的查询词。
 把「它」「这个遗址」这类指代替换成上文提到的具体对象，保留关键限定词，不超过 30 字。
-sufficient 为 true 时 search_query 填空字符串。
 
-把 usedLocal 填成你实际引用过的 evidence 编号数组，usedWeb 填实际引用过的 web 编号数组。
-若某个数组没有可用内容，填空数组。
+usedLocal / usedWeb 填你实际引用的编号数组，没用到就填空数组。
 
 只返回 JSON，不要任何额外文字，格式：
-{"answer":"","sufficient":true,"confidence":"high","search_query":"","usedLocal":[],"usedWeb":[],"gap":null,"note":null}`;
+{"local_answer":"","web_answer":"","search_query":"","confidence":"high","usedLocal":[],"usedWeb":[],"note":null}`;
 
 const CHAT_SYSTEM_WITH_WEB = `${CHAT_SYSTEM}
 
-补充：本次已提供联网检索结果 web[]。请据此补全回答，并把你实际使用的 web 条目标号填进 usedWeb。
-若 evidence 已经能完整回答本轮问题，就不要引用 web，usedWeb 留空数组——不要为了显得信息丰富而补充无关的外部内容。`;
+补充：本次已提供联网检索结果 web[]。请把与问题相关的内容写进 web_answer（分点），并填好 usedWeb。
+若 web 与问题无关，web_answer 留空字符串。`;
 
 const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划师。
 
@@ -186,10 +188,18 @@ async function handleChat(request, env) {
     ]);
   }
 
+  const localText = String(result.local_answer || "").trim();
+  const webText = String(result.web_answer || "").trim();
+  const segments = [];
+  if (localText) segments.push({ kind: "local", text: localText });
+  if (webText) segments.push({ kind: "web", text: webText });
+
   return json(
     {
-      answer: String(result.answer || "").trim() || fallbackAnswer(evidence, searchedWeb),
-      local: pickLocal(evidence, result.usedLocal),
+      // segments 是主结构（前端据此分两段渲染）；answer 保留给旧前端做兼容
+      segments,
+      answer: segments.map((s) => s.text).join("\n\n") || fallbackAnswer(evidence),
+      local: pickLocal(evidence, result.usedLocal, Boolean(localText)),
       web: pickWeb(webItems, result.usedWeb),
       confidence: normalizeConfidence(result.confidence, searchedWeb),
       note: result.note || null,
@@ -233,7 +243,9 @@ function buildUserPayload(question, evidence, web) {
   });
 }
 
-function pickLocal(evidence, used) {
+function pickLocal(evidence, used, hasLocalText) {
+  // 本地段为空时不挂本地出处——避免把不相关的本地信息当成"来源"列出来
+  if (!hasLocalText) return [];
   const ids = Array.isArray(used) && used.length > 0 ? used : evidence.map((e) => e.index);
   return ids
     .map((i) => evidence.find((e) => e.index === i))
@@ -255,11 +267,9 @@ function normalizeConfidence(value, searchedWeb) {
   return searchedWeb ? "medium" : "high";
 }
 
-function fallbackAnswer(evidence, searchedWeb) {
+function fallbackAnswer(evidence) {
   if (evidence.length > 0) return evidence[0].text;
-  return searchedWeb
-    ? "已联网检索，但没有找到可引用的可靠来源。"
-    : "本地资料库未命中，且联网检索未启用。";
+  return "暂时没有找到与该问题直接相关的内容，可以换个问法试试。";
 }
 
 // ─── 智能体 2：行程规划（M2） ─────────────────────────────────────────────────

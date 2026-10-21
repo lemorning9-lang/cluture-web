@@ -145,12 +145,10 @@ console.log("\n[2] 本地证据充足 + 搜索无结果 → 只答本地");
     chat: [
       () =>
         chatReply({
-          answer: "陶寺遗址已确认城址面积约 280 万平方米，宫城、大型墓葬与礼乐器构成综合证据。",
-          sufficient: true,
+          local_answer: "陶寺遗址已确认城址面积约 280 万平方米，宫城、大型墓葬与礼乐器构成综合证据。",
           confidence: "high",
           usedLocal: [0, 1],
           usedWeb: [],
-          gap: null,
           note: null,
         }),
     ],
@@ -188,23 +186,19 @@ console.log("\n[3] 本地不足 → 联网检索 → 回填来源链接");
     chat: [
       () =>
         chatReply({
-          answer: "",
-          sufficient: false,
+          local_answer: "",
           confidence: "low",
           usedLocal: [],
           usedWeb: [],
-          gap: "缺少该遗址最新考古发现的报道",
           note: null,
         }),
       () =>
         chatReply({
           answer:
             "据 2023 年报道，陶寺遗址新发现大型夯土建筑基址，进一步支持其都邑性质。本地资料库未收录该进展。",
-          sufficient: true,
           confidence: "medium",
           usedLocal: [],
           usedWeb: [0, 1],
-          gap: null,
           note: "本地资料库未收录该条新发现，已依据联网结果补充。",
         }),
     ],
@@ -254,12 +248,10 @@ console.log("\n[4] 联网无结果 → 不编造");
     chat: [
       () =>
         chatReply({
-          answer: "",
-          sufficient: false,
+          local_answer: "",
           confidence: "low",
           usedLocal: [],
           usedWeb: [],
-          gap: "本地与联网都没有",
           note: null,
         }),
     ],
@@ -289,7 +281,7 @@ console.log("\n[5] 模型输出被代码块包裹时仍可解析");
               {
                 message: {
                   content:
-                    '```json\n{"answer":"良渚古城遗址距今约5300-4300年。","sufficient":true,"confidence":"high","usedLocal":[0],"usedWeb":[],"gap":null,"note":null}\n```',
+                    '```json\n{"local_answer":"良渚古城遗址距今约5300-4300年。","confidence":"high","usedLocal":[0],"usedWeb":[],"note":null}\n```',
                 },
               },
             ],
@@ -332,22 +324,18 @@ console.log("\n[7] 搜索结果清洗：重复标题、同一链接带锚点");
     chat: [
       () =>
         chatReply({
-          answer: "",
-          sufficient: false,
+          local_answer: "",
           confidence: "low",
           usedLocal: [],
           usedWeb: [],
-          gap: "需联网",
           note: null,
         }),
       () =>
         chatReply({
-          answer: "据联网资料整理。",
-          sufficient: true,
+          local_answer: "据联网资料整理。",
           confidence: "medium",
           usedLocal: [],
           usedWeb: [0, 1],
-          gap: null,
           note: null,
         }),
     ],
@@ -386,12 +374,10 @@ console.log("\n[8] 多轮上下文透传");
     chat: [
       () =>
         chatReply({
-          answer: "结合上文，陶寺遗址出土的陶器包括彩绘蟠龙纹陶盘。",
-          sufficient: true,
+          local_answer: "结合上文，陶寺遗址出土的陶器包括彩绘蟠龙纹陶盘。",
           confidence: "high",
           usedLocal: [0],
           usedWeb: [],
-          gap: null,
           note: null,
         }),
     ],
@@ -437,24 +423,20 @@ console.log("\n[9] 联网查询词使用模型改写结果");
     chat: [
       () =>
         chatReply({
-          answer: "",
-          sufficient: false,
+          local_answer: "",
           confidence: "low",
           search_query: "陶寺遗址 出土 陶器",
           usedLocal: [],
           usedWeb: [],
-          gap: "问题里有指代",
           note: null,
         }),
       () =>
         chatReply({
-          answer: "陶寺遗址出土陶器包括彩绘蟠龙纹陶盘等。",
-          sufficient: true,
+          local_answer: "陶寺遗址出土陶器包括彩绘蟠龙纹陶盘等。",
           confidence: "medium",
           search_query: "",
           usedLocal: [],
           usedWeb: [0],
-          gap: null,
           note: null,
         }),
     ],
@@ -490,24 +472,20 @@ console.log("\n[10] 每次都联网：搜索有结果就重问一遍，由模型
     chat: [
       () =>
         chatReply({
-          answer: "初版答案",
-          sufficient: true,
+          local_answer: "初版答案",
           confidence: "high",
           search_query: "",
           usedLocal: [0],
           usedWeb: [],
-          gap: null,
           note: null,
         }),
       () =>
         chatReply({
-          answer: "终版答案",
-          sufficient: true,
+          local_answer: "终版答案",
           confidence: "high",
           search_query: "",
           usedLocal: [0],
           usedWeb: [0],
-          gap: null,
           note: null,
         }),
     ],
@@ -526,6 +504,51 @@ console.log("\n[10] 每次都联网：搜索有结果就重问一遍，由模型
   check("searchedWeb 为 true", body.meta?.searchedWeb === true);
   check("web 有 1 条", body.web?.length === 1, String(body.web?.length));
   check("采用第二遍答案", body.answer === "终版答案", body.answer);
+}
+
+// ─── 11. 分段输出：本地不相关时只给联网段，且不挂本地出处 ──────────────────────
+
+console.log("\n[11] 分段输出：本地不相关时只给联网段");
+
+{
+  installMock({
+    chat: [
+      () =>
+        chatReply({
+          local_answer: "",
+          web_answer: "",
+          search_query: "陶寺遗址 附近 景点",
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [],
+          note: null,
+        }),
+      () =>
+        chatReply({
+          local_answer: "",
+          web_answer: "· 丁村遗址\n· 洪洞大槐树寻根祭祖园\n· 壶口瀑布",
+          search_query: "",
+          confidence: "medium",
+          usedLocal: [],
+          usedWeb: [0],
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "临汾周边景点", url: "https://example.com/n", snippet: "x", rerank_score: 2, authority: 3 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({ question: "陶寺遗址附近的景点有哪些", evidence: EVIDENCE });
+  const body = await res.json();
+
+  check("只有一段", body.segments?.length === 1, JSON.stringify(body.segments));
+  check("该段是联网", body.segments?.[0]?.kind === "web", JSON.stringify(body.segments?.[0]));
+  check("本地出处为空（不硬挂无关本地来源）", (body.local || []).length === 0, JSON.stringify(body.local));
+  check("答案仍是分点", /· 丁村/.test(body.answer || ""), body.answer);
 }
 
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────

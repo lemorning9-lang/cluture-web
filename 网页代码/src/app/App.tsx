@@ -214,6 +214,8 @@ interface ChatMessage {
   citation?: string;
   /** 结构化出处：本地条目与联网来源分开渲染 */
   refs?: { kind: "local" | "web"; label: string; url?: string }[];
+  /** 分段答案：本地资料库一段、联网搜索一段，各自分点 */
+  segments?: { kind: "local" | "web"; text: string }[];
 }
 
 /** 本地检索语料条目，由站内数据与「本地资料数据库」共同构建 */
@@ -5526,6 +5528,7 @@ async function askRemote(
   answer: string;
   citation: string;
   refs: { kind: "local" | "web"; label: string; url?: string }[];
+  segments: { kind: "local" | "web"; text: string }[];
 }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 25000);
@@ -5554,14 +5557,25 @@ async function askRemote(
     ];
     const hasWeb = refs.some((r) => r.kind === "web");
     const hasLocal = refs.some((r) => r.kind === "local");
+    const segments = Array.isArray(data.segments)
+      ? data.segments
+          .filter((s: any) => s && typeof s.text === "string" && s.text.trim())
+          .map((s: any) => ({
+            kind: s.kind === "web" ? ("web" as const) : ("local" as const),
+            text: String(s.text).trim(),
+          }))
+      : [];
     return {
-      answer: String(data.answer || "").trim(),
+      answer: String(
+        data.answer || segments.map((s) => s.text).join("\n\n"),
+      ).trim(),
       citation: hasWeb
         ? hasLocal
           ? "来自本地资料库 + 联网搜索"
           : "来自联网搜索"
         : "来自本地资料库",
       refs,
+      segments,
     };
   } finally {
     clearTimeout(timer);
@@ -5717,6 +5731,30 @@ function AIAssistant() {
     }, 18);
   };
 
+  /** 远程答案直接整段呈现：已是分段结构，且等待时间较长，再逐字显示体验更差 */
+  const showFull = (
+    content: string,
+    origin: ChatMessage["origin"],
+    citation: string,
+    refs?: ChatMessage["refs"],
+    segments?: ChatMessage["segments"],
+  ) => {
+    setMessages((prev) => {
+      const next = [...prev];
+      next[next.length - 1] = {
+        ...next[next.length - 1],
+        content,
+        segments,
+        origin,
+        citation,
+        refs,
+        typing: false,
+      };
+      return next;
+    });
+    setTyping(false);
+  };
+
   const sendMessage = (text: string) => {
     if (!text.trim() || typing) return;
     setMessages((prev) => [...prev, { role: "user", content: text }]);
@@ -5747,7 +5785,13 @@ function AIAssistant() {
       .then((remote) => {
         if (!remote.answer) throw new Error("后端返回空答案");
         const usedWeb = remote.refs.some((r) => r.kind === "web");
-        reveal(remote.answer, usedWeb ? "web" : "local", remote.citation, remote.refs);
+        showFull(
+          remote.answer,
+          usedWeb ? "web" : "local",
+          remote.citation,
+          remote.refs,
+          remote.segments,
+        );
       })
       .catch(() => {
         // 后端不可达（国内网络常见）→ 用本地检索结果兜底。
@@ -5810,7 +5854,22 @@ function AIAssistant() {
                 <div
                   className={`max-w-[80%] px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary/15 text-foreground border border-primary/20" : "bg-muted text-white"}`}
                 >
-                  {renderWithLinks(msg.content)}
+                  {msg.segments && msg.segments.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {msg.segments.map((seg, index) => (
+                        <div key={index}>
+                          <div className="text-primary/70 text-xs mb-1">
+                            {seg.kind === "local" ? "本地资料库" : "联网搜索"}
+                          </div>
+                          <div className="whitespace-pre-wrap">
+                            {renderWithLinks(seg.text)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    renderWithLinks(msg.content)
+                  )}
                   {msg.typing && (
                     <span className="inline-block w-1 h-3 bg-primary/60 ml-0.5 animate-pulse" />
                   )}
