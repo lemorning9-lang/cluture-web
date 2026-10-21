@@ -191,25 +191,23 @@ async function checkQuota(request, env, kind) {
   const conf = LIMITS[kind];
   // 没有 CF-Connecting-IP 说明不在 Cloudflare 后面（本地 dev、单测），直接放行
   const ip = request.headers.get("CF-Connecting-IP");
-  if (!ip) return null;
+  if (!ip) return { blocked: null, ip: false, kv: Boolean(env && env.RATE_KV) };
 
   const now = Date.now();
   const windowKey = `w:${kind}:${ip}:${Math.floor(now / (conf.windowSeconds * 1000))}`;
-  if ((await bump(env, windowKey, conf.windowSeconds + 60)) > conf.perIp) {
-    return conf.windowHint;
-  }
+  const windowCount = await bump(env, windowKey, conf.windowSeconds + 60);
+  const debug = { ip: true, kv: Boolean(env && env.RATE_KV), windowCount };
+  if (windowCount > conf.perIp) return { ...debug, blocked: conf.windowHint };
 
   const day = new Date(now).toISOString().slice(0, 10);
-  if ((await bump(env, `d:${kind}:${day}`, 25 * 3600)) > conf.daily) {
-    return "今日额度已用完，请明天再试。";
-  }
+  const dayCount = await bump(env, `d:${kind}:${day}`, 25 * 3600);
+  if (dayCount > conf.daily) return { ...debug, blocked: "今日额度已用完，请明天再试。" };
 
   const month = new Date(now).toISOString().slice(0, 7);
-  if ((await bump(env, `M:${kind}:${month}`, 32 * 24 * 3600)) > conf.monthly) {
-    return "本月额度已用完。";
-  }
+  const monthCount = await bump(env, `M:${kind}:${month}`, 32 * 24 * 3600);
+  if (monthCount > conf.monthly) return { ...debug, blocked: "本月额度已用完。" };
 
-  return null;
+  return { ...debug, dayCount, monthCount, blocked: null };
 }
 
 // ─── 入口 ─────────────────────────────────────────────────────────────────────
@@ -276,8 +274,8 @@ async function handleChat(request, env) {
     throw new ApiError("后端尚未配置 DEEPSEEK_API_KEY", 503, "在 Worker 的 Runtime variables and secrets 中添加");
   }
 
-  const limited = await checkQuota(request, env, "chat");
-  if (limited) throw new ApiError(limited, 429);
+  const quota = await checkQuota(request, env, "chat");
+  if (quota.blocked) throw new ApiError(quota.blocked, 429);
 
   const body = await readJson(request);
   const question = String(body.question || "").trim().slice(0, MAX_QUESTION_LEN);
@@ -330,7 +328,7 @@ async function handleChat(request, env) {
       web: pickWeb(webItems, result.usedWeb),
       confidence: normalizeConfidence(result.confidence, searchedWeb),
       note: result.note || null,
-      meta: { searchedWeb, model: CHAT_MODEL },
+      meta: { searchedWeb, model: CHAT_MODEL, quota },
     },
     200,
     request.headers.get("Origin") || "",
@@ -416,8 +414,8 @@ async function handlePlan(request, env) {
     );
   }
 
-  const limited = await checkQuota(request, env, "plan");
-  if (limited) throw new ApiError(limited, 429);
+  const quota = await checkQuota(request, env, "plan");
+  if (quota.blocked) throw new ApiError(quota.blocked, 429);
 
   const body = await readJson(request);
   const sites = normalizePlanSites(body.sites);
@@ -526,6 +524,7 @@ async function handlePlan(request, env) {
         candidates: candidates.length,
         nearby: nearbyPoints.length,
         legs: matrix.length,
+        quota,
       },
     },
     200,
