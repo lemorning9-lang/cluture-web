@@ -328,7 +328,9 @@ async function handlePlan(request, env) {
   if (matrix.length === 0) throw new ApiError("高德未能返回路径数据", 502);
 
   // 4) 模型在真实数据上排行程
-  const raw = await chatJSON(env, [
+  const raw = await chatJSON(
+    env,
+    [
     { role: "system", content: PLAN_SYSTEM },
     {
       role: "user",
@@ -345,7 +347,10 @@ async function handlePlan(request, env) {
         matrix,
       }),
     },
-  ]);
+    ],
+    // 行程是多天多站的 JSON，输出预算要比问答大得多
+    3500,
+  );
 
   // 5) 校验并重算里程：距离只认矩阵，不认模型自己写的数
   const plan = finalizePlan(raw, candidates, matrix);
@@ -538,7 +543,7 @@ function finalizePlan(raw, candidates, matrix) {
 
 // ─── DeepSeek 调用 ────────────────────────────────────────────────────────────
 
-async function chatJSON(env, messages) {
+async function chatJSON(env, messages, maxTokens = 1200) {
   const res = await fetchWithTimeout(`${DEEPSEEK_BASE}/chat/completions`, {
     method: "POST",
     headers: {
@@ -549,7 +554,7 @@ async function chatJSON(env, messages) {
       model: CHAT_MODEL,
       messages,
       temperature: 0.2,
-      max_tokens: 1200,
+      max_tokens: maxTokens,
       response_format: { type: "json_object" },
     }),
   });
