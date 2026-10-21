@@ -150,50 +150,62 @@ const LIMITS = {
   },
 };
 
-const hasCache = () => typeof caches !== "undefined" && caches.default;
+/**
+ * 计数：优先用 KV（全局一致）；没有绑定 KV 时退回单实例内存计数。
+ * 内存计数只在同一个 isolate 内有效，多实例分摊后会放宽，仅作兜底。
+ * 不依赖 Cache API：实测它不会为任意 URL 持久化，计数永远是 0。
+ */
+const memoryCounters = new Map();
 
-async function bump(key, ttlSeconds) {
-  if (!hasCache()) return 0; // 本地单测或非 Workers 环境跳过
-  // Cache API 接受字符串 URL；传 URL 对象在部分实现里匹配不到，会让所有计数塌到同一个 key
-  const url = `https://ratelimit.internal/${encodeURIComponent(key)}`;
-  let count = 0;
-  try {
-    const cached = await caches.default.match(url);
-    if (cached) count = Number(await cached.text()) || 0;
-  } catch {
-    /* 读失败按 0 处理 */
+function bumpMemory(key, ttlSeconds) {
+  const now = Date.now();
+  const entry = memoryCounters.get(key);
+  const next = entry && entry.exp > now ? entry.count + 1 : 1;
+  memoryCounters.set(key, { count: next, exp: now + ttlSeconds * 1000 });
+  if (memoryCounters.size > 500) {
+    for (const [k, v] of memoryCounters) {
+      if (v.exp <= now) memoryCounters.delete(k);
+    }
   }
-  count += 1;
-  try {
-    await caches.default.put(
-      url,
-      new Response(String(count), {
-        headers: { "Cache-Control": `max-age=${ttlSeconds}` },
-      }),
-    );
-  } catch {
-    /* 写失败不阻断请求 */
+  return next;
+}
+
+async function bump(env, key, ttlSeconds) {
+  if (env && env.RATE_KV) {
+    try {
+      const current = Number(await env.RATE_KV.get(key)) || 0;
+      const next = current + 1;
+      await env.RATE_KV.put(key, String(next), {
+        expirationTtl: Math.max(60, ttlSeconds),
+      });
+      return next;
+    } catch {
+      /* KV 异常时退回内存计数，不影响主流程 */
+    }
   }
-  return count;
+  return bumpMemory(key, ttlSeconds);
 }
 
 /** 返回 null 表示放行；否则返回给用户看的提示 */
-async function checkQuota(request, kind) {
+async function checkQuota(request, env, kind) {
   const conf = LIMITS[kind];
-  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-  const now = Date.now();
+  // 没有 CF-Connecting-IP 说明不在 Cloudflare 后面（本地 dev、单测），直接放行
+  const ip = request.headers.get("CF-Connecting-IP");
+  if (!ip) return null;
 
+  const now = Date.now();
   const windowKey = `w:${kind}:${ip}:${Math.floor(now / (conf.windowSeconds * 1000))}`;
-  const perIp = await bump(windowKey, conf.windowSeconds + 60);
-  if (perIp > conf.perIp) return conf.windowHint;
+  if ((await bump(env, windowKey, conf.windowSeconds + 60)) > conf.perIp) {
+    return conf.windowHint;
+  }
 
   const day = new Date(now).toISOString().slice(0, 10);
-  if ((await bump(`d:${kind}:${day}`, 25 * 3600)) > conf.daily) {
+  if ((await bump(env, `d:${kind}:${day}`, 25 * 3600)) > conf.daily) {
     return "今日额度已用完，请明天再试。";
   }
 
   const month = new Date(now).toISOString().slice(0, 7);
-  if ((await bump(`M:${kind}:${month}`, 32 * 24 * 3600)) > conf.monthly) {
+  if ((await bump(env, `M:${kind}:${month}`, 32 * 24 * 3600)) > conf.monthly) {
     return "本月额度已用完。";
   }
 
@@ -264,7 +276,7 @@ async function handleChat(request, env) {
     throw new ApiError("后端尚未配置 DEEPSEEK_API_KEY", 503, "在 Worker 的 Runtime variables and secrets 中添加");
   }
 
-  const limited = await checkQuota(request, "chat");
+  const limited = await checkQuota(request, env, "chat");
   if (limited) throw new ApiError(limited, 429);
 
   const body = await readJson(request);
@@ -404,7 +416,7 @@ async function handlePlan(request, env) {
     );
   }
 
-  const limited = await checkQuota(request, "plan");
+  const limited = await checkQuota(request, env, "plan");
   if (limited) throw new ApiError(limited, 429);
 
   const body = await readJson(request);

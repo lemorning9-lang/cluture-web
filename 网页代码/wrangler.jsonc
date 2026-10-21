@@ -7,6 +7,10 @@
   // 也只有在有 main 之后，控制台的 Runtime variables and secrets 才允许添加。
   "main": "worker/index.js",
 
+  // 保留在控制台添加的绑定：限流用的 KV(RATE_KV) 只需在控制台加一次，
+  // 后续 wrangler deploy 不会把它冲掉
+  "keep_bindings": ["kv_namespace"],
+
   "assets": {
     // 相对本文件所在目录，即 网页代码/dist
     "directory": "./dist",
