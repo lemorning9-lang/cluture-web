@@ -799,6 +799,107 @@ console.log("[13] 自由描述：解析意图、联网找周边景区");
   );
 }
 
+// ─── 14. 限流：超过频率返回 429 ────────────────────────────────────────────────
+
+console.log("");
+console.log("[14] 限流：超过频率返回 429");
+
+// Workers 之外没有 caches，这里伪造一个
+const rlStore = new Map();
+globalThis.caches = {
+  default: {
+    async match(req) {
+      const key = typeof req === "string" ? req : String(req.url);
+      const value = rlStore.get(key);
+      return value === undefined ? undefined : new Response(value);
+    },
+    async put(req, res) {
+      const key = typeof req === "string" ? req : String(req.url);
+      rlStore.set(key, await res.text());
+    },
+  },
+};
+
+{
+  installMock({
+    chat: [
+      () =>
+        chatReply({
+          local_answer: "· 答案",
+          web_answer: "",
+          search_query: "",
+          confidence: "high",
+          usedLocal: [0],
+          usedWeb: [],
+          note: null,
+        }),
+    ],
+    search: [() => searchReply([])],
+  });
+
+  const statuses = [];
+  for (let i = 0; i < 12; i += 1) {
+    const res = await worker.fetch(
+      new Request("https://example.com/api/chat", {
+        method: "POST",
+        headers: {
+          Origin: ORIGIN,
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "203.0.113.9",
+        },
+        body: JSON.stringify({ question: "陶寺", evidence: [EVIDENCE[0]] }),
+      }),
+      ENV,
+    );
+    statuses.push(res.status);
+  }
+
+  check("前 10 次放行", statuses.slice(0, 10).every((s) => s === 200), JSON.stringify(statuses));
+  check(
+    "第 11 次起返回 429",
+    statuses[10] === 429 && statuses[11] === 429,
+    JSON.stringify(statuses),
+  );
+
+  const blocked = await worker.fetch(
+    new Request("https://example.com/api/chat", {
+      method: "POST",
+      headers: {
+        Origin: ORIGIN,
+        "Content-Type": "application/json",
+        "CF-Connecting-IP": "203.0.113.9",
+      },
+      body: JSON.stringify({ question: "陶寺", evidence: [EVIDENCE[0]] }),
+    }),
+    ENV,
+  );
+  const body = await blocked.json();
+  check("429 带中文提示", /频繁/.test(body.error || ""), body.error);
+  check(
+    "429 仍带 CORS 头（前端能读到提示）",
+    blocked.headers.get("Access-Control-Allow-Origin") === ORIGIN,
+    blocked.headers.get("Access-Control-Allow-Origin"),
+  );
+}
+
+{
+  const res = await worker.fetch(
+    new Request("https://example.com/api/chat", {
+      method: "POST",
+      headers: {
+        Origin: ORIGIN,
+        "Content-Type": "application/json",
+        "CF-Connecting-IP": "198.51.100.7",
+      },
+      body: JSON.stringify({ question: "陶寺", evidence: [EVIDENCE[0]] }),
+    }),
+    ENV,
+  );
+  check("换 IP 后恢复放行", res.status === 200, String(res.status));
+}
+
+delete globalThis.caches;
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);

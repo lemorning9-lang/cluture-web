@@ -5541,7 +5541,11 @@ async function askRemote(
     });
     if (!res.ok) {
       const detail = await res.json().catch(() => null);
-      throw new Error(detail?.error || `HTTP ${res.status}`);
+      const failure = new Error(detail?.error || `HTTP ${res.status}`) as Error & {
+        status?: number;
+      };
+      failure.status = res.status;
+      throw failure;
     }
     const data = await res.json();
     const refs = [
@@ -5926,7 +5930,16 @@ function AIAssistant() {
           remote.segments,
         );
       })
-      .catch(() => {
+      .catch((err) => {
+        // 被限流时要把提示原样告诉用户，不能静默降级成"本地答案"
+        if ((err as { status?: number })?.status === 429) {
+          reveal(
+            err instanceof Error ? err.message : "请求过于频繁，请稍后再试。",
+            "pending",
+            "请求被限流",
+          );
+          return;
+        }
         // 后端不可达（国内网络常见）→ 用本地检索结果兜底。
         // 这里必须留下可见标记：否则用户会以为"AI 答得差"，而不是"智能服务没连上"
         reveal(

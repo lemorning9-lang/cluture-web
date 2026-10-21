@@ -123,6 +123,83 @@ const NEARBY_SYSTEM = `你是资料摘录员。从给定的搜索结果里挑出
 - 与目标遗址明显无关的（例如外省的同类景点）不要
 - 只返回 JSON：{"attractions":[{"name":"","note":""}]}`;
 
+// ─── 限流与额度 ───────────────────────────────────────────────────────────────
+
+/**
+ * 免费版 Cloudflare 没有共享存储，这里用 Cache API 做固定窗口计数：
+ * 零配置即可运行，代价是计数「每个边缘节点一份」——不是全局精确值。
+ * 对限流够用（同一客户端通常落到同一节点）。
+ *
+ * 注意：真正兜住费用上限的是 DeepSeek / 高德后台的月度额度设置；
+ * 这里的额度是防止额度被一次性打光，以及拦住单个用户的刷屏行为。
+ */
+const LIMITS = {
+  chat: {
+    perIp: 10, // 每分钟
+    windowSeconds: 60,
+    daily: 60,
+    monthly: 800,
+    windowHint: "提问太频繁了，请等一分钟后再试。",
+  },
+  plan: {
+    perIp: 3, // 每 10 分钟
+    windowSeconds: 600,
+    daily: 15,
+    monthly: 200,
+    windowHint: "行程规划比较费资源，请 10 分钟后再试。",
+  },
+};
+
+const hasCache = () => typeof caches !== "undefined" && caches.default;
+
+async function bump(key, ttlSeconds) {
+  if (!hasCache()) return 0; // 本地单测或非 Workers 环境跳过
+  // Cache API 接受字符串 URL；传 URL 对象在部分实现里匹配不到，会让所有计数塌到同一个 key
+  const url = `https://ratelimit.internal/${encodeURIComponent(key)}`;
+  let count = 0;
+  try {
+    const cached = await caches.default.match(url);
+    if (cached) count = Number(await cached.text()) || 0;
+  } catch {
+    /* 读失败按 0 处理 */
+  }
+  count += 1;
+  try {
+    await caches.default.put(
+      url,
+      new Response(String(count), {
+        headers: { "Cache-Control": `max-age=${ttlSeconds}` },
+      }),
+    );
+  } catch {
+    /* 写失败不阻断请求 */
+  }
+  return count;
+}
+
+/** 返回 null 表示放行；否则返回给用户看的提示 */
+async function checkQuota(request, kind) {
+  const conf = LIMITS[kind];
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const now = Date.now();
+
+  const windowKey = `w:${kind}:${ip}:${Math.floor(now / (conf.windowSeconds * 1000))}`;
+  const perIp = await bump(windowKey, conf.windowSeconds + 60);
+  if (perIp > conf.perIp) return conf.windowHint;
+
+  const day = new Date(now).toISOString().slice(0, 10);
+  if ((await bump(`d:${kind}:${day}`, 25 * 3600)) > conf.daily) {
+    return "今日额度已用完，请明天再试。";
+  }
+
+  const month = new Date(now).toISOString().slice(0, 7);
+  if ((await bump(`M:${kind}:${month}`, 32 * 24 * 3600)) > conf.monthly) {
+    return "本月额度已用完。";
+  }
+
+  return null;
+}
+
 // ─── 入口 ─────────────────────────────────────────────────────────────────────
 
 export default {
@@ -186,6 +263,9 @@ async function handleChat(request, env) {
   if (!env.DEEPSEEK_API_KEY) {
     throw new ApiError("后端尚未配置 DEEPSEEK_API_KEY", 503, "在 Worker 的 Runtime variables and secrets 中添加");
   }
+
+  const limited = await checkQuota(request, "chat");
+  if (limited) throw new ApiError(limited, 429);
 
   const body = await readJson(request);
   const question = String(body.question || "").trim().slice(0, MAX_QUESTION_LEN);
@@ -323,6 +403,9 @@ async function handlePlan(request, env) {
       "在 Worker 的 Runtime variables and secrets 中添加（类型选 Secret，服务平台需为「Web服务」）",
     );
   }
+
+  const limited = await checkQuota(request, "plan");
+  if (limited) throw new ApiError(limited, 429);
 
   const body = await readJson(request);
   const sites = normalizePlanSites(body.sites);
