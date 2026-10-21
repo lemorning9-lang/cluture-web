@@ -77,18 +77,23 @@ const CHAT_SYSTEM_WITH_WEB = `${CHAT_SYSTEM}
 const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划师。
 
 输入：
-1) 用户需求：出发地、天数、偏好、人数、交通方式
-2) 候选遗址 sites[]：每条含 name、culture、period、location、lat、lng、brief
-3) 距离矩阵 matrix[]：由高德接口计算，每条含 from、to、distance_m、duration_s
+1) 用户需求：出发地 origin、天数 days、偏好 preferences、交通方式 travel
+2) 候选遗址 sites[]：每条含 name、culture、period、location、brief、straight_km（到出发地的直线距离）
+3) 距离矩阵 matrix[]：由高德接口计算，每条含 from、to、km（驾车公里）、min（驾车分钟）
 
 规则（必须遵守）：
 - 只能从 sites 中选择，不得推荐名单外的地点
 - 距离与车程只能引用 matrix 中的数值，不得估算
-- 若所需的某段在 matrix 中不存在，必须标注"该段未获得路径规划数据"
+- 若所需的某段在 matrix 中找不到，transport 写「该段未获得路径规划数据」
 - 默认每天不超过 2 个遗址 + 1-2 小时车程；用户要求高强度时才放宽，并在 cautions 说明
-- 不编造门票价格、开放时间、联系电话；不确定时提示"出行前请核实"
-- 用户未提供的信息要在 assumptions 中说明你做的假设
-- 只返回 JSON，不要任何额外文字`;
+- 不编造门票价格、开放时间、联系电话；不确定时提示「出行前请核实」
+- 用户未提供的信息要在 assumptions 中说明你做的假设（例如未提供天数则按 3 天）
+- 同一天内的遗址要在地理上连贯：优先选择 matrix 中相互车程较短的组合
+- highlight 用一句话点出这处遗址最值得看的东西，不要空泛
+- 语气简练、书面，不用表情符号；不要讨论资料是否充分、不解释规划过程
+
+只返回 JSON，不要任何额外文字，格式：
+{"assumptions":[""],"summary":"","days":[{"day":1,"title":"","stops":[{"site":"","time":"","highlight":"","transport":""}],"tips":""}],"cautions":[""]}`;
 
 // ─── 入口 ─────────────────────────────────────────────────────────────────────
 
@@ -274,10 +279,260 @@ function fallbackAnswer(evidence) {
   return "暂时没有找到与该问题直接相关的内容，可以换个问法试试。";
 }
 
-// ─── 智能体 2：行程规划（M2） ─────────────────────────────────────────────────
+// ─── 智能体 2：行程规划 ───────────────────────────────────────────────────────
 
-async function handlePlan() {
-  throw new ApiError("行程规划尚未启用（M2）", 501);
+const AMAP_BASE = "https://restapi.amap.com";
+const MAX_CANDIDATES = 10;
+const MAX_PLAN_DAYS = 10;
+
+async function handlePlan(request, env) {
+  if (request.method !== "POST") throw new ApiError("只支持 POST", 405);
+  if (!env.DEEPSEEK_API_KEY) throw new ApiError("后端尚未配置 DEEPSEEK_API_KEY", 503);
+  if (!env.AMAP_WEB_KEY) {
+    throw new ApiError(
+      "后端尚未配置 AMAP_WEB_KEY",
+      503,
+      "在 Worker 的 Runtime variables and secrets 中添加（类型选 Secret，服务平台需为「Web服务」）",
+    );
+  }
+
+  const body = await readJson(request);
+  const origin = String(body.origin || "").trim().slice(0, 40);
+  if (!origin) throw new ApiError("origin（出发地）不能为空", 400);
+
+  const days = clampInt(body.days, 1, MAX_PLAN_DAYS, 3);
+  const travel = String(body.travel || "自驾").slice(0, 10);
+  const preferences = Array.isArray(body.preferences)
+    ? body.preferences.map((p) => String(p).slice(0, 20)).slice(0, 5)
+    : [];
+
+  const sites = normalizePlanSites(body.sites);
+  if (sites.length < 4) throw new ApiError("可用候选遗址太少（至少 4 处），无法规划", 400);
+
+  // 1) 出发地转坐标
+  const start = await geocode(env, origin);
+  if (!start) {
+    throw new ApiError(`无法定位出发地「${origin}」`, 400, "请写得更具体，例如「西安」「山西临汾」");
+  }
+
+  // 2) 按距离与偏好收敛候选
+  const candidates = pickCandidates(sites, start, preferences);
+  const points = [
+    { id: "出发地", lng: start.lng, lat: start.lat },
+    ...candidates.map((s) => ({ id: s.name, lng: s.lng, lat: s.lat })),
+  ];
+
+  // 3) 高德算真实驾车距离矩阵（这是"距离必须有据可查"的来源）
+  const matrix = await buildMatrix(env, points);
+  if (matrix.length === 0) throw new ApiError("高德未能返回路径数据", 502);
+
+  // 4) 模型在真实数据上排行程
+  const raw = await chatJSON(env, [
+    { role: "system", content: PLAN_SYSTEM },
+    {
+      role: "user",
+      content: JSON.stringify({
+        request: { origin, days, preferences, travel },
+        sites: candidates.map((s) => ({
+          name: s.name,
+          culture: s.culture,
+          period: s.period,
+          location: s.location,
+          brief: s.brief,
+          straight_km: Math.round(s.straight_km),
+        })),
+        matrix,
+      }),
+    },
+  ]);
+
+  // 5) 校验并重算里程：距离只认矩阵，不认模型自己写的数
+  const plan = finalizePlan(raw, candidates, matrix);
+
+  return json(
+    {
+      ...plan,
+      meta: { model: CHAT_MODEL, candidates: candidates.length, legs: matrix.length },
+    },
+    200,
+    request.headers.get("Origin") || "",
+  );
+}
+
+function clampInt(value, min, max, fallback) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(n)));
+}
+
+function normalizePlanSites(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .slice(0, 40)
+    .map((s) => ({
+      name: String(s?.name || "").slice(0, 40),
+      culture: String(s?.culture || "").slice(0, 30),
+      period: String(s?.period || "").slice(0, 20),
+      location: String(s?.location || "").slice(0, 40),
+      brief: String(s?.brief || "").slice(0, 120),
+      domain: String(s?.domain || "").slice(0, 10),
+      lng: Number(s?.lng),
+      lat: Number(s?.lat),
+    }))
+    .filter((s) => s.name && Number.isFinite(s.lng) && Number.isFinite(s.lat));
+}
+
+function haversineKm(a, b) {
+  const R = 6371;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** 先按偏好筛流域，再按直线距离取最近的一批，控制高德调用次数 */
+function pickCandidates(sites, start, preferences) {
+  const pref = preferences.join(" ");
+  let pool = sites;
+  if (/黄河/.test(pref)) pool = sites.filter((s) => s.domain === "黄河");
+  else if (/长江/.test(pref)) pool = sites.filter((s) => s.domain === "长江");
+  else if (/其他|三星堆|辽河|牛河梁/.test(pref)) pool = sites.filter((s) => s.domain === "其他");
+  if (pool.length < 4) pool = sites;
+
+  return pool
+    .map((s) => ({ ...s, straight_km: haversineKm(start, s) }))
+    .sort((a, b) => a.straight_km - b.straight_km)
+    .slice(0, MAX_CANDIDATES);
+}
+
+async function amapJson(env, path, params) {
+  const url = new URL(AMAP_BASE + path);
+  url.searchParams.set("key", env.AMAP_WEB_KEY);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
+
+  const res = await fetchWithTimeout(url.toString(), { method: "GET" });
+  const text = await res.text();
+  if (!res.ok) throw new ApiError(`高德接口请求失败 (${res.status})`, 502, text.slice(0, 200));
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new ApiError("高德接口返回无法解析", 502, text.slice(0, 200));
+  }
+  if (String(data.status) !== "1") {
+    throw new ApiError("高德接口返回错误", 502, `${data.info || ""} ${data.infocode || ""}`.trim());
+  }
+  return data;
+}
+
+async function geocode(env, address) {
+  const data = await amapJson(env, "/v3/geocode/geo", { address });
+  const first = (data.geocodes || [])[0];
+  if (!first?.location) return null;
+  const [lng, lat] = String(first.location).split(",").map(Number);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+  return { lng, lat };
+}
+
+/** 对每个目的地点调用一次距离测量，1 次请求拿回所有起点到它的驾车距离 */
+async function buildMatrix(env, points) {
+  const legs = [];
+  for (const dest of points) {
+    const data = await amapJson(env, "/v3/distance", {
+      origins: points.map((p) => `${p.lng},${p.lat}`).join("|"),
+      destination: `${dest.lng},${dest.lat}`,
+      type: "1",
+    });
+    for (const row of data.results || []) {
+      const from = points[Number(row.origin_id) - 1];
+      if (!from) continue;
+      const meters = Number(row.distance);
+      const seconds = Number(row.duration);
+      if (!Number.isFinite(meters) || !Number.isFinite(seconds) || meters <= 0) continue;
+      legs.push({
+        from: from.id,
+        to: dest.id,
+        km: Math.round(meters / 100) / 10,
+        min: Math.max(1, Math.round(seconds / 60)),
+      });
+    }
+  }
+  return legs;
+}
+
+/** 只保留候选内的遗址；车程与总里程一律按矩阵重算，模型给的数值不采信 */
+function finalizePlan(raw, candidates, matrix) {
+  const byName = new Map(candidates.map((s) => [s.name, s]));
+  const legIndex = new Map(matrix.map((l) => [`${l.from}→${l.to}`, l]));
+
+  const cautions = Array.isArray(raw?.cautions)
+    ? raw.cautions.map((c) => String(c).slice(0, 120)).filter(Boolean)
+    : [];
+  const assumptions = Array.isArray(raw?.assumptions)
+    ? raw.assumptions.map((a) => String(a).slice(0, 120)).filter(Boolean)
+    : [];
+
+  const outDays = [];
+  let cursor = "出发地";
+  let totalKm = 0;
+  let totalMin = 0;
+  let missing = 0;
+
+  for (const day of Array.isArray(raw?.days) ? raw.days : []) {
+    const stops = [];
+    for (const stop of Array.isArray(day?.stops) ? day.stops : []) {
+      const site = byName.get(String(stop?.site || "").trim());
+      if (!site) continue; // 模型编造的地点直接丢弃
+
+      const leg = legIndex.get(`${cursor}→${site.name}`);
+      if (leg) {
+        totalKm += leg.km;
+        totalMin += leg.min;
+        stops.push({
+          site: site.name,
+          time: String(stop?.time || "").slice(0, 30),
+          highlight: String(stop?.highlight || "").slice(0, 120),
+          transport: `${cursor} → ${site.name}：驾车 ${leg.km} 公里 / 约 ${leg.min} 分钟`,
+        });
+      } else {
+        missing += 1;
+        stops.push({
+          site: site.name,
+          time: String(stop?.time || "").slice(0, 30),
+          highlight: String(stop?.highlight || "").slice(0, 120),
+          transport: `${cursor} → ${site.name}：该段未获得路径规划数据`,
+        });
+      }
+      cursor = site.name;
+    }
+    if (stops.length > 0) {
+      outDays.push({
+        day: outDays.length + 1,
+        title: String(day?.title || "").slice(0, 40),
+        stops,
+        tips: String(day?.tips || "").slice(0, 160),
+      });
+    }
+  }
+
+  if (missing > 0) {
+    cautions.push(`有 ${missing} 段行程未获得路径规划数据，实际车程请以导航为准`);
+  }
+
+  return {
+    assumptions,
+    summary: String(raw?.summary || "").slice(0, 120),
+    days: outDays,
+    totals: {
+      distance_km: Math.round(totalKm),
+      drive_hours: Math.round((totalMin / 60) * 10) / 10,
+    },
+    cautions,
+  };
 }
 
 // ─── DeepSeek 调用 ────────────────────────────────────────────────────────────

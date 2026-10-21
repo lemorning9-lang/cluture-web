@@ -44,24 +44,34 @@ function searchReply(results) {
 /** 按调用序列返回预设响应，并记录每次请求的 URL 与 body */
 function installMock(handlers) {
   const calls = [];
-  let chatIndex = 0;
-  let searchIndex = 0;
+  const counters = {};
+  const pick = (key, body, url) => {
+    const list = handlers[key] || [];
+    const index = counters[key] ?? 0;
+    counters[key] = index + 1;
+    const h = list[Math.min(index, list.length - 1)];
+    if (!h) throw new Error("未配置 " + key + " 的 mock");
+    return h(body, url);
+  };
   globalThis.fetch = async (url, init) => {
+    const u = String(url);
     const body = init?.body ? JSON.parse(init.body) : null;
-    calls.push({ url: String(url), body });
-    if (String(url).includes("/chat/completions")) {
-      const h = handlers.chat[Math.min(chatIndex, handlers.chat.length - 1)];
-      chatIndex += 1;
-      return h(body);
-    }
-    if (String(url).includes("/tools/search")) {
-      const h = handlers.search[Math.min(searchIndex, handlers.search.length - 1)];
-      searchIndex += 1;
-      return h(body);
-    }
-    throw new Error("未预期的请求: " + url);
+    calls.push({ url: u, body });
+    if (u.includes("/chat/completions")) return pick("chat", body, u);
+    if (u.includes("/tools/search")) return pick("search", body, u);
+    if (u.includes("/geocode/geo")) return pick("geocode", body, u);
+    if (u.includes("/v3/distance")) return pick("distance", body, u);
+    throw new Error("未预期的请求: " + u);
   };
   return calls;
+}
+
+/** 构造高德接口的 JSON 响应 */
+function amapReply(obj) {
+  return new Response(JSON.stringify(obj), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 function postChat(payload, env = ENV) {
@@ -299,9 +309,9 @@ console.log("\n[5] 模型输出被代码块包裹时仍可解析");
   check("成功提取答案", /5300/.test(body.answer || ""), body.answer);
 }
 
-// ─── 6. 行程规划接口尚未启用 ───────────────────────────────────────────────────
+// ─── 6. 行程规划的参数与凭据校验 ──────────────────────────────────────────────────
 
-console.log("\n[6] /api/plan 当前返回未启用");
+console.log("\n[6] /api/plan 参数与凭据校验");
 
 {
   const res = await worker.fetch(
@@ -312,7 +322,21 @@ console.log("\n[6] /api/plan 当前返回未启用");
     }),
     ENV,
   );
-  check("返回 501", res.status === 501, `实际 ${res.status}`);
+  const body = await res.json();
+  check("缺 AMAP_WEB_KEY 返回 503", res.status === 503, `实际 ${res.status}`);
+  check("提示里点名 AMAP_WEB_KEY", /AMAP_WEB_KEY/.test(body.error || ""), body.error);
+}
+
+{
+  const res = await worker.fetch(
+    new Request("https://example.com/api/plan", {
+      method: "POST",
+      headers: { Origin: ORIGIN, "Content-Type": "application/json" },
+      body: JSON.stringify({ days: 3 }),
+    }),
+    { ...ENV, AMAP_WEB_KEY: "amap-test" },
+  );
+  check("缺 origin 返回 400", res.status === 400, `实际 ${res.status}`);
 }
 
 // ─── 7. 联网结果的标题去重与链接去锚点 ────────────────────────────────────────
@@ -549,6 +573,110 @@ console.log("\n[11] 分段输出：本地不相关时只给联网段");
   check("该段是联网", body.segments?.[0]?.kind === "web", JSON.stringify(body.segments?.[0]));
   check("本地出处为空（不硬挂无关本地来源）", (body.local || []).length === 0, JSON.stringify(body.local));
   check("答案仍是分点", /· 丁村/.test(body.answer || ""), body.answer);
+}
+
+// ─── 12. 行程规划：高德距离矩阵 + 模型排序 + 校验 ───────────────────────────────
+
+console.log("");
+console.log("[12] 行程规划：距离按矩阵重算，编造地点被丢弃");
+
+const PLAN_SITES = [
+  { name: "陶寺遗址", culture: "龙山文化", period: "高潮", location: "山西临汾", brief: "观象台与宫城", domain: "黄河", lng: 111.52, lat: 35.88 },
+  { name: "石峁遗址", culture: "龙山文化", period: "高潮", location: "陕西神木", brief: "皇城台石城", domain: "黄河", lng: 110.5, lat: 38.6 },
+  { name: "碧村遗址", culture: "龙山文化", period: "高潮", location: "山西兴县", brief: "黄河边的石城", domain: "黄河", lng: 111.1, lat: 38.7 },
+  { name: "南佐遗址", culture: "仰韶文化", period: "古国", location: "甘肃庆阳", brief: "大型宫殿基址", domain: "黄河", lng: 107.6, lat: 35.7 },
+];
+
+{
+  const calls = installMock({
+    geocode: [() => amapReply({ status: "1", geocodes: [{ location: "112.549,37.857" }] })],
+    distance: [
+      (body, url) => {
+        const origins = new URL(url).searchParams.get("origins") || "";
+        const n = origins.split("|").length;
+        return amapReply({
+          status: "1",
+          results: Array.from({ length: n }, (_, i) => ({
+            origin_id: String(i + 1),
+            dest_id: "1",
+            distance: "100000",
+            duration: "6000",
+            info: "ok",
+          })),
+        });
+      },
+    ],
+    chat: [
+      () =>
+        chatReply({
+          assumptions: ["未提供偏好，按黄河流域规划"],
+          summary: "晋南—陕北的龙山都邑线",
+          days: [
+            {
+              day: 1,
+              title: "太原—临汾",
+              stops: [{ site: "陶寺遗址", time: "14:00-17:00", highlight: "观象台与宫城", transport: "随便写的 3 小时" }],
+              tips: "提前预约",
+            },
+            {
+              day: 2,
+              title: "临汾—神木",
+              stops: [
+                { site: "石峁遗址", time: "10:00-13:00", highlight: "皇城台", transport: "" },
+                { site: "编造遗址", time: "", highlight: "", transport: "" },
+              ],
+              tips: "",
+            },
+          ],
+          cautions: ["部分遗址需提前预约"],
+        }),
+    ],
+  });
+
+  const res = await worker.fetch(
+    new Request("https://example.com/api/plan", {
+      method: "POST",
+      headers: { Origin: ORIGIN, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        origin: "太原",
+        days: 2,
+        preferences: ["黄河"],
+        travel: "自驾",
+        sites: PLAN_SITES,
+      }),
+    }),
+    { ...ENV, AMAP_WEB_KEY: "amap-test" },
+  );
+  const body = await res.json();
+
+  check("状态 200", res.status === 200, JSON.stringify(body).slice(0, 200));
+  check("调用了地理编码", calls.some((c) => c.url.includes("/geocode/geo")));
+  check("调用了距离测量", calls.some((c) => c.url.includes("/v3/distance")));
+  check("两天行程", body.days?.length === 2, String(body.days?.length));
+  check("编造的地点被丢弃", !JSON.stringify(body).includes("编造遗址"));
+  check(
+    "车程引用矩阵数值而非模型写的",
+    String(body.days?.[0]?.stops?.[0]?.transport || "").includes("驾车 100 公里") &&
+      !JSON.stringify(body).includes("随便写的"),
+    body.days?.[0]?.stops?.[0]?.transport,
+  );
+  check("总里程按矩阵重算", body.totals?.distance_km === 200, JSON.stringify(body.totals));
+  check("总车程按矩阵重算", body.totals?.drive_hours === 3.3, JSON.stringify(body.totals));
+  check("保留模型的注意事项", (body.cautions || []).some((c) => /预约/.test(c)), JSON.stringify(body.cautions));
+  check("保留假设说明", (body.assumptions || []).length > 0);
+}
+
+{
+  installMock({ geocode: [() => amapReply({ status: "1", geocodes: [] })] });
+  const res = await worker.fetch(
+    new Request("https://example.com/api/plan", {
+      method: "POST",
+      headers: { Origin: ORIGIN, "Content-Type": "application/json" },
+      body: JSON.stringify({ origin: "不存在的地方", days: 2, sites: PLAN_SITES }),
+    }),
+    { ...ENV, AMAP_WEB_KEY: "amap-test" },
+  );
+  check("定位失败返回 400", res.status === 400, `实际 ${res.status}`);
 }
 
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
