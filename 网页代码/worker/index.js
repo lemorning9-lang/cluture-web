@@ -79,7 +79,7 @@ const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划�
 输入：
 1) 用户需求：出发地 origin、天数 days、偏好 preferences、交通方式 travel
 2) 候选遗址 sites[]：每条含 name、culture、period、location、brief、straight_km（到出发地的直线距离）
-3) 距离矩阵 matrix[]：由高德接口计算，每条含 from、to、km（驾车公里）、min（驾车分钟）
+3) 距离矩阵 matrix：由高德接口计算，每行一段「起点>终点 公里km/分钟min」
 4) 可选：周边景区 nearby[]：来自联网检索，含 name、note（一句话说明）
 
 规则（必须遵守）：
@@ -91,7 +91,8 @@ const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划�
 - 不编造门票价格、开放时间、联系电话；不确定时提示「出行前请核实」
 - 用户未提供的信息要在 assumptions 中说明你做的假设（例如未提供天数则按 3 天）
 - 同一天内的遗址要在地理上连贯：优先选择 matrix 中相互车程较短的组合
-- highlight 用一句话点出这处遗址最值得看的东西，不要空泛
+- highlight 用一句话点出这处遗址最值得看的东西，不超过 30 字
+- summary 不超过 40 字；assumptions 与 cautions 各不超过 3 条、每条不超过 25 字；tips 不超过 30 字
 - 语气简练、书面，不用表情符号；不要讨论资料是否充分、不解释规划过程
 
 只返回 JSON，不要任何额外文字，格式：
@@ -309,7 +310,7 @@ function fallbackAnswer(evidence) {
 // ─── 智能体 2：行程规划 ───────────────────────────────────────────────────────
 
 const AMAP_BASE = "https://restapi.amap.com";
-const MAX_CANDIDATES = 10;
+const MAX_CANDIDATES = 8;
 const MAX_PLAN_DAYS = 10;
 
 async function handlePlan(request, env) {
@@ -368,11 +369,11 @@ async function handlePlan(request, env) {
   const candidates = pickCandidates(sites, start, preferences, anchors);
 
   // 周边景区也参与车程计算（地理编码失败的跳过）
-  const nearbyPoints = [];
-  for (const item of nearby) {
-    const loc = await geocode(env, item.name);
-    if (loc) nearbyPoints.push({ ...item, lng: loc.lng, lat: loc.lat });
-  }
+  const geocoded = await mapPool(nearby, 3, async (item) => {
+    const loc = await geocode(env, item.name).catch(() => null);
+    return loc ? { ...item, lng: loc.lng, lat: loc.lat } : null;
+  });
+  const nearbyPoints = geocoded.filter(Boolean);
 
   const points = [
     { id: "出发地", lng: start.lng, lat: start.lat },
@@ -400,11 +401,11 @@ async function handlePlan(request, env) {
             straight_km: Math.round(s.straight_km),
           })),
           nearby: nearbyPoints.map((n) => ({ name: n.name, note: n.note })),
-          matrix,
+          matrix: compactMatrix(matrix),
         }),
       },
     ],
-    3500,
+    2000,
   );
 
   const allowed = new Set([
@@ -583,15 +584,45 @@ async function geocode(env, address) {
   return { lng, lat };
 }
 
-/** 对每个目的地点调用一次距离测量，一次请求拿回所有起点到它的驾车距离 */
+/** 矩阵压成一行一段的文本，比 JSON 数组省很多 token */
+function compactMatrix(legs) {
+  return legs.map((l) => `${l.from}>${l.to} ${l.km}km/${l.min}min`).join("\n");
+}
+
+async function mapPool(items, limit, worker) {
+  const results = new Array(items.length);
+  let cursor = 0;
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (cursor < items.length) {
+      const index = cursor++;
+      results[index] = await worker(items[index]);
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
+
 async function buildMatrix(env, points) {
+  const origins = points.map((p) => `${p.lng},${p.lat}`).join("|");
+  // 并发取距离：串行 8 次太慢，整单请求可能因此超时
+  const fetched = await mapPool(points, 4, async (dest) => {
+    try {
+      const data = await amapJson(env, "/v3/distance", {
+        origins,
+        destination: `${dest.lng},${dest.lat}`,
+        type: "1",
+      });
+      return data;
+    } catch {
+      return null; // 单点失败不影响其他路段
+    }
+  });
+
   const legs = [];
-  for (const dest of points) {
-    const data = await amapJson(env, "/v3/distance", {
-      origins: points.map((p) => `${p.lng},${p.lat}`).join("|"),
-      destination: `${dest.lng},${dest.lat}`,
-      type: "1",
-    });
+  for (let index = 0; index < fetched.length; index += 1) {
+    const data = fetched[index];
+    if (!data) continue;
+    const dest = points[index];
     for (const row of data.results || []) {
       const from = points[Number(row.origin_id) - 1];
       if (!from) continue;
