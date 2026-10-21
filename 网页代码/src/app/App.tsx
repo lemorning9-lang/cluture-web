@@ -5681,6 +5681,83 @@ function askLocal(query: string): {
   };
 }
 
+/** /api/plan 的返回结构，见仓库根目录 智能体设计.md */
+interface PlanStop {
+  site: string;
+  time: string;
+  highlight: string;
+  transport: string;
+}
+
+interface PlanDay {
+  day: number;
+  title: string;
+  stops: PlanStop[];
+  tips: string;
+}
+
+interface PlanResult {
+  assumptions: string[];
+  summary: string;
+  days: PlanDay[];
+  totals: { distance_km: number; drive_hours: number };
+  cautions: string[];
+}
+
+/** 行程结果展示 */
+function PlanView({ plan }: { plan: PlanResult }) {
+  return (
+    <div className="space-y-3 text-sm text-white">
+      {plan.summary && <div className="text-primary/85">{plan.summary}</div>}
+      {plan.days.map((d) => (
+        <div key={d.day} className="border border-border/70 p-2.5 space-y-2">
+          <div className="text-primary">
+            第 {d.day} 天{d.title ? ` · ${d.title}` : ""}
+          </div>
+          {d.stops.map((stop, index) => (
+            <div key={index} className="space-y-0.5">
+              <div>
+                · {stop.site}
+                {stop.time && (
+                  <span className="text-primary/60 text-xs ml-1.5">
+                    {stop.time}
+                  </span>
+                )}
+              </div>
+              {stop.highlight && (
+                <div className="text-xs whitespace-normal">{stop.highlight}</div>
+              )}
+              {stop.transport && (
+                <div className="text-xs text-muted-foreground whitespace-normal">
+                  {stop.transport}
+                </div>
+              )}
+            </div>
+          ))}
+          {d.tips && (
+            <div className="text-xs text-muted-foreground whitespace-normal">
+              提示：{d.tips}
+            </div>
+          )}
+        </div>
+      ))}
+      <div className="text-xs text-primary/85">
+        总计约 {plan.totals.distance_km} 公里 / {plan.totals.drive_hours} 小时车程
+      </div>
+      {plan.cautions.map((c, index) => (
+        <div key={index} className="text-xs text-muted-foreground whitespace-normal">
+          · {c}
+        </div>
+      ))}
+      {plan.assumptions.length > 0 && (
+        <div className="text-xs text-muted-foreground whitespace-normal">
+          规划假设：{plan.assumptions.join("；")}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AIAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -5692,6 +5769,13 @@ function AIAssistant() {
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [mode, setMode] = useState<"chat" | "plan">("chat");
+  const [planOrigin, setPlanOrigin] = useState("");
+  const [planDays, setPlanDays] = useState(3);
+  const [prefs, setPrefs] = useState<string[]>([]);
+  const [plan, setPlan] = useState<PlanResult | null>(null);
+  const [planning, setPlanning] = useState(false);
+  const [planError, setPlanError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -5753,6 +5837,42 @@ function AIAssistant() {
       return next;
     });
     setTyping(false);
+  };
+
+  /** 行程规划：前端把 29 处遗址（含坐标）交给后端，后端用高德算真实车程 */
+  const runPlan = async () => {
+    const origin = planOrigin.trim();
+    if (!origin || planning) return;
+    setPlanning(true);
+    setPlanError("");
+    setPlan(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          origin,
+          days: planDays,
+          preferences: prefs,
+          travel: "自驾",
+          sites: SITES,
+        }),
+      });
+      if (!res.ok) {
+        const detail = await res.json().catch(() => null);
+        throw new Error(detail?.error || `HTTP ${res.status}`);
+      }
+      setPlan(await res.json());
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setPlanError(
+        /fetch|network|abort/i.test(message)
+          ? "网络受限，无法连接智能服务"
+          : message || "规划失败，请稍后重试",
+      );
+    } finally {
+      setPlanning(false);
+    }
   };
 
   const sendMessage = (text: string) => {
@@ -5837,7 +5957,96 @@ function AIAssistant() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex border-b border-border flex-shrink-0">
+            {[
+              ["chat", "知识问答"],
+              ["plan", "行程规划"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setMode(key as "chat" | "plan")}
+                className={`flex-1 py-2 text-sm transition-colors ${
+                  mode === key
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {mode === "plan" && (
+            <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+              <div className="text-muted-foreground text-sm">出发城市</div>
+              <input
+                value={planOrigin}
+                onChange={(e) => setPlanOrigin(e.target.value)}
+                placeholder="如 太原、西安、临汾"
+                className="w-full bg-transparent border border-border px-3 py-2 text-sm text-white placeholder:text-muted-foreground outline-none focus:border-primary/50"
+              />
+              <div className="text-muted-foreground text-sm">天数</div>
+              <div className="flex gap-1.5">
+                {[1, 2, 3, 5, 7].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setPlanDays(n)}
+                    className={`flex-1 py-1.5 text-sm border transition-colors ${
+                      planDays === n
+                        ? "border-primary/60 text-primary"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {n} 天
+                  </button>
+                ))}
+              </div>
+              <div className="text-muted-foreground text-sm">偏好（可选）</div>
+              <div className="flex flex-wrap gap-1.5">
+                {["黄河流域", "长江流域", "其他地区"].map((p) => (
+                  <button
+                    key={p}
+                    onClick={() =>
+                      setPrefs((prev) =>
+                        prev.includes(p)
+                          ? prev.filter((x) => x !== p)
+                          : [...prev, p],
+                      )
+                    }
+                    className={`px-2.5 py-1 text-sm border transition-colors ${
+                      prefs.includes(p)
+                        ? "border-primary/60 text-primary"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={runPlan}
+                disabled={planning || !planOrigin.trim()}
+                className="w-full py-2 bg-primary/90 text-primary-foreground text-sm hover:bg-primary disabled:opacity-40 transition-colors"
+              >
+                {planning ? "正在规划…" : "生成行程"}
+              </button>
+              {planning && (
+                <div className="text-xs text-muted-foreground">
+                  正在用高德计算真实车程，约需 10–20 秒
+                </div>
+              )}
+              {planError && (
+                <div className="text-xs text-red-300">{planError}</div>
+              )}
+              {plan && <PlanView plan={plan} />}
+            </div>
+          )}
+
+          <div
+            className={`flex-1 overflow-y-auto p-4 space-y-3 ${
+              mode === "plan" ? "hidden" : ""
+            }`}
+          >
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -5880,7 +6089,7 @@ function AIAssistant() {
             <div ref={messagesEndRef} />
           </div>
 
-          {messages.length <= 1 && (
+          {mode === "chat" && messages.length <= 1 && (
             <div className="px-4 pb-2 flex-shrink-0">
               <div className="text-muted-foreground text-sm tracking-wider mb-2">
                 快捷提问
@@ -5899,7 +6108,7 @@ function AIAssistant() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 px-4 py-3 border-t border-border flex-shrink-0">
+          <div className={`flex items-center gap-2 px-4 py-3 border-t border-border flex-shrink-0 ${mode === "plan" ? "hidden" : ""}`}>
             <input
               type="text"
               value={input}
