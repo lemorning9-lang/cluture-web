@@ -679,6 +679,126 @@ const PLAN_SITES = [
   check("定位失败返回 400", res.status === 400, `实际 ${res.status}`);
 }
 
+// ─── 13. 自由描述规划：解析意图 + 联网找周边景区 + 车程重算 ──────────────────────
+
+console.log("");
+console.log("[13] 自由描述：解析意图、联网找周边景区");
+
+{
+  const calls = installMock({
+    chat: [
+      // 1) 解析意图
+      () =>
+        chatReply({
+          origin: "太原",
+          days: 2,
+          anchor_sites: ["陶寺遗址"],
+          nearby_query: "陶寺遗址 周边 景区",
+          preferences: [],
+          travel: "自驾",
+        }),
+      // 2) 从摘要里摘出周边景点
+      () =>
+        chatReply({
+          attractions: [{ name: "壶口瀑布", note: "黄河壶口瀑布风景名胜区" }],
+        }),
+      // 3) 排行程
+      () =>
+        chatReply({
+          assumptions: ["按 2 天安排"],
+          summary: "太原出发，陶寺与壶口瀑布两日线",
+          days: [
+            {
+              day: 1,
+              title: "太原—临汾",
+              stops: [{ site: "陶寺遗址", time: "下午", highlight: "观象台与宫城", transport: "" }],
+              tips: "",
+            },
+            {
+              day: 2,
+              title: "临汾—吉县",
+              stops: [{ site: "壶口瀑布", time: "上午", highlight: "", transport: "" }],
+              tips: "",
+            },
+          ],
+          cautions: [],
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          {
+            title: "陶寺遗址周边景点推荐",
+            url: "https://example.com/nearby",
+            snippet: "陶寺遗址周边可顺道游览壶口瀑布、洪洞大槐树等",
+            rerank_score: 2.2,
+            authority: 3,
+          },
+        ]),
+    ],
+    geocode: [() => amapReply({ status: "1", geocodes: [{ location: "112.549,37.857" }] })],
+    distance: [
+      (body, url) => {
+        const origins = new URL(url).searchParams.get("origins") || "";
+        const n = origins.split("|").length;
+        return amapReply({
+          status: "1",
+          results: Array.from({ length: n }, (_, i) => ({
+            origin_id: String(i + 1),
+            dest_id: "1",
+            distance: "100000",
+            duration: "6000",
+            info: "ok",
+          })),
+        });
+      },
+    ],
+  });
+
+  const res = await worker.fetch(
+    new Request("https://example.com/api/plan", {
+      method: "POST",
+      headers: { Origin: ORIGIN, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "我下周想去陶寺遗址，顺带去周边景区看看，从太原出发，两天",
+        sites: PLAN_SITES,
+      }),
+    }),
+    { ...ENV, AMAP_WEB_KEY: "amap-test" },
+  );
+  const body = await res.json();
+
+  check("状态 200", res.status === 200, JSON.stringify(body).slice(0, 240));
+  check(
+    "三次模型调用（解析 / 摘景点 / 排行程）",
+    calls.filter((c) => c.url.includes("/chat/completions")).length === 3,
+    String(calls.filter((c) => c.url.includes("/chat/completions")).length),
+  );
+  check(
+    "用解析出的查询词联网",
+    calls.some((c) => c.url.includes("/tools/search") && /周边 景区/.test(JSON.stringify(c.body || {}))),
+  );
+  check("解析出出发地", body.resolved?.origin === "太原", JSON.stringify(body.resolved));
+  check("解析出天数", body.resolved?.days === 2, JSON.stringify(body.resolved));
+  check(
+    "锚点遗址被识别",
+    (body.resolved?.anchors || []).includes("陶寺遗址"),
+    JSON.stringify(body.resolved?.anchors),
+  );
+  check("周边景区被摘出", body.nearby?.[0]?.name === "壶口瀑布", JSON.stringify(body.nearby));
+  check(
+    "周边景区进了行程",
+    JSON.stringify(body.days || []).includes("壶口瀑布"),
+    JSON.stringify(body.days || []),
+  );
+  check("总里程按矩阵重算", body.totals?.distance_km === 200, JSON.stringify(body.totals));
+  check(
+    "提示周边景点来自联网",
+    (body.cautions || []).some((c) => /联网/.test(c)),
+    JSON.stringify(body.cautions),
+  );
+}
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);

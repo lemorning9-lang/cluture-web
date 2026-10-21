@@ -5776,6 +5776,7 @@ function AIAssistant() {
   const [plan, setPlan] = useState<PlanResult | null>(null);
   const [planning, setPlanning] = useState(false);
   const [planError, setPlanError] = useState("");
+  const [planText, setPlanText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -5840,9 +5841,8 @@ function AIAssistant() {
   };
 
   /** 行程规划：前端把 29 处遗址（含坐标）交给后端，后端用高德算真实车程 */
-  const runPlan = async () => {
-    const origin = planOrigin.trim();
-    if (!origin || planning) return;
+  const requestPlan = async (payload: Record<string, unknown>) => {
+    if (planning) return;
     setPlanning(true);
     setPlanError("");
     setPlan(null);
@@ -5850,13 +5850,7 @@ function AIAssistant() {
       const res = await fetch(`${API_BASE}/api/plan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          origin,
-          days: planDays,
-          preferences: prefs,
-          travel: "自驾",
-          sites: SITES,
-        }),
+        body: JSON.stringify({ ...payload, sites: SITES }),
       });
       if (!res.ok) {
         const detail = await res.json().catch(() => null);
@@ -5873,6 +5867,25 @@ function AIAssistant() {
     } finally {
       setPlanning(false);
     }
+  };
+
+  /** 按条件规划 */
+  const runPlan = () => {
+    const origin = planOrigin.trim();
+    if (!origin || planning) return;
+    requestPlan({ origin, days: planDays, preferences: prefs, travel: "自驾" });
+  };
+
+  /** 自由描述规划：后端会解析出出发地、天数、想去的遗址与周边景区 */
+  const runPlanFree = () => {
+    const message = planText.trim();
+    if (!message || planning) return;
+    requestPlan({
+      message,
+      days: planDays,
+      preferences: prefs,
+      travel: "自驾",
+    });
   };
 
   const sendMessage = (text: string) => {
@@ -5978,6 +5991,27 @@ function AIAssistant() {
 
           {mode === "plan" && (
             <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+              <div className="text-muted-foreground text-sm">
+                直接说你想怎么走（可跳过下面的条件）
+              </div>
+              <textarea
+                value={planText}
+                onChange={(e) => setPlanText(e.target.value)}
+                rows={3}
+                placeholder="例如：下周想去陶寺遗址，顺带去周边景区看看，从太原出发，两天"
+                className="w-full bg-transparent border border-border px-3 py-2 text-sm text-white placeholder:text-muted-foreground outline-none focus:border-primary/50 resize-none"
+              />
+              <button
+                onClick={runPlanFree}
+                disabled={planning || !planText.trim()}
+                className="w-full py-2 bg-primary/90 text-primary-foreground text-sm hover:bg-primary disabled:opacity-40 transition-colors"
+              >
+                {planning ? "正在规划…" : "按描述规划"}
+              </button>
+
+              <div className="pt-2 border-t border-border/60 text-muted-foreground text-xs">
+                或者按条件设置
+              </div>
               <div className="text-muted-foreground text-sm">出发城市</div>
               <input
                 value={planOrigin}

@@ -80,9 +80,10 @@ const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划�
 1) 用户需求：出发地 origin、天数 days、偏好 preferences、交通方式 travel
 2) 候选遗址 sites[]：每条含 name、culture、period、location、brief、straight_km（到出发地的直线距离）
 3) 距离矩阵 matrix[]：由高德接口计算，每条含 from、to、km（驾车公里）、min（驾车分钟）
+4) 可选：周边景区 nearby[]：来自联网检索，含 name、note（一句话说明）
 
 规则（必须遵守）：
-- 只能从 sites 中选择，不得推荐名单外的地点
+- 行程里的 site 只能是 sites[] 或 nearby[] 中出现过的名称，不得推荐名单外的地点
 - 距离与车程只能引用 matrix 中的数值，不得估算
 - 若所需的某段在 matrix 中找不到，transport 写「该段未获得路径规划数据」
 - 默认每天不超过 2 个遗址 + 1-2 小时车程；用户要求高强度时才放宽，并在 cautions 说明
@@ -95,6 +96,31 @@ const PLAN_SYSTEM = `你是「中华文明探源」主题旅行的行程规划�
 
 只返回 JSON，不要任何额外文字，格式：
 {"assumptions":[""],"summary":"","days":[{"day":1,"title":"","stops":[{"site":"","time":"","highlight":"","transport":""}],"tips":""}],"cautions":[""]}`;
+
+const EXTRACT_SYSTEM = `你是行程需求解析器。把用户的一句话需求解析成结构化字段。
+
+你会收到 message（用户原话）与 candidate_sites（可选的遗址名单）。
+
+只返回 JSON：
+{"origin":"","days":3,"anchor_sites":[],"nearby_query":"","preferences":[],"travel":"自驾"}
+
+规则：
+- origin：出发地。用户说「从太原出发」「我在临汾」时取该地名；完全没提就给空字符串
+- days：天数；没提就给 3
+- anchor_sites：用户明确想去的遗址，只能从 candidate_sites 里原样选；没有就给空数组
+- nearby_query：用户想顺带看周边景区时，给一条用于搜索的查询词，例如「陶寺遗址 周边 景区」；没有这个诉求就给空字符串
+- preferences：流域或主题偏好，如「黄河流域」「亲子」，没有给空数组
+- travel：交通方式，默认「自驾」
+- 不要输出 JSON 以外的任何内容`;
+
+const NEARBY_SYSTEM = `你是资料摘录员。从给定的搜索结果里挑出可以直接去的周边景区或景点。
+
+规则：
+- 只能挑搜索结果标题或摘要里明确出现过的景点，不得凭记忆补充
+- 最多 5 个，按与该遗址的相关性排序
+- 每个写一句不超过 30 字的说明，说明也要来自搜索结果
+- 与目标遗址明显无关的（例如外省的同类景点）不要
+- 只返回 JSON：{"attractions":[{"name":"","note":""}]}`;
 
 // ─── 入口 ─────────────────────────────────────────────────────────────────────
 
@@ -298,71 +324,175 @@ async function handlePlan(request, env) {
   }
 
   const body = await readJson(request);
-  const origin = String(body.origin || "").trim().slice(0, 40);
-  if (!origin) throw new ApiError("origin（出发地）不能为空", 400);
-
-  const days = clampInt(body.days, 1, MAX_PLAN_DAYS, 3);
-  const travel = String(body.travel || "自驾").slice(0, 10);
-  const preferences = Array.isArray(body.preferences)
-    ? body.preferences.map((p) => String(p).slice(0, 20)).slice(0, 5)
-    : [];
-
   const sites = normalizePlanSites(body.sites);
   if (sites.length < 4) throw new ApiError("可用候选遗址太少（至少 4 处），无法规划", 400);
 
-  // 1) 出发地转坐标
+  // 意图来源有两种：自由描述（message）优先，否则用表单字段
+  let origin = String(body.origin || "").trim().slice(0, 40);
+  let days = clampInt(body.days, 1, MAX_PLAN_DAYS, 3);
+  let preferences = Array.isArray(body.preferences)
+    ? body.preferences.map((p) => String(p).slice(0, 20)).slice(0, 5)
+    : [];
+  let travel = String(body.travel || "自驾").slice(0, 10);
+  let anchors = [];
+  let nearbyQuery = "";
+
+  const message = String(body.message || "").trim().slice(0, 300);
+  if (message) {
+    const parsed = await parsePlanMessage(env, message, sites);
+    if (parsed.origin) origin = parsed.origin;
+    if (Number.isFinite(parsed.days)) days = clampInt(parsed.days, 1, MAX_PLAN_DAYS, days);
+    if (parsed.preferences.length > 0) preferences = parsed.preferences;
+    if (parsed.travel) travel = parsed.travel;
+    anchors = parsed.anchor_sites;
+    nearbyQuery = parsed.nearby_query;
+  }
+
+  // 没说出发地就取锚点遗址所在地；再没有就只能问用户
+  if (!origin) {
+    const anchorSite = anchors.length > 0 ? sites.find((s) => s.name === anchors[0]) : null;
+    origin = anchorSite ? anchorSite.location : "";
+  }
+  if (!origin) {
+    throw new ApiError("请告诉我出发城市", 400, "例如「从太原出发」，或者直接说「想去陶寺遗址」");
+  }
+
+  // 周边景区：联网检索后，用摘要里出现过的景点名
+  const nearby = nearbyQuery ? await findNearbyAttractions(env, nearbyQuery) : [];
+
   const start = await geocode(env, origin);
   if (!start) {
     throw new ApiError(`无法定位出发地「${origin}」`, 400, "请写得更具体，例如「西安」「山西临汾」");
   }
 
-  // 2) 按距离与偏好收敛候选
-  const candidates = pickCandidates(sites, start, preferences);
+  const candidates = pickCandidates(sites, start, preferences, anchors);
+
+  // 周边景区也参与车程计算（地理编码失败的跳过）
+  const nearbyPoints = [];
+  for (const item of nearby) {
+    const loc = await geocode(env, item.name);
+    if (loc) nearbyPoints.push({ ...item, lng: loc.lng, lat: loc.lat });
+  }
+
   const points = [
     { id: "出发地", lng: start.lng, lat: start.lat },
     ...candidates.map((s) => ({ id: s.name, lng: s.lng, lat: s.lat })),
+    ...nearbyPoints.map((n) => ({ id: n.name, lng: n.lng, lat: n.lat })),
   ];
 
-  // 3) 高德算真实驾车距离矩阵（这是"距离必须有据可查"的来源）
   const matrix = await buildMatrix(env, points);
   if (matrix.length === 0) throw new ApiError("高德未能返回路径数据", 502);
 
-  // 4) 模型在真实数据上排行程
   const raw = await chatJSON(
     env,
     [
-    { role: "system", content: PLAN_SYSTEM },
-    {
-      role: "user",
-      content: JSON.stringify({
-        request: { origin, days, preferences, travel },
-        sites: candidates.map((s) => ({
-          name: s.name,
-          culture: s.culture,
-          period: s.period,
-          location: s.location,
-          brief: s.brief,
-          straight_km: Math.round(s.straight_km),
-        })),
-        matrix,
-      }),
-    },
+      { role: "system", content: PLAN_SYSTEM },
+      {
+        role: "user",
+        content: JSON.stringify({
+          request: { origin, days, preferences, travel, message: message || undefined },
+          sites: candidates.map((s) => ({
+            name: s.name,
+            culture: s.culture,
+            period: s.period,
+            location: s.location,
+            brief: s.brief,
+            straight_km: Math.round(s.straight_km),
+          })),
+          nearby: nearbyPoints.map((n) => ({ name: n.name, note: n.note })),
+          matrix,
+        }),
+      },
     ],
-    // 行程是多天多站的 JSON，输出预算要比问答大得多
     3500,
   );
 
-  // 5) 校验并重算里程：距离只认矩阵，不认模型自己写的数
-  const plan = finalizePlan(raw, candidates, matrix);
+  const allowed = new Set([
+    ...candidates.map((s) => s.name),
+    ...nearbyPoints.map((n) => n.name),
+  ]);
+  const notes = new Map(nearbyPoints.map((n) => [n.name, n.note]));
+
+  const plan = finalizePlan(raw, allowed, notes, matrix);
+  const cautions = [...plan.cautions];
+  if (nearbyPoints.length > 0) {
+    cautions.push("周边景区信息来自联网检索，开放时间与门票请以官方为准");
+  }
 
   return json(
     {
       ...plan,
-      meta: { model: CHAT_MODEL, candidates: candidates.length, legs: matrix.length },
+      cautions,
+      resolved: { origin, days, preferences, travel, anchors, nearby_query: nearbyQuery },
+      nearby: nearby.map((n) => ({ name: n.name, note: n.note })),
+      meta: {
+        model: CHAT_MODEL,
+        candidates: candidates.length,
+        nearby: nearbyPoints.length,
+        legs: matrix.length,
+      },
     },
     200,
     request.headers.get("Origin") || "",
   );
+}
+
+/** 自由描述 → 结构化需求 */
+async function parsePlanMessage(env, message, sites) {
+  const names = sites.map((s) => s.name);
+  const result = await chatJSON(
+    env,
+    [
+      { role: "system", content: EXTRACT_SYSTEM },
+      { role: "user", content: JSON.stringify({ message, candidate_sites: names }) },
+    ],
+    600,
+  );
+
+  const picks = Array.isArray(result?.anchor_sites) ? result.anchor_sites : [];
+  return {
+    origin: String(result?.origin || "").trim().slice(0, 40),
+    days: Number(result?.days),
+    anchor_sites: picks
+      .map((n) => String(n || "").trim())
+      .filter((n) => names.includes(n))
+      .slice(0, 3),
+    nearby_query: String(result?.nearby_query || "").trim().slice(0, 60),
+    preferences: Array.isArray(result?.preferences)
+      ? result.preferences.map((p) => String(p).slice(0, 20)).slice(0, 4)
+      : [],
+    travel: String(result?.travel || "").slice(0, 10),
+  };
+}
+
+/** 联网检索 → 从摘要里摘出具体景点（不凭记忆补充） */
+async function findNearbyAttractions(env, query) {
+  const results = await searchWeb(env, query);
+  if (results.length === 0) return [];
+
+  const parsed = await chatJSON(
+    env,
+    [
+      { role: "system", content: NEARBY_SYSTEM },
+      {
+        role: "user",
+        content: JSON.stringify({
+          query,
+          results: results.map((r) => ({ title: r.title, snippet: r.snippet })),
+        }),
+      },
+    ],
+    600,
+  );
+
+  const list = Array.isArray(parsed?.attractions) ? parsed.attractions : [];
+  return list
+    .map((a) => ({
+      name: String(a?.name || "").trim().slice(0, 30),
+      note: String(a?.note || "").trim().slice(0, 60),
+    }))
+    .filter((a) => a.name)
+    .slice(0, 5);
 }
 
 function clampInt(value, min, max, fallback) {
@@ -399,19 +529,28 @@ function haversineKm(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-/** 先按偏好筛流域，再按直线距离取最近的一批，控制高德调用次数 */
-function pickCandidates(sites, start, preferences) {
-  const pref = preferences.join(" ");
+/** 先按偏好筛流域，再取最近的若干处；用户点名的遗址一定进候选 */
+function pickCandidates(sites, start, preferences, anchors) {
+  const anchorSet = new Set(anchors || []);
+  const pref = (preferences || []).join(" ");
   let pool = sites;
   if (/黄河/.test(pref)) pool = sites.filter((s) => s.domain === "黄河");
   else if (/长江/.test(pref)) pool = sites.filter((s) => s.domain === "长江");
   else if (/其他|三星堆|辽河|牛河梁/.test(pref)) pool = sites.filter((s) => s.domain === "其他");
   if (pool.length < 4) pool = sites;
 
-  return pool
+  const picked = new Map();
+  for (const s of sites) {
+    if (anchorSet.has(s.name)) picked.set(s.name, { ...s, straight_km: haversineKm(start, s) });
+  }
+  const scored = pool
     .map((s) => ({ ...s, straight_km: haversineKm(start, s) }))
-    .sort((a, b) => a.straight_km - b.straight_km)
-    .slice(0, MAX_CANDIDATES);
+    .sort((a, b) => a.straight_km - b.straight_km);
+  for (const s of scored) {
+    if (picked.size >= MAX_CANDIDATES) break;
+    if (!picked.has(s.name)) picked.set(s.name, s);
+  }
+  return Array.from(picked.values());
 }
 
 async function amapJson(env, path, params) {
@@ -444,7 +583,7 @@ async function geocode(env, address) {
   return { lng, lat };
 }
 
-/** 对每个目的地点调用一次距离测量，1 次请求拿回所有起点到它的驾车距离 */
+/** 对每个目的地点调用一次距离测量，一次请求拿回所有起点到它的驾车距离 */
 async function buildMatrix(env, points) {
   const legs = [];
   for (const dest of points) {
@@ -470,9 +609,8 @@ async function buildMatrix(env, points) {
   return legs;
 }
 
-/** 只保留候选内的遗址；车程与总里程一律按矩阵重算，模型给的数值不采信 */
-function finalizePlan(raw, candidates, matrix) {
-  const byName = new Map(candidates.map((s) => [s.name, s]));
+/** 只保留名单内的地点；车程与总里程一律按矩阵重算，模型给的数值不采信 */
+function finalizePlan(raw, allowed, notes, matrix) {
   const legIndex = new Map(matrix.map((l) => [`${l.from}→${l.to}`, l]));
 
   const cautions = Array.isArray(raw?.cautions)
@@ -491,29 +629,30 @@ function finalizePlan(raw, candidates, matrix) {
   for (const day of Array.isArray(raw?.days) ? raw.days : []) {
     const stops = [];
     for (const stop of Array.isArray(day?.stops) ? day.stops : []) {
-      const site = byName.get(String(stop?.site || "").trim());
-      if (!site) continue; // 模型编造的地点直接丢弃
+      const name = String(stop?.site || "").trim();
+      if (!allowed.has(name)) continue; // 编造或不在候选内的地点直接丢弃
 
-      const leg = legIndex.get(`${cursor}→${site.name}`);
+      const leg = legIndex.get(`${cursor}→${name}`);
+      const highlight = String(stop?.highlight || notes.get(name) || "").slice(0, 120);
       if (leg) {
         totalKm += leg.km;
         totalMin += leg.min;
         stops.push({
-          site: site.name,
+          site: name,
           time: String(stop?.time || "").slice(0, 30),
-          highlight: String(stop?.highlight || "").slice(0, 120),
-          transport: `${cursor} → ${site.name}：驾车 ${leg.km} 公里 / 约 ${leg.min} 分钟`,
+          highlight,
+          transport: `${cursor} → ${name}：驾车 ${leg.km} 公里 / 约 ${leg.min} 分钟`,
         });
       } else {
         missing += 1;
         stops.push({
-          site: site.name,
+          site: name,
           time: String(stop?.time || "").slice(0, 30),
-          highlight: String(stop?.highlight || "").slice(0, 120),
-          transport: `${cursor} → ${site.name}：该段未获得路径规划数据`,
+          highlight,
+          transport: `${cursor} → ${name}：该段未获得路径规划数据`,
         });
       }
-      cursor = site.name;
+      cursor = name;
     }
     if (stops.length > 0) {
       outDays.push({
