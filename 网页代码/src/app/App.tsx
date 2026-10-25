@@ -5777,7 +5777,7 @@ function AIAssistant() {
     {
       role: "ai",
       content:
-        "您好，我是探源AI导游。我可以为您介绍中华文明探源工程的29处核心遗址，解答文化问题，或为您规划定制行程。",
+        "您好，我是寻迹AI导游。我可以为您介绍中华文明探源工程的29处核心遗址，解答文化问题，或为您规划定制行程。",
     },
   ]);
   const [input, setInput] = useState("");
@@ -5981,7 +5981,7 @@ function AIAssistant() {
             </div>
             <div>
               <div className="text-foreground text-base tracking-wide">
-                探源AI导游
+                寻迹AI导游
               </div>
             </div>
             <div className="ml-auto flex items-center gap-1.5">
@@ -5994,7 +5994,7 @@ function AIAssistant() {
 
           <div className="flex border-b border-border flex-shrink-0">
             {[
-              ["chat", "知识问答"],
+              ["chat", "遗址探源"],
               ["plan", "行程规划"],
             ].map(([key, label]) => (
               <button
