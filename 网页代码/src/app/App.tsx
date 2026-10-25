@@ -210,7 +210,7 @@ interface ChatMessage {
   typing?: boolean;
   /** 回答出处：local=本地资料库命中，web=联网检索，pending=本地未命中且联网失败 */
   origin?: "local" | "web" | "pending";
-  /** 出处详情，渲染在气泡内，如 "来自本地资料库 · 遗址档案 · 良渚古城遗址" */
+  /** 出处详情，渲染在气泡内，如 "来自本地资料库 · 遗址档案 · 良渚遗址" */
   citation?: string;
   /** 结构化出处：本地条目与联网来源分开渲染 */
   refs?: { kind: "local" | "web"; label: string; url?: string }[];
@@ -1674,7 +1674,7 @@ function CinematicPrologue({
               {
                 era: "文明转型",
                 title: "王朝建立",
-                text: "二里头，三星堆、殷墟等遗址出土了青铜礼器、甲骨文使商代成为信史，王朝开始建立。",
+                text: "二里头、三星堆、殷墟等遗址出土了青铜礼器、甲骨文使商代成为信史，王朝开始建立。",
               },
             ].map((card) => (
               <div

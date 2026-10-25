@@ -30,27 +30,106 @@ SECTION_SUFFIX = "相关学习资料"
 OVERVIEW_HEADER = "遗址"
 
 _STRIP_CHARS = re.compile(r"[\s（）()、，,·—\-－:：]")
-_SITE_SUFFIX = re.compile(r"(遗址群|古城遗址|遗址|城址|古城|墓地|遗迹)$")
+
+# ── 遗址名称规范（来源：仓库根目录《遗址名称+时间轴.docx》）─────────────────
+# 资料库 docx / 图片目录名 / 视频链接小节标题存在多种写法
+# （如「铸鼎塬」「石家河古城遗址」「偃师二里头」「良渚」），
+# 一律归一到下列 29 个规范名，保证 AI 检索与出处标注和站内 SITES 一致。
+
+CANONICAL_SITES = [
+    "铸鼎原遗址群", "城头山遗址", "东山村遗址",
+    "双槐树遗址", "大地湾遗址", "南佐遗址", "大汶口文化遗址", "焦家遗址", "岗上遗址",
+    "牛河梁遗址", "鸡叫城遗址", "城河遗址", "黄山遗址", "凌家滩遗址",
+    "赵陵山遗址", "草鞋山遗址", "良渚遗址", "石家河遗址", "宝墩遗址",
+    "城子崖遗址", "陶寺遗址", "石峁遗址", "碧村遗址", "柳湾遗址",
+    "二里头遗址", "郑州商城遗址", "殷墟遗址", "三星堆遗址", "新干遗址群",
+]
+_CANONICAL_SET = set(CANONICAL_SITES)
+
+# 核心词（去掉地名前缀与「遗址/城址/古城」等后缀后的专名）→ 规范名
+_SITE_CORES = {
+    "铸鼎原": "铸鼎原遗址群", "铸鼎塬": "铸鼎原遗址群",
+    "城头山": "城头山遗址", "东山村": "东山村遗址", "鸡叫城": "鸡叫城遗址",
+    "城河": "城河遗址", "黄山": "黄山遗址", "凌家滩": "凌家滩遗址",
+    "赵陵山": "赵陵山遗址", "草鞋山": "草鞋山遗址", "良渚": "良渚遗址",
+    "石家河": "石家河遗址", "宝墩": "宝墩遗址", "双槐树": "双槐树遗址",
+    "大地湾": "大地湾遗址", "南佐": "南佐遗址", "大汶口": "大汶口文化遗址",
+    "焦家": "焦家遗址", "岗上": "岗上遗址", "城子崖": "城子崖遗址",
+    "陶寺": "陶寺遗址", "石峁": "石峁遗址", "碧村": "碧村遗址", "柳湾": "柳湾遗址",
+    "二里头": "二里头遗址", "郑州商城": "郑州商城遗址", "殷墟": "殷墟遗址",
+    "三星堆": "三星堆遗址", "新干": "新干遗址群", "牛河梁": "牛河梁遗址",
+}
+
+# 资料里出现过的地名前缀，长词在前（避免「郑州商城」被「郑州」误剥）
+_LOCATION_PREFIXES = [
+    "河南灵宝", "湖南澧县", "江苏张家港", "河南巩义", "甘肃庆阳", "甘肃秦安",
+    "山东泰安", "山东章丘", "山东济南", "山东滕州", "辽宁朝阳", "湖北沙洋",
+    "河南南阳", "安徽含山", "江苏昆山", "江苏苏州", "浙江余杭", "湖北天门",
+    "四川成都", "山西临汾", "陕西神木", "山西兴县", "青海乐都", "河南偃师",
+    "河南郑州", "河南安阳", "四川广汉", "江西新干",
+    "河南", "湖南", "江苏", "甘肃", "庆阳", "山东", "山西", "陕西", "青海",
+    "辽宁", "湖北", "安徽", "浙江", "四川", "江西", "偃师", "安阳", "广汉",
+]
 
 
 def normalize(text):
     return _STRIP_CHARS.sub("", text)
 
 
-def site_aliases(name):
-    """遗址名及其可安全简写的形式（如「城头山遗址」→「城头山」）。"""
-    out = {name}
-    short = _SITE_SUFFIX.sub("", name)
-    if short and len(short) >= 2 and short != name:
-        out.add(short)
-    return out
+def _strip_site_suffixes(name):
+    """反复剥掉结尾的「遗址群/文化遗址/遗址/城址/古城」等后缀。"""
+    prev = None
+    while prev != name:
+        prev = name
+        name = re.sub(r"(遗址群|文化遗址|遗址|城址|古城|墓地|遗迹)$", "", name)
+    return name
+
+
+def _resolve(name):
+    """单个候选串 → 规范名；不成则 None。"""
+    if name in _CANONICAL_SET:
+        return name
+    if name in _SITE_CORES:
+        return _SITE_CORES[name]
+    core = _strip_site_suffixes(name)
+    if core in _SITE_CORES:
+        return _SITE_CORES[core]
+    if core in _CANONICAL_SET:
+        return core
+    return None
+
+
+def canonical_site(raw, quiet=False):
+    """把各种写法归一成规范遗址名；归一失败时原样返回并在 stderr 告警。
+
+    顺序：原串 → 去后缀 → 剥一个地名前缀再试。
+    前缀逐个独立尝试（不叠加修改），这样「江西新干遗址」既能命中
+    前缀「江西」得到「新干遗址」，也不会被「江西新干」剥得只剩「遗址」。
+    """
+    name = re.sub(r"（[^）]*）", "", str(raw or "")).strip()
+    name = re.sub(r"\s+", "", name)
+    if not name:
+        return str(raw or "").strip()
+
+    hit = _resolve(name)
+    if hit:
+        return hit
+    for prefix in _LOCATION_PREFIXES:
+        if name.startswith(prefix) and len(name) > len(prefix):
+            hit = _resolve(name[len(prefix):])
+            if hit:
+                return hit
+
+    if not quiet:
+        print(f"  ! 未能归一遗址名：{raw!r}", file=sys.stderr)
+    return str(raw or "").strip()
 
 
 def clean_site(raw):
-    """目录名 → 遗址名：去掉前导序号与结尾的「图片」。"""
+    """目录名 → 遗址名：去掉前导序号与结尾的「图片」，再归一到规范名。"""
     name = re.sub(r"^\d+", "", raw)
     name = re.sub(r"(相关图片|图片)$", "", name)
-    return name.strip()
+    return canonical_site(name)
 
 
 def docx_tables(path):
@@ -90,7 +169,7 @@ def parse_overview(table, region, site_names):
         if row[0] in (OVERVIEW_HEADER, "") or len(row) < 3:
             continue
         cells = row + [""] * (4 - len(row))
-        name = cells[0].strip()
+        name = canonical_site(cells[0])
         out.append(
             {
                 "region": region,
@@ -100,7 +179,7 @@ def parse_overview(table, region, site_names):
                 "relation": cells[3],
             }
         )
-        site_names.update(site_aliases(name))
+        site_names.add(name)
     return out
 
 
@@ -123,12 +202,9 @@ def collect_dossiers(tables, region, site_names):
             if label == SITE_HEADER_FIELD:
                 if current and current["fields"]:
                     dossiers.append(current)
-                name = re.split(r"[，,]", value)[0].strip()
+                name = canonical_site(re.split(r"[，,]", value)[0])
                 current = {"region": region, "name": name, "fields": []}
-                site_names.update(site_aliases(name))
-                for alias in re.split(r"[，,、]", value):
-                    if len(alias.strip()) >= 3:
-                        site_names.add(alias.strip())
+                site_names.add(name)
                 continue
             if current is not None:
                 current["fields"].append({"label": label, "value": value})
@@ -140,41 +216,71 @@ def collect_dossiers(tables, region, site_names):
 def match_site_header(line, site_names):
     """把小节标题匹配到规范遗址名；不是小节标题就返回 None。
 
-    小节标题长这样：「8. 陶寺遗址相关学习资料」「双槐树遗址 相关学习资料」。
-    只认去序号、去固定后缀后的完全匹配——放宽成前缀匹配会把
+    小节标题长这样：「8. 陶寺遗址相关学习资料」「双槐树遗址 相关学习资料」
+    「9. 石峁遗址、相关学习资料」。先去序号与固定后缀，再归一到规范名。
+    只认归一后的完全匹配——放宽成前缀匹配会把
     「牛河梁女神庙」这类标题也当成小节标题，反而更糟。
     """
     text = re.sub(r"^\s*\d+\s*[.、)）]?\s*", "", line).strip()
-    norm = normalize(text)
-    if norm.endswith(SECTION_SUFFIX):
-        norm = norm[: -len(SECTION_SUFFIX)]
-    if len(norm) < 2:
+    # 两种文档的小节后缀不同：黄河/其他用「相关学习资料」，长江用「视频资料」
+    text = re.sub(r"[、,，\s]*(相关学习资料|视频资料|学习资料)$", "", text).strip()
+    text = re.sub(r"[、,，\s]+$", "", text)
+    if len(text) < 2:
         return None
-    for name in site_names:
-        if norm == normalize(name):
-            return name
+    # quiet：视频标题等普通行也会走到这里，不匹配是常态，不该刷告警
+    matched = canonical_site(text, quiet=True)
+    if matched in site_names:
+        return matched
     return None
 
 
+_URL_RE = re.compile(r"https?://\S+")
+_TITLE_NUM = re.compile(r"^\s*\d+\s*[.、)）]?\s*")
+
+
 def parse_links(loose, region, site_names):
-    """视频链接文档是「遗址名 / 标题 / 链接」的循环，标题偶尔没有配套链接。"""
+    """链接文档解析。
+
+    两种排布都要支持：
+    · 独立行链接：标题行 + 整行以 http 开头的 URL（黄河/其他文档）
+    · 行内链接：URL 嵌在标题末尾，如「1. 《中国考古大会》http://…」（长江文档）
+    「可用内容：…」行是上一条链接的内容说明，并入标题以提升检索命中。
+    """
     links = []
     site = ""
     title = ""
+
+    def emit(url, t):
+        url = url.rstrip("。，、；）)")
+        t = _TITLE_NUM.sub("", (t or "").strip()).strip()
+        if t and site and url:
+            links.append(
+                {"region": region, "site": site, "title": t, "url": url}
+            )
+
     for line in loose:
-        if line.startswith("http"):
-            if title:
-                links.append(
-                    {"region": region, "site": site, "title": title, "url": line}
-                )
+        urls = _URL_RE.findall(line)
+        if urls:
+            for url in urls:
+                head = line[: line.find(url)]
+                emit(url, head if head.strip() else title)
             title = ""
             continue
+
+        if line.startswith("可用内容"):
+            desc = re.split(r"[：:]", line, 1)[-1].strip()
+            if links and links[-1]["site"] == site and desc:
+                links[-1]["title"] += f"（{desc}）"
+            continue
+
         matched = match_site_header(line, site_names)
         if matched:
             site = matched
             title = ""
             continue
+
         title = line
+
     return links
 
 
@@ -186,7 +292,7 @@ def main():
     overview = []
     dossiers = []
     links = []
-    site_names = set()
+    site_names = set(CANONICAL_SITES)
     intro_docs = []
     link_docs = []
 
@@ -210,7 +316,7 @@ def main():
 
     # 先把图片目录名收作遗址名，供档案/链接里的简称对齐
     for img in images:
-        site_names.update(site_aliases(img["site"]))
+        site_names.add(img["site"])
 
     for region, path, filename in intro_docs:
         try:
