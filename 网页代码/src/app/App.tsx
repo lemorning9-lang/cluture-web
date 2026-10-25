@@ -2518,8 +2518,7 @@ function ModuleTimeSpace() {
   const amapRef = useRef<any>(null);
   const [amapReady, setAmapReady] = useState(false);
 
-  // 地图标记筛选匹配（M3 修订）：地图始终显示全部 29 处标记，
-  // 筛选时非匹配标记变淡、匹配标记突出，而非移除。
+  // 地图标记筛选匹配：有筛选时地图只显示匹配的遗址标记。
   const siteMatchesFilter = (s: Site) =>
     (timePeriod === "全部" || s.period === timePeriod) &&
     (domain === "全部" ||
@@ -2529,6 +2528,25 @@ function ModuleTimeSpace() {
 
   const filtered = SITES.filter(siteMatchesFilter);
 
+  // 统一的遗址标记构造：初始化 / 筛选重建 / 精选定位三处共用同一样式与点击行为
+  const makeSiteMarker = (site: Site) => {
+    const Win = window as any;
+    const marker = new Win.AMap.Marker({
+      position: [site.lng, site.lat],
+      title: site.name,
+      label: {
+        content:
+          '<div style="color:#c9a227;font-size:10px;font-weight:bold;text-shadow:0 0 6px rgba(200,150,64,0.6)">◆</div>',
+        offset: new Win.AMap.Pixel(0, -8),
+      },
+    });
+    marker.on("click", () => {
+      setSelectedSite(site);
+      setDrawerTab("介绍");
+    });
+    return marker;
+  };
+
   // 精选遗址点击：地图居中定位到该遗址，标记短暂弹跳高亮（真实地图）
   const focusMapOnSite = (site: Site) => {
     const Win = window as any;
@@ -2536,7 +2554,13 @@ function ModuleTimeSpace() {
       const map = amapRef.current;
       map.setCenter([site.lng, site.lat]);
       if (map.getZoom() < 9) map.setZoom(9);
-      const m = markersRef.current.get(site.id);
+      let m = markersRef.current.get(site.id);
+      if (!m) {
+        // 遗址被当前筛选隐藏时临时补上标记，下次筛选变化会随 clearMap 一并清除
+        m = makeSiteMarker(site);
+        map.add(m);
+        markersRef.current.set(site.id, m);
+      }
       if (m?.setAnimation) {
         m.setAnimation("AMAP_ANIMATION_BOUNCE");
         if (highlightTimerRef.current) {
@@ -2570,19 +2594,8 @@ function ModuleTimeSpace() {
 
       const markers: any[] = [];
       SITES.forEach((site) => {
-        const marker = new Win.AMap.Marker({
-          position: [site.lng, site.lat],
-          title: site.name,
-          label: {
-            content:
-              '<div style="color:#c9a227;font-size:10px;font-weight:bold;text-shadow:0 0 6px rgba(200,150,64,0.6)">◆</div>',
-            offset: new Win.AMap.Pixel(0, -8),
-          },
-        });
-        marker.on("click", () => {
-          setSelectedSite(site);
-          setDrawerTab("介绍");
-        });
+        const marker = makeSiteMarker(site);
+        markersRef.current.set(site.id, marker);
         markers.push(marker);
       });
       map.add(markers);
@@ -2621,57 +2634,44 @@ function ModuleTimeSpace() {
     };
   }, []);
 
-  // ─── 筛选变化时更新地图标记（M3 修订：29 处全部常显） ────────────
-  // 筛选不再移除标记：非匹配标记透明度降至 0.25，匹配标记满透明度并
-  // 飞行定位 + 短暂弹跳高亮。标记点击始终为「打开抽屉」。
+  // ─── 筛选变化时更新地图标记：只显示匹配的遗址 ────────────────────
+  // 有筛选时仅添加匹配标记并飞行定位 + 弹跳高亮；回到「全部」时恢复
+  // 全部 29 处并复位全图视野。标记点击为「打开抽屉」。
   useEffect(() => {
     if (!amapRef.current || !(window as any).AMap) return;
     const map = amapRef.current;
     map.clearMap();
 
+    const hasFilter = timePeriod !== "全部" || domain !== "全部";
     const markers: any[] = [];
-    const matching: any[] = [];
     markersRef.current = new Map();
     SITES.forEach((site) => {
-      const marker = new (window as any).AMap.Marker({
-        position: [site.lng, site.lat],
-        title: site.name,
-        label: {
-          content:
-            '<div style="color:#c9a227;font-size:10px;font-weight:bold;text-shadow:0 0 6px rgba(200,150,64,0.6)">◆</div>',
-          offset: new (window as any).AMap.Pixel(0, -8),
-        },
-      });
-      marker.on("click", () => {
-        setSelectedSite(site);
-        setDrawerTab("介绍");
-      });
+      if (hasFilter && !siteMatchesFilter(site)) return;
+      const marker = makeSiteMarker(site);
       markersRef.current.set(site.id, marker);
-      if (siteMatchesFilter(site)) {
-        matching.push(marker);
-      } else {
-        marker.setOpacity?.(0.25);
-      }
       markers.push(marker);
     });
     map.add(markers);
 
-    const hasFilter = timePeriod !== "全部" || domain !== "全部";
-    if (hasFilter && matching.length > 0) {
-      map.setFitView(matching, false, [80, 80, 80, 80]);
-      matching.forEach((m) =>
-        m.setAnimation?.("AMAP_ANIMATION_BOUNCE"),
-      );
-      if (highlightTimerRef.current) {
-        window.clearTimeout(highlightTimerRef.current);
-      }
-      highlightTimerRef.current = window.setTimeout(() => {
-        matching.forEach((m) =>
-          m.setAnimation?.("AMAP_ANIMATION_NONE"),
+    if (markers.length > 0) {
+      if (hasFilter) {
+        map.setFitView(markers, false, [80, 80, 80, 80]);
+        markers.forEach((m) =>
+          m.setAnimation?.("AMAP_ANIMATION_BOUNCE"),
         );
-      }, 2200);
+        if (highlightTimerRef.current) {
+          window.clearTimeout(highlightTimerRef.current);
+        }
+        highlightTimerRef.current = window.setTimeout(() => {
+          markers.forEach((m) =>
+            m.setAnimation?.("AMAP_ANIMATION_NONE"),
+          );
+        }, 2200);
+      } else {
+        map.setFitView(null, false, [60, 60, 60, 60]);
+      }
     }
-  }, [timePeriod, domain]);
+  }, [timePeriod, domain, amapReady]);
 
   return (
     <div className="min-h-screen">
@@ -2753,9 +2753,8 @@ function ModuleTimeSpace() {
                   </span>
                 </div>
 
-                {/* Markers */}
-                {SITES.map((site) => {
-                  const isMatch = siteMatchesFilter(site);
+                {/* Markers（有筛选时只渲染匹配遗址） */}
+                {filtered.map((site) => {
                   return (
                   <button
                     key={site.id}
@@ -2771,7 +2770,7 @@ function ModuleTimeSpace() {
                     title={site.name}
                   >
                     <div
-                      className={`relative transition-all duration-200 ${selectedSite?.id === site.id ? "scale-150" : isMatch ? "hover:scale-125" : "scale-75 opacity-30 hover:opacity-80"}`}
+                      className={`relative transition-all duration-200 ${selectedSite?.id === site.id ? "scale-150" : "hover:scale-125"}`}
                     >
                       {site.status === "实地打卡" && (
                         <>
@@ -2803,6 +2802,16 @@ function ModuleTimeSpace() {
                   })}
               </>
             )}
+
+            {/* 筛选无结果提示 */}
+            {(timePeriod !== "全部" || domain !== "全部") &&
+              filtered.length === 0 && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                  <span className="text-primary/60 text-sm tracking-[0.3em]">
+                    当前筛选暂无匹配遗址
+                  </span>
+                </div>
+              )}
 
             {/* Legend */}
             <div className="absolute bottom-3 left-3 z-10 bg-background/85 backdrop-blur-sm border border-border p-3 space-y-1.5">
