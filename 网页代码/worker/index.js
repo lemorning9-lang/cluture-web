@@ -55,8 +55,8 @@ const CHAT_SYSTEM = `你是「寻迹AI导游」的资料助理，服务于「中
   优先从 evidence 的「核心表达 / 探源工程」综述或「价值意义 / 工程地位」类字段概括，写进 local_answer；
   本地没有时依据 web 写进 web_answer；两边都没有就不补，不得编造
 - 联网结果带 level 字段（官方 / 学术 / 权威媒体 / 其他 / 百科 / 自媒体）：
-  同等相关时优先采用官方、学术与权威媒体；只有在权威来源未覆盖时才引用百科或自媒体，
-  且不把它们作为唯一依据
+  同等相关时优先采用官方、学术与权威媒体；若本次只提供了低档来源（说明缺权威材料），
+  可以引用，但措辞要审慎，不要下定论
 - 不得编造链接
 - 两段都要分点：每项单独一行、以「· 」开头；即使只有一条也用分点，保持格式统一
 - 每段分点控制在 6 条以内；同类内容合并成一条（多个景点、多个器物并列时用「、」连接），
@@ -971,8 +971,6 @@ const TRUST_RULES = [
 ];
 
 const MAX_WEB_RESULTS = 6;
-// 权威来源充足时，百科/自媒体最多占这么多条，其余名额留给权威来源
-const MAX_LOW_TIER = 2;
 
 function hostOf(url) {
   try {
@@ -1005,13 +1003,10 @@ function orderByTier(items) {
       Number(b.authority ?? 0) - Number(a.authority ?? 0) ||
       Number(b.relevance ?? 0) - Number(a.relevance ?? 0),
   );
+  // 只要存在官方/学术/权威媒体，就只用这些：其他/百科/自媒体一条都不交给模型，
+  // 避免模型顺手引用低权威内容。权威来源一条都没有时，才整体退回低档来源。
   const authoritative = sorted.filter((r) => r.levelRank >= SOURCE_TIERS.media.rank);
-  const lowTier = sorted.filter((r) => r.levelRank < SOURCE_TIERS.media.rank);
-  // 权威来源不足 3 条时不砍低档，否则可能一条都不剩
-  const picked =
-    authoritative.length >= 3
-      ? [...authoritative, ...lowTier.slice(0, MAX_LOW_TIER)]
-      : sorted;
+  const picked = authoritative.length > 0 ? authoritative : sorted;
   return picked.slice(0, MAX_WEB_RESULTS);
 }
 

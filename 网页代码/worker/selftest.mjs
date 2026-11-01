@@ -942,14 +942,14 @@ console.log("\n[15] 联网来源分级：官方/学术优先，百科与自媒�
 
   check("官方来源排第一", web[0]?.levelLabel === "官方", JSON.stringify(web[0]));
   check(
-    "域名白名单命中：gov.cn、cctv.com、自媒体域名",
+    "域名白名单命中：gov.cn、cctv.com",
     web.some((w) => w.levelLabel === "权威媒体") &&
       web.filter((w) => w.levelLabel === "官方").length === 2,
     JSON.stringify(web.map((w) => w.levelLabel)),
   );
   check(
-    "自媒体被降权但仍保留标注",
-    web[web.length - 1]?.levelLabel === "自媒体",
+    "有权威来源时自媒体被整条剔除（不显示也不交给模型）",
+    web.length === 3 && !web.some((w) => w.levelLabel === "自媒体"),
     JSON.stringify(web.map((w) => w.levelLabel)),
   );
   check(
@@ -998,19 +998,19 @@ console.log("\n[15] 联网来源分级：官方/学术优先，百科与自媒�
   const res = await postChat({ question: "良渚古城的水利系统", evidence: [] });
   const body = await res.json();
   const web = body.web || [];
-  const low = web.filter((w) => w.levelLabel === "百科" || w.levelLabel === "自媒体");
+  const low = web.filter((w) => ["百科", "自媒体", "其他"].includes(w.levelLabel));
 
-  check("权威来源优先占满名额", web.length === 6, String(web.length));
-  check("百科/自媒体最多 2 条", low.length <= 2, JSON.stringify(web.map((w) => w.levelLabel)));
+  check("只输出权威档来源", web.length === 5, String(web.length));
+  check("百科/自媒体/其他全部不显示", low.length === 0, JSON.stringify(web.map((w) => w.levelLabel)));
   check(
-    "前五条都是官方/学术/权威媒体",
-    web.slice(0, 5).every((w) => ["官方", "学术", "权威媒体"].includes(w.levelLabel)),
+    "五条都是官方/学术/权威媒体",
+    web.every((w) => ["官方", "学术", "权威媒体"].includes(w.levelLabel)),
     JSON.stringify(web.map((w) => w.levelLabel)),
   );
 }
 
 {
-  // 权威来源不足 3 条时不砍低档，否则可能一条都不剩；
+  // 一条权威来源都没有时才退回低档来源；
   // 顺带验证「百科」与「自媒体」两档都能识别
   installMock({
     chat: [
@@ -1046,7 +1046,7 @@ console.log("\n[15] 联网来源分级：官方/学术优先，百科与自媒�
   const body = await res.json();
   const labels = (body.web || []).map((w) => w.levelLabel);
 
-  check("无权威来源时低档不被清空", labels.length === 4, JSON.stringify(labels));
+  check("无权威来源时退回低档来源", labels.length === 4, JSON.stringify(labels));
   check(
     "百科与自媒体两档都识别",
     labels.includes("百科") && labels.includes("自媒体"),
