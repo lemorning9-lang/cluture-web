@@ -900,6 +900,160 @@ globalThis.caches = {
 
 delete globalThis.caches;
 
+// ─── 15. 联网来源分级（仅遗址探源） ────────────────────────────────────────────
+
+console.log("\n[15] 联网来源分级：官方/学术优先，百科与自媒体降权并标注");
+
+{
+  installMock({
+    chat: [
+      () =>
+        chatReply({
+          local_answer: "",
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [],
+          note: null,
+        }),
+      () =>
+        chatReply({
+          local_answer: "据官方与考古简报整理。",
+          confidence: "medium",
+          usedLocal: [],
+          usedWeb: [0, 1, 2, 3],
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          // 自媒体但 authority 更高，仍应排到官方之后
+          { title: "自媒体解读", url: "https://www.toutiao.com/a1", snippet: "s", rerank_score: 2.4, authority: 4 },
+          { title: "国家文物局发布", url: "https://www.ncha.gov.cn/art/1.html", snippet: "s", rerank_score: 2.0, authority: 2 },
+          { title: "考古所简报", url: "https://kaogu.cssn.cn/x.html", snippet: "s", rerank_score: 1.9, authority: 2 },
+          { title: "央视报道", url: "https://tv.cctv.com/1.html", snippet: "s", rerank_score: 1.8, authority: 2 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({ question: "陶寺遗址有哪些新发现", evidence: [] });
+  const body = await res.json();
+  const web = body.web || [];
+
+  check("官方来源排第一", web[0]?.levelLabel === "官方", JSON.stringify(web[0]));
+  check(
+    "域名白名单命中：gov.cn、cctv.com、自媒体域名",
+    web.some((w) => w.levelLabel === "权威媒体") &&
+      web.filter((w) => w.levelLabel === "官方").length === 2,
+    JSON.stringify(web.map((w) => w.levelLabel)),
+  );
+  check(
+    "自媒体被降权但仍保留标注",
+    web[web.length - 1]?.levelLabel === "自媒体",
+    JSON.stringify(web.map((w) => w.levelLabel)),
+  );
+  check(
+    "每条联网来源都带档位",
+    web.length > 0 && web.every((w) => !!w.levelLabel),
+    JSON.stringify(web.map((w) => w.level)),
+  );
+}
+
+{
+  installMock({
+    chat: [
+      () =>
+        chatReply({
+          local_answer: "",
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [],
+          note: null,
+        }),
+      () =>
+        chatReply({
+          local_answer: "综合多方资料。",
+          confidence: "medium",
+          usedLocal: [],
+          usedWeb: [0, 1, 2, 3, 4, 5],
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "文物局通稿", url: "https://www.gov.cn/a", snippet: "s", rerank_score: 2, authority: 3 },
+          { title: "社科院论文", url: "https://www.cssn.cn/b", snippet: "s", rerank_score: 2, authority: 3 },
+          { title: "考古网", url: "https://www.kaogu.cn/c", snippet: "s", rerank_score: 2, authority: 3 },
+          { title: "求是文章", url: "https://www.qstheory.cn/d", snippet: "s", rerank_score: 2, authority: 3 },
+          { title: "学习强国", url: "https://www.xuexi.cn/e", snippet: "s", rerank_score: 2, authority: 3 },
+          { title: "百度百科", url: "https://baike.baidu.com/item/1", snippet: "s", rerank_score: 2, authority: 4 },
+          { title: "知乎回答", url: "https://www.zhihu.com/question/1", snippet: "s", rerank_score: 2, authority: 4 },
+          { title: "百家号", url: "https://baijiahao.baidu.com/s?id=1", snippet: "s", rerank_score: 2, authority: 4 },
+          { title: "小红书笔记", url: "https://www.xiaohongshu.com/x", snippet: "s", rerank_score: 2, authority: 4 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({ question: "良渚古城的水利系统", evidence: [] });
+  const body = await res.json();
+  const web = body.web || [];
+  const low = web.filter((w) => w.levelLabel === "百科" || w.levelLabel === "自媒体");
+
+  check("权威来源优先占满名额", web.length === 6, String(web.length));
+  check("百科/自媒体最多 2 条", low.length <= 2, JSON.stringify(web.map((w) => w.levelLabel)));
+  check(
+    "前五条都是官方/学术/权威媒体",
+    web.slice(0, 5).every((w) => ["官方", "学术", "权威媒体"].includes(w.levelLabel)),
+    JSON.stringify(web.map((w) => w.levelLabel)),
+  );
+}
+
+{
+  // 权威来源不足 3 条时不砍低档，否则可能一条都不剩；
+  // 顺带验证「百科」与「自媒体」两档都能识别
+  installMock({
+    chat: [
+      () =>
+        chatReply({
+          local_answer: "",
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [],
+          note: null,
+        }),
+      () =>
+        chatReply({
+          local_answer: "据网络资料整理。",
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [0, 1, 2, 3],
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "百度百科", url: "https://baike.baidu.com/item/1", snippet: "s", rerank_score: 2, authority: 4 },
+          { title: "知乎回答", url: "https://www.zhihu.com/question/1", snippet: "s", rerank_score: 2, authority: 3 },
+          { title: "百家号", url: "https://baijiahao.baidu.com/s?id=1", snippet: "s", rerank_score: 2, authority: 2 },
+          { title: "小红书笔记", url: "https://www.xiaohongshu.com/x", snippet: "s", rerank_score: 2, authority: 1 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({ question: "某遗址民间传说", evidence: [] });
+  const body = await res.json();
+  const labels = (body.web || []).map((w) => w.levelLabel);
+
+  check("无权威来源时低档不被清空", labels.length === 4, JSON.stringify(labels));
+  check(
+    "百科与自媒体两档都识别",
+    labels.includes("百科") && labels.includes("自媒体"),
+    JSON.stringify(labels),
+  );
+}
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);

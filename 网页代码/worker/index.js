@@ -54,6 +54,9 @@ const CHAT_SYSTEM = `你是「寻迹AI导游」的资料助理，服务于「中
   （它在探源工程中的意义、对文明起源进程的实证作用）：
   优先从 evidence 的「核心表达 / 探源工程」综述或「价值意义 / 工程地位」类字段概括，写进 local_answer；
   本地没有时依据 web 写进 web_answer；两边都没有就不补，不得编造
+- 联网结果带 level 字段（官方 / 学术 / 权威媒体 / 其他 / 百科 / 自媒体）：
+  同等相关时优先采用官方、学术与权威媒体；只有在权威来源未覆盖时才引用百科或自媒体，
+  且不把它们作为唯一依据
 - 不得编造链接
 - 两段都要分点：每项单独一行、以「· 」开头；即使只有一条也用分点，保持格式统一
 - 每段分点控制在 6 条以内；同类内容合并成一条（多个景点、多个器物并列时用「、」连接），
@@ -307,7 +310,8 @@ async function handleChat(request, env) {
   // 本地证据已能完整回答时，提示词要求它不要引用 web。
   // 查询词优先用模型改写的 search_query——带代词的问题直接搜会跑偏。
   const searchQuery = String(first.search_query || "").trim() || question;
-  const found = await searchWeb(env, searchQuery);
+  // 遗址探源走来源分级：官方/学术/权威媒体优先，百科与自媒体降权并标注
+  const found = await searchWeb(env, searchQuery, { tiered: true });
 
   if (found.length > 0) {
     searchedWeb = true;
@@ -370,7 +374,14 @@ function buildUserPayload(question, evidence, web) {
   return JSON.stringify({
     question,
     evidence: evidence.map(({ index, site, field, text }) => ({ index, site, field, text })),
-    web: web.map(({ index, title, url, snippet }) => ({ index, title, url, snippet })),
+    // levelLabel 让模型知道来源档位，从而优先采信官方与学术来源
+    web: web.map(({ index, title, url, snippet, levelLabel }) => ({
+      index,
+      title,
+      url,
+      snippet,
+      level: levelLabel,
+    })),
   });
 }
 
@@ -389,7 +400,13 @@ function pickWeb(web, used) {
   return used
     .map((i) => web.find((w) => w.index === i))
     .filter(Boolean)
-    .map((w) => ({ title: w.title, url: w.url, snippet: w.snippet.slice(0, 160) }));
+    .map((w) => ({
+      title: w.title,
+      url: w.url,
+      snippet: w.snippet.slice(0, 160),
+      level: w.level || "other",
+      levelLabel: w.levelLabel || "其他",
+    }));
 }
 
 function normalizeConfidence(value, searchedWeb) {
@@ -862,7 +879,143 @@ function parseLooseJSON(text) {
   }
 }
 
-async function searchWeb(env, question) {
+// ─── 联网来源权威度分级（仅智能体 1：遗址探源） ───────────────────────────────
+//
+// 通用联网搜索不受控，同一条考古结论可能来自国家文物局，也可能来自自媒体。
+// 这里按域名把来源分成 6 档，排序时权威优先，百科与自媒体降权并标注。
+// 行程规划不经此分级：规划只需要「哪里能去」，来源权威度不影响可用性。
+
+const SOURCE_TIERS = {
+  official: { rank: 4, label: "官方" }, // 政府、社科院、求是、新华社
+  academic: { rank: 3, label: "学术" }, // 考古所、博物馆、高校
+  media: { rank: 2, label: "权威媒体" }, // 央视、学习强国、央广
+  other: { rank: 1, label: "其他" },
+  reference: { rank: 0, label: "百科" }, // 百科、问答：需标注
+  unofficial: { rank: -1, label: "自媒体" }, // 自媒体、UGC：需标注
+};
+
+// 顺序即优先级：先匹配到的规则胜出，所以子域名（baijiahao.baidu.com）
+// 必须排在父域（baidu.com）之前——这里没有父域通配规则，靠精确子域区分。
+const TRUST_RULES = [
+  {
+    tier: "official",
+    domains: ["gov.cn", "cssn.cn", "qstheory.cn", "news.cn", "xinhuanet.com", "people.com.cn"],
+  },
+  {
+    tier: "academic",
+    domains: [
+      "kaogu.cn",
+      "edu.cn",
+      "ac.cn",
+      "chnmuseum.cn",
+      "dpm.org.cn",
+      "sxhm.com",
+      "njmuseum.com",
+      "hnmuseum.com",
+      "zhejiangmuseum.com",
+      "lzmuseum.com",
+      "sxdmuseum.com",
+      "capitalmuseum.org.cn",
+      "shanximuseum.com",
+      "gansumuseum.com",
+      "sdmuseum.com",
+      "shanghaimuseum.net",
+      "hbww.org",
+    ],
+  },
+  {
+    tier: "media",
+    domains: [
+      "cctv.com",
+      "cctv.cn",
+      "xuexi.cn",
+      "cnr.cn",
+      "chinanews.com.cn",
+      "gmw.cn",
+      "ce.cn",
+      "thepaper.cn",
+      "jiemian.com",
+    ],
+  },
+  {
+    tier: "reference",
+    domains: [
+      "baike.baidu.com",
+      "baike.sogou.com",
+      "zhidao.baidu.com",
+      "zhihu.com",
+      "wikipedia.org",
+      "wikiwand.com",
+      "quora.com",
+    ],
+  },
+  {
+    tier: "unofficial",
+    domains: [
+      "baijiahao.baidu.com",
+      "mp.weixin.qq.com",
+      "toutiao.com",
+      "weibo.com",
+      "douban.com",
+      "xiaohongshu.com",
+      "bilibili.com",
+      "douyin.com",
+      "kuaishou.com",
+      "sohu.com",
+      "163.com",
+      "sina.com.cn",
+      "ifeng.com",
+      "qq.com",
+    ],
+  },
+];
+
+const MAX_WEB_RESULTS = 6;
+// 权威来源充足时，百科/自媒体最多占这么多条，其余名额留给权威来源
+const MAX_LOW_TIER = 2;
+
+function hostOf(url) {
+  try {
+    return new URL(url).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+/** 域名 → 档位。白名单按后缀匹配，未命中省份馆时用 museum/kaogu 关键词兜底 */
+function classifySource(url) {
+  const host = hostOf(url);
+  if (!host) return { tier: "other", ...SOURCE_TIERS.other };
+  for (const rule of TRUST_RULES) {
+    for (const domain of rule.domains) {
+      if (host === domain || host.endsWith("." + domain)) {
+        return { tier: rule.tier, ...SOURCE_TIERS[rule.tier] };
+      }
+    }
+  }
+  if (/museum|kaogu|bwg/.test(host)) return { tier: "academic", ...SOURCE_TIERS.academic };
+  return { tier: "other", ...SOURCE_TIERS.other };
+}
+
+/** 先按档位、再按检索接口给的 authority、最后按相关度排序 */
+function orderByTier(items) {
+  const sorted = [...items].sort(
+    (a, b) =>
+      b.levelRank - a.levelRank ||
+      Number(b.authority ?? 0) - Number(a.authority ?? 0) ||
+      Number(b.relevance ?? 0) - Number(a.relevance ?? 0),
+  );
+  const authoritative = sorted.filter((r) => r.levelRank >= SOURCE_TIERS.media.rank);
+  const lowTier = sorted.filter((r) => r.levelRank < SOURCE_TIERS.media.rank);
+  // 权威来源不足 3 条时不砍低档，否则可能一条都不剩
+  const picked =
+    authoritative.length >= 3
+      ? [...authoritative, ...lowTier.slice(0, MAX_LOW_TIER)]
+      : sorted;
+  return picked.slice(0, MAX_WEB_RESULTS);
+}
+
+async function searchWeb(env, question, { tiered = false } = {}) {
   let res;
   try {
     res = await fetchWithTimeout(`${DEEPSEEK_BASE}${SEARCH_PATH}`, {
@@ -896,13 +1049,24 @@ async function searchWeb(env, question) {
   const pool = strong.length >= 3 ? strong : list.filter((r) => Number(r.rerank_score ?? 0) >= 1.0);
 
   const seen = new Set();
-  return pool
-    .sort((a, b) => Number(b.authority ?? 0) - Number(a.authority ?? 0))
-    .map((r) => ({
-      title: cleanTitle(r.title),
-      url: String(r.url || ""),
-      snippet: String(r.snippet || r.summary || "").slice(0, 200),
-    }))
+  let items = pool
+    .map((r) => {
+      const url = String(r.url || "");
+      const item = {
+        title: cleanTitle(r.title),
+        url,
+        snippet: String(r.snippet || r.summary || "").slice(0, 200),
+        authority: Number(r.authority ?? 0),
+        relevance: Number(r.rerank_score ?? 0),
+      };
+      if (tiered) {
+        const level = classifySource(url);
+        item.level = level.tier;
+        item.levelLabel = level.label;
+        item.levelRank = level.rank;
+      }
+      return item;
+    })
     .filter((r) => {
       if (!r.url) return false;
       // 同一篇文章可能以带 #锚点 的不同 URL 重复返回，按标题+去锚点 URL 去重
@@ -910,9 +1074,20 @@ async function searchWeb(env, question) {
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-    })
-    .slice(0, 6)
-    .map((r, index) => ({ index, ...r }));
+    });
+
+  if (tiered) {
+    items = orderByTier(items);
+  } else {
+    items.sort((a, b) => b.authority - a.authority);
+  }
+
+  return items.slice(0, MAX_WEB_RESULTS).map((r, index) => {
+    const base = { index, title: r.title, url: r.url, snippet: r.snippet };
+    return tiered
+      ? { ...base, level: r.level, levelLabel: r.levelLabel }
+      : base;
+  });
 }
 
 /**

@@ -212,8 +212,13 @@ interface ChatMessage {
   origin?: "local" | "web" | "pending";
   /** 出处详情，渲染在气泡内，如 "来自本地资料库 · 遗址档案 · 良渚遗址" */
   citation?: string;
-  /** 结构化出处：本地条目与联网来源分开渲染 */
-  refs?: { kind: "local" | "web"; label: string; url?: string }[];
+  /** 结构化出处：本地条目与联网来源分开渲染；联网来源带权威度档位 */
+  refs?: {
+    kind: "local" | "web";
+    label: string;
+    url?: string;
+    level?: string;
+  }[];
   /** 分段答案：本地资料库一段、联网搜索一段，各自分点 */
   segments?: { kind: "local" | "web"; text: string }[];
 }
@@ -5536,7 +5541,12 @@ async function askRemote(
 ): Promise<{
   answer: string;
   citation: string;
-  refs: { kind: "local" | "web"; label: string; url?: string }[];
+  refs: {
+    kind: "local" | "web";
+    label: string;
+    url?: string;
+    level?: string;
+  }[];
   segments: { kind: "local" | "web"; text: string }[];
 }> {
   const controller = new AbortController();
@@ -5566,6 +5576,7 @@ async function askRemote(
         kind: "web" as const,
         label: String(r.title || r.url || ""),
         url: String(r.url || ""),
+        level: String(r.levelLabel || ""),
       })),
     ];
     const hasWeb = refs.some((r) => r.kind === "web");
@@ -5630,23 +5641,36 @@ function renderCitation(msg: ChatMessage) {
           <span aria-hidden="true">◆</span>
           <span>
             来自联网搜索：
-            {web.map((r, index) => (
-              <span key={index}>
-                {index > 0 ? "、" : ""}
-                {r.url ? (
-                  <a
-                    href={r.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline break-all"
-                  >
-                    {r.label}
-                  </a>
-                ) : (
-                  r.label
-                )}
+            {web.map((r, index) => {
+              const weak = r.level === "百科" || r.level === "自媒体";
+              return (
+                <span key={index}>
+                  {index > 0 ? "、" : ""}
+                  {r.level && (
+                    <span className={weak ? "opacity-60" : "opacity-80"}>
+                      [{r.level}]
+                    </span>
+                  )}
+                  {r.url ? (
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline break-all"
+                    >
+                      {r.label}
+                    </a>
+                  ) : (
+                    r.label
+                  )}
+                </span>
+              );
+            })}
+            {web.some((r) => r.level === "百科" || r.level === "自媒体") && (
+              <span className="opacity-60">
+                （百科与自媒体来源请交叉核实）
               </span>
-            ))}
+            )}
           </span>
         </div>
       )}
