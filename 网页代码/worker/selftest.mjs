@@ -1054,6 +1054,77 @@ console.log("\n[15] 联网来源分级：官方/学术优先，百科与自媒�
   );
 }
 
+// ─── 16. 遗址串台防护：问陶寺却答二里头 ──────────────────────────────────────
+
+console.log("\n[16] 遗址串台防护：搜索词补遗址名、跨遗址结果被剔除");
+
+{
+  const calls = installMock({
+    chat: [
+      () =>
+        chatReply({
+          local_answer: "",
+          // 模拟模型把搜索词改写成了另一个遗址
+          search_query: "二里头遗址出土文物",
+          confidence: "low",
+          usedLocal: [],
+          usedWeb: [],
+          note: null,
+        }),
+      () =>
+        chatReply({
+          local_answer: "陶寺遗址出土彩绘蟠龙纹陶盘、鼍鼓、特磬。",
+          confidence: "medium",
+          usedLocal: [0],
+          usedWeb: [0, 1],
+          note: null,
+        }),
+    ],
+    search: [
+      () =>
+        searchReply([
+          { title: "二里头遗址的科学发掘", url: "https://www.cssn.cn/a", snippet: "二里头宫城与铸铜作坊", rerank_score: 2.2, authority: 4 },
+          { title: "陶寺遗址出土文物", url: "https://www.gov.cn/b", snippet: "陶寺彩绘蟠龙纹陶盘与鼍鼓", rerank_score: 2, authority: 3 },
+          { title: "中国早期国家的礼乐制度", url: "https://www.kaogu.cn/c", snippet: "泛论礼乐起源", rerank_score: 1.9, authority: 3 },
+        ]),
+    ],
+  });
+
+  const res = await postChat({
+    question: "陶寺遗址出土了哪些重要文物？",
+    evidence: [
+      {
+        site: "陶寺遗址",
+        field: "遗址档案 · 重要发现",
+        text: "陶寺遗址出土彩绘蟠龙纹陶盘、鼍鼓、特磬等礼乐器。",
+      },
+    ],
+  });
+  const body = await res.json();
+
+  const searchCall = calls.find((c) => c.url.includes("/tools/search"));
+  check(
+    "搜索词被兜底补上所问遗址",
+    /陶寺/.test(searchCall?.body?.query || ""),
+    searchCall?.body?.query,
+  );
+  check(
+    "指向其他遗址的联网结果被剔除",
+    !(body.web || []).some((w) => /二里头/.test(w.title + w.url)),
+    JSON.stringify((body.web || []).map((w) => w.title)),
+  );
+  check(
+    "所问遗址与泛论文章保留",
+    (body.web || []).length === 2,
+    JSON.stringify((body.web || []).map((w) => w.title)),
+  );
+  check(
+    "诊断字段带最终搜索词",
+    /陶寺/.test(body.meta?.searchQuery || ""),
+    body.meta?.searchQuery,
+  );
+}
+
 // ─── 汇总 ─────────────────────────────────────────────────────────────────────
 
 console.log(`\n通过 ${pass}，失败 ${fail}`);

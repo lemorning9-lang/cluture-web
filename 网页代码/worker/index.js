@@ -41,6 +41,8 @@ const CHAT_SYSTEM = `你是「寻迹AI导游」的资料助理，服务于「中
 回答必须分成两段，每段只用各自的来源：
 - local_answer：只依据 evidence 作答
 - web_answer：只依据 web 作答（web 为空时留空字符串）
+- 全篇围绕用户所问的遗址：不得把其他遗址的考古发现、器物或数据写到该遗址名下；
+  材料里出现别的遗址时不要混入
 
 判断与落段规则（必须遵守）：
 - 先判断 evidence 是否直接回答了本轮问题的核心
@@ -316,9 +318,15 @@ async function handleChat(request, env) {
   // 而一次搜索成本极低（¥5/1000 次）。是否采用联网内容交给第二遍的模型决定：
   // 本地证据已能完整回答时，提示词要求它不要引用 web。
   // 查询词优先用模型改写的 search_query——带代词的问题直接搜会跑偏。
-  const searchQuery = String(first.search_query || "").trim() || question;
+  // 但改写本身也可能跑偏（实测把陶寺改成了二里头），所以再用问题里点名的
+  // 遗址做一次确定性兜底：查询词里没有该遗址名就补上。
+  const askedGroups = mentionedSiteGroups(question);
+  const searchQuery = ensureSiteInQuery(
+    String(first.search_query || "").trim() || question,
+    askedGroups,
+  );
   // 遗址探源走来源分级：官方/学术/权威媒体优先，百科与自媒体降权并标注
-  const found = await searchWeb(env, searchQuery, { tiered: true });
+  const found = await searchWeb(env, searchQuery, { tiered: true, asked: askedGroups });
 
   if (found.length > 0) {
     searchedWeb = true;
@@ -345,7 +353,7 @@ async function handleChat(request, env) {
       web: pickWeb(webItems, result.usedWeb),
       confidence: normalizeConfidence(result.confidence, searchedWeb),
       note: result.note || null,
-      meta: { searchedWeb, model: CHAT_MODEL, quota },
+      meta: { searchedWeb, model: CHAT_MODEL, quota, searchQuery },
     },
     200,
     request.headers.get("Origin") || "",
@@ -979,6 +987,87 @@ const TRUST_RULES = [
 
 const MAX_WEB_RESULTS = 6;
 
+// ─── 遗址名识别（防「问 A 答成 B」） ────────────────────────────────────────
+// 实测出现过：问「陶寺遗址出土了哪些文物」，搜索返回的全是二里头结果，
+// 模型随后把二里头的内容写进了本地段与联网段。这里用确定性的名称比对
+// 修两处：搜索词兜底补上遗址名、联网结果剔除其他遗址的条目。
+
+const SITE_GROUPS = [
+  ["铸鼎原遗址群", "铸鼎原"],
+  ["城头山遗址", "城头山"],
+  ["东山村遗址", "东山村"],
+  ["双槐树遗址", "双槐树"],
+  ["大地湾遗址", "大地湾"],
+  ["南佐遗址"],
+  ["大汶口文化遗址", "大汶口"],
+  ["焦家遗址"],
+  ["岗上遗址"],
+  ["牛河梁遗址", "牛河梁"],
+  ["鸡叫城遗址", "鸡叫城"],
+  ["城河遗址"],
+  ["黄山遗址"],
+  ["凌家滩遗址", "凌家滩"],
+  ["赵陵山遗址", "赵陵山"],
+  ["草鞋山遗址", "草鞋山"],
+  ["良渚遗址", "良渚"],
+  ["石家河遗址", "石家河"],
+  ["宝墩遗址"],
+  ["城子崖遗址", "城子崖"],
+  ["陶寺遗址", "陶寺"],
+  ["石峁遗址", "石峁"],
+  ["碧村遗址"],
+  ["柳湾遗址"],
+  ["二里头遗址", "二里头"],
+  ["郑州商城遗址", "郑州商城"],
+  ["殷墟遗址", "殷墟"],
+  ["三星堆遗址", "三星堆"],
+  ["新干遗址群"],
+];
+
+const SITE_TERM_INDEX = new Map();
+SITE_GROUPS.forEach((terms, group) => {
+  terms.forEach((term) => SITE_TERM_INDEX.set(term, group));
+});
+
+/** 文本中出现的遗址（按组去重，返回组号集合） */
+function mentionedSiteGroups(text) {
+  const s = String(text || "");
+  const groups = new Set();
+  for (const [term, group] of SITE_TERM_INDEX) {
+    if (s.includes(term)) groups.add(group);
+  }
+  return groups;
+}
+
+/** 遗址组 → 用于检索的规范名（组内第一个词就是全名） */
+function siteGroupName(group) {
+  return SITE_GROUPS[group][0];
+}
+
+/**
+ * 搜索词兜底：模型改写出的 search_query 若没提到用户问的遗址，
+ * 直接补上规范名，避免搜索跑偏到别的遗址。
+ */
+function ensureSiteInQuery(query, askedGroups) {
+  if (askedGroups.size === 0) return query;
+  const inQuery = mentionedSiteGroups(query);
+  for (const g of askedGroups) {
+    if (inQuery.has(g)) return query;
+  }
+  return `${siteGroupName([...askedGroups][0])} ${query}`.trim();
+}
+
+/** 联网结果过滤：明确指向其他遗址、且没提到所问遗址的条目直接剔除 */
+function filterWebBySite(items, askedGroups) {
+  if (askedGroups.size === 0) return items;
+  return items.filter((item) => {
+    const groups = mentionedSiteGroups(`${item.title} ${item.snippet}`);
+    if (groups.size === 0) return true; // 泛论文章（不点名任何遗址）保留
+    for (const g of groups) if (askedGroups.has(g)) return true;
+    return false;
+  });
+}
+
 function hostOf(url) {
   try {
     return new URL(url).hostname.toLowerCase();
@@ -1017,7 +1106,7 @@ function orderByTier(items) {
   return picked.slice(0, MAX_WEB_RESULTS);
 }
 
-async function searchWeb(env, question, { tiered = false } = {}) {
+async function searchWeb(env, question, { tiered = false, asked = new Set() } = {}) {
   let res;
   try {
     res = await fetchWithTimeout(`${DEEPSEEK_BASE}${SEARCH_PATH}`, {
@@ -1079,7 +1168,7 @@ async function searchWeb(env, question, { tiered = false } = {}) {
     });
 
   if (tiered) {
-    items = orderByTier(items);
+    items = orderByTier(filterWebBySite(items, asked));
   } else {
     items.sort((a, b) => b.authority - a.authority);
   }
