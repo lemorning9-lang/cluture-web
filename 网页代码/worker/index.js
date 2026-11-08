@@ -142,19 +142,26 @@ const NEARBY_SYSTEM = `你是资料摘录员。从给定的搜索结果里挑出
  * 注意：真正兜住费用上限的是 DeepSeek / 高德后台的月度额度设置；
  * 这里的额度是防止额度被一次性打光，以及拦住单个用户的刷屏行为。
  */
+/**
+ * 额度按「Provider 后台月度预算」折算，留一成余量：
+ *   DeepSeek ¥15/月：一次问答约 ¥0.01（含 1 次搜索 + 2 次对话），
+ *                    1000 次 ≈ ¥10；一次行程约 ¥0.02，250 次 ≈ ¥5
+ *   AMap     ¥50/月：一次行程约 10 次接口调用，250 次远低于免费额度
+ * 真正的硬上限仍在 DeepSeek / 高德后台，这里只防止单个用户把额度一次打光。
+ */
 const LIMITS = {
   chat: {
     perIp: 10, // 每分钟
     windowSeconds: 60,
     daily: 60,
-    monthly: 800,
+    monthly: 1000,
     windowHint: "提问太频繁了，请等一分钟后再试。",
   },
   plan: {
     perIp: 3, // 每 10 分钟
     windowSeconds: 600,
     daily: 15,
-    monthly: 200,
+    monthly: 250,
     windowHint: "行程规划比较费资源，请 10 分钟后再试。",
   },
 };
