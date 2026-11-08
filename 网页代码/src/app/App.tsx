@@ -4145,7 +4145,7 @@ function ModuleCulturalTreasures({
   );
 }
 
-// ─── Module 3: 探源社区 ───────────────────────────────────────────────────────
+// ─── Module 3: 四海共鉴 ───────────────────────────────────────────────────────
 
 function ModuleCommunity() {
   const [likedPosts, setLikedPosts] = useState<Set<number>>(
@@ -4178,12 +4178,12 @@ function ModuleCommunity() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="relative z-10 px-8 pb-8 max-w-7xl mx-auto w-full">
-          <SectionLabel en="EXPLORER COMMUNITY" />
+          <SectionLabel en="SHARED HERITAGE" />
           <h1
             className="gilt-text text-5xl tracking-wider"
             style={{ fontFamily: FD }}
           >
-            探源社区
+            四海共鉴
           </h1>
         </div>
       </div>
@@ -6222,7 +6222,7 @@ export default function App() {
   const tabs: { key: Tab; label: string; sub: string }[] = [
     { key: "探源", label: "时空探源", sub: "TIME ORIGIN" },
     { key: "遗珍", label: "文化遗珍", sub: "TREASURES" },
-    { key: "社区", label: "探源社区", sub: "COMMUNITY" },
+    { key: "社区", label: "四海共鉴", sub: "COMMUNITY" },
     { key: "个人", label: "个人中心", sub: "PROFILE" },
   ];
 
@@ -6378,7 +6378,7 @@ export default function App() {
                 {[
                   "时空探源地图",
                   "文化活动体验",
-                  "探源社区广场",
+                  "四海共鉴广场",
                   "个人打卡足迹",
                   "AI智能导游",
                 ].map((link) => (
